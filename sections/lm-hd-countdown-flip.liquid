@@ -216,7 +216,7 @@
 
   @media screen and (max-width: 749px) {
     #lm-cdf-{{ uid }} { padding-left: 16px; padding-right: 40px; }
-    .lm-cdf__inner-{{ uid }} { gap: 10px 20px; }
+    .lm-cdf__inner-{{ uid }} { gap: 10px 20px; flex-direction: column; }
     .lm-cdf__timer-{{ uid }} { gap: 9px; }
     .lm-cdf__label-{{ uid }} { font-size: {{ section.settings.label_size | times: 0.85 | round: 0 }}px; }
     .lm-cdf__cell-{{ uid }} { width: {{ dw_m }}px; height: {{ dh_m }}px; }
