@@ -1,0 +1,162 @@
+{%- comment -%}
+  Luxe Magics — Bulk order calendar range.
+  Each card's button picks that calendar in the enquiry form (script lives in lm-bulk-enquiry).
+{%- endcomment -%}
+
+{{ 'section-lm-bulk-order.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div
+  id="{{ section.settings.anchor | default: 'calendars' | handleize }}"
+  class="lmb color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_borders %} lmb__border-y{% endif %}"
+>
+  <div class="page-width section-{{ section.id }}-padding">
+    <div class="lmb__section-head">
+      <h2>{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p>{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="lmb-range__grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign title = block.settings.title
+        -%}
+        <div class="lmb-range__card" {{ block.shopify_attributes }}>
+          <div class="lmb-range__media">
+            {%- if block.settings.image != blank -%}
+              {{
+                block.settings.image
+                | image_url: width: 800
+                | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 25vw, (min-width: 750px) 50vw, 100vw', widths: '300, 500, 800'
+              }}
+            {%- else -%}
+              {%- render 'lm-bulk-illustration', type: block.settings.illustration, label: title, year: section.settings.year -%}
+            {%- endif -%}
+          </div>
+
+          <div class="lmb-range__body">
+            <h3>{{ title | escape }}</h3>
+            {%- if block.settings.tagline != blank -%}
+              <p class="lmb__muted">{{ block.settings.tagline | escape }}</p>
+            {%- endif -%}
+            {%- if block.settings.points != blank -%}
+              {%- assign points = block.settings.points | newline_to_br | split: '<br />' -%}
+              <ul>
+                {%- for point in points -%}
+                  {%- assign point = point | strip -%}
+                  {%- if point != blank -%}
+                    <li>{{ point | escape }}</li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+            {%- if block.settings.best_for != blank -%}
+              <div class="lmb-range__best"><b>Best for:</b> {{ block.settings.best_for | escape }}</div>
+            {%- endif -%}
+
+            <button
+              type="button"
+              class="lmb-btn lmb-range__pick"
+              aria-pressed="false"
+              data-bulk-pick="{{ title | escape }}"
+              data-label="{{ section.settings.button_label | escape }}"
+              data-selected-label="{{ section.settings.selected_label | escape }}"
+            >
+              {{- section.settings.button_label | escape -}}
+            </button>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Bulk order – Range",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The 2027 range" },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Pick the format that fits who you are gifting. Choose one and it carries straight into your enquiry below."
+    },
+    { "type": "text", "id": "year", "label": "Year shown in illustrations", "default": "2027" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Select for enquiry" },
+    { "type": "text", "id": "selected_label", "label": "Button label when selected", "default": "Selected for enquiry" },
+    { "type": "text", "id": "anchor", "label": "Anchor ID", "default": "calendars", "info": "Link to this section with #calendars" },
+    { "type": "header", "content": "Colors and spacing" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-1" },
+    { "type": "checkbox", "id": "show_borders", "label": "Show top and bottom border", "default": true },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "t:sections.all.padding.padding_top", "default": 72 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "t:sections.all.padding.padding_bottom", "default": 80 }
+  ],
+  "blocks": [
+    {
+      "type": "calendar",
+      "name": "Calendar",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Name", "info": "Must match a line in the enquiry form's Calendar types so the button can pick it.", "default": "Desk Calendar" },
+        { "type": "text", "id": "tagline", "label": "Tagline", "default": "Stays on the desk all year." },
+        {
+          "type": "textarea",
+          "id": "points",
+          "label": "Key points",
+          "info": "One point per line.",
+          "default": "Tent-style stand-up format\nYour logo and brand colours on the cover\nMonthly pages with room for notes"
+        },
+        { "type": "text", "id": "best_for", "label": "Best for", "default": "Corporate gifting and client desks" },
+        {
+          "type": "select",
+          "id": "illustration",
+          "label": "Illustration",
+          "options": [
+            { "value": "desk", "label": "Desk calendar" },
+            { "value": "wall", "label": "Wall calendar" },
+            { "value": "fridge", "label": "Fridge calendar" },
+            { "value": "photo", "label": "Photo calendar" }
+          ],
+          "default": "desk"
+        },
+        { "type": "image_picker", "id": "image", "label": "Custom image", "info": "Overrides the illustration." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bulk order – Range",
+      "blocks": [
+        { "type": "calendar" },
+        {
+          "type": "calendar",
+          "settings": {
+            "title": "Wall Calendar",
+            "tagline": "One big page for every month.",
+            "points": "Large photo or artwork panel each month\nYour festivals and company dates marked in\nReady to hang",
+            "best_for": "Offices, reception areas and shops",
+            "illustration": "wall"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

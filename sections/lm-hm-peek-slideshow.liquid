@@ -1,0 +1,817 @@
+{%- comment -%}
+  Luxe Magics — Home: Peek Slideshow (v2)
+  Filename: sections/lm-hm-peek-slideshow.liquid
+  Center-focused carousel with side peek: rounded slides, seamless infinite
+  loop, autoplay, dots, arrows, touch swipe. Entire slide clickable to its link.
+  Separate desktop + mobile images per slide; height adapts to image size
+  (or fixed height mode). Fully customizable via theme editor.
+{%- endcomment -%}
+
+{%- liquid
+  assign uid = section.id
+  assign adapt = false
+  if section.settings.height_mode == 'adapt'
+    assign adapt = true
+  endif
+-%}
+
+{%- style -%}
+
+  #lm-pks-{{ uid }} {
+    width: 100%;
+    background: {{ section.settings.section_bg }};
+    padding: {{ section.settings.padding_block }}px 0;
+    overflow: hidden;
+  }
+
+  .lm-pks__track-{{ uid }} {
+    display: flex;
+    align-items: center;
+    gap: {{ section.settings.slide_gap }}px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-left: calc((100% - {{ section.settings.slide_width }}%) / 2);
+    padding-right: calc((100% - {{ section.settings.slide_width }}%) / 2);
+    -webkit-overflow-scrolling: touch;
+  }
+  .lm-pks__track-{{ uid }}::-webkit-scrollbar { display: none; }
+
+  .lm-pks__slide-{{ uid }} {
+    position: relative;
+    flex: 0 0 {{ section.settings.slide_width }}%;
+    scroll-snap-align: center;
+    {% if adapt %}
+    height: auto;
+    aspect-ratio: var(--lm-ratio-d, 16 / 9);
+    {% else %}
+    height: {{ section.settings.height_desktop }}px;
+    {% endif %}
+    border-radius: {{ section.settings.radius }}px;
+    overflow: hidden;
+    display: block;
+    text-decoration: none;
+  }
+
+  .lm-pks__slide-{{ uid }} img,
+  .lm-pks__slide-{{ uid }} picture {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .lm-pks__slide-{{ uid }} img { object-fit: cover; }
+
+  /* side slides dimmed so the center one stands out */
+  .lm-pks__slide-{{ uid }} {
+    opacity: {{ section.settings.side_opacity | divided_by: 100.0 }};
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lm-pks__slide-{{ uid }}.lm-zoom {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lm-pks__slide-{{ uid }} { transition: none; opacity: 1; }
+  }
+
+  {% if section.settings.zoom_effect %}
+  /* state-based zoom: inactive slides rest slightly zoomed-in; the active one
+     eases to 100% on a long expo curve — continuous motion, nothing snaps */
+  .lm-pks__slide-{{ uid }} img {
+    transform: scale(1.07);
+    transition: transform 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+  .lm-pks__slide-{{ uid }}.lm-zoom img {
+    transform: scale(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lm-pks__slide-{{ uid }} img { transform: scale(1); transition: none; }
+  }
+  {% endif %}
+
+  .lm-pks__content-{{ uid }} {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6%;
+    gap: 10px;
+    z-index: 1;
+  }
+  .lm-pks__content-{{ uid }}.lm-pos-left   { align-items: flex-start; text-align: left; }
+  .lm-pks__content-{{ uid }}.lm-pos-center { align-items: center; text-align: center; }
+  .lm-pks__content-{{ uid }}.lm-pos-right  { align-items: flex-end; text-align: right; }
+
+  .lm-pks__subheading-{{ uid }} {
+    margin: 0;
+    font-size: clamp(13px, 1.3vw, 17px);
+    font-weight: 500;
+  }
+  .lm-pks__heading-{{ uid }} {
+    margin: 0;
+    font-size: clamp(26px, 3.6vw, 52px);
+    font-weight: 500;
+    line-height: 1.15;
+    max-width: 14em;
+  }
+  .lm-pks__btn-{{ uid }} {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 13px 30px;
+    border-radius: 999px;
+    background: {{ section.settings.button_bg }};
+    color: {{ section.settings.button_text_color }};
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* Arrows */
+  .lm-pks__arrow-{{ uid }} {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: {{ section.settings.arrow_bg }};
+    color: {{ section.settings.arrow_color }};
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+  }
+  .lm-pks__arrow-{{ uid }}:hover { opacity: 1; }
+  .lm-pks__arrow-{{ uid }} svg { width: 18px; height: 18px; }
+  .lm-pks__arrow--prev-{{ uid }} { left: 18px; }
+  .lm-pks__arrow--next-{{ uid }} { right: 18px; }
+
+  .lm-pks__wrap-{{ uid }} { position: relative; }
+
+  /* Dots */
+  .lm-pks__dots-{{ uid }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .lm-pks__dot-{{ uid }} {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    border: none;
+    padding: 0;
+    background: {{ section.settings.dot_color }};
+    opacity: 0.45;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .lm-pks__dot-{{ uid }}.lm-active {
+    width: 34px;
+    opacity: 1;
+  }
+  .lm-pks__dotfill-{{ uid }} {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: {{ section.settings.dot_active_color }};
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  {% if section.settings.autoplay %}
+  .lm-pks__dot-{{ uid }}.lm-active .lm-pks__dotfill-{{ uid }}.lm-run {
+    animation: lmDotFill-{{ uid }} var(--lm-speed, 5s) linear forwards;
+  }
+  @keyframes lmDotFill-{{ uid }} {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+  .lm-pks__dots-{{ uid }}.lm-paused .lm-pks__dotfill-{{ uid }} {
+    animation-play-state: paused;
+  }
+  {% else %}
+  .lm-pks__dot-{{ uid }}.lm-active .lm-pks__dotfill-{{ uid }} {
+    transform: scaleX(1);
+  }
+  {% endif %}
+
+  @media screen and (max-width: 749px) {
+    .lm-pks__slide-{{ uid }} {
+      flex-basis: {{ section.settings.slide_width_mobile }}%;
+      {% if adapt %}
+      aspect-ratio: var(--lm-ratio-m, var(--lm-ratio-d, 4 / 5));
+      {% else %}
+      height: {{ section.settings.height_mobile }}px;
+      {% endif %}
+      border-radius: {{ section.settings.radius | times: 0.75 | round: 0 }}px;
+    }
+    .lm-pks__track-{{ uid }} {
+      padding-left: calc((100% - {{ section.settings.slide_width_mobile }}%) / 2);
+      padding-right: calc((100% - {{ section.settings.slide_width_mobile }}%) / 2);
+      gap: {{ section.settings.slide_gap | times: 0.6 | round: 0 }}px;
+    }
+    .lm-pks__arrow-{{ uid }} { display: none; }
+    .lm-pks__content-{{ uid }} { padding: 8%; }
+  }
+
+{%- endstyle -%}
+
+<div id="lm-pks-{{ uid }}" {{ section.shopify_attributes }}>
+  <div class="lm-pks__wrap-{{ uid }}">
+
+    <div class="lm-pks__track-{{ uid }}" data-lm-track>
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign tag = 'div'
+          if block.settings.link != blank
+            assign tag = 'a'
+          endif
+          assign ratio_d = 1.7778
+          if block.settings.image != blank
+            assign ratio_d = block.settings.image.aspect_ratio
+          endif
+          assign ratio_m = ratio_d
+          if block.settings.image_mobile != blank
+            assign ratio_m = block.settings.image_mobile.aspect_ratio
+          endif
+        -%}
+        <{{ tag }}
+          class="lm-pks__slide-{{ uid }}"
+          style="--lm-ratio-d: {{ ratio_d }}; --lm-ratio-m: {{ ratio_m }};"
+          {% if block.settings.link != blank %}href="{{ block.settings.link }}" aria-label="{{ block.settings.heading | default: 'Slide' | escape }}"{% endif %}
+          {% if block.settings.link != blank %}data-link-desktop="{{ block.settings.link }}"{% endif %}
+          {% if block.settings.link_mobile != blank %}data-link-mobile="{{ block.settings.link_mobile }}"{% endif %}
+          data-lm-slide
+          {{ block.shopify_attributes }}
+        >
+          {%- if block.settings.image != blank -%}
+            <picture>
+              {%- if block.settings.image_mobile != blank -%}
+                <source
+                  media="(max-width: 749px)"
+                  srcset="{{ block.settings.image_mobile | image_url: width: 500 }} 500w, {{ block.settings.image_mobile | image_url: width: 800 }} 800w, {{ block.settings.image_mobile | image_url: width: 1100 }} 1100w"
+                  sizes="{{ section.settings.slide_width_mobile }}vw"
+                >
+              {%- endif -%}
+              <img
+                src="{{ block.settings.image | image_url: width: 1800 }}"
+                srcset="{{ block.settings.image | image_url: width: 800 }} 800w, {{ block.settings.image | image_url: width: 1200 }} 1200w, {{ block.settings.image | image_url: width: 1800 }} 1800w"
+                sizes="{{ section.settings.slide_width }}vw"
+                alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}"
+                {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy"{% endif %}
+                width="{{ block.settings.image.width }}"
+                height="{{ block.settings.image.height }}"
+              >
+            </picture>
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'lm-pks__placeholder' }}
+          {%- endif -%}
+
+          {%- if block.settings.heading != blank or block.settings.subheading != blank or block.settings.button_text != blank -%}
+            <div class="lm-pks__content-{{ uid }} lm-pos-{{ block.settings.content_position }}" style="color: {{ block.settings.text_color }};">
+              {%- if block.settings.subheading != blank -%}
+                <p class="lm-pks__subheading-{{ uid }}">{{ block.settings.subheading }}</p>
+              {%- endif -%}
+              {%- if block.settings.heading != blank -%}
+                <h2 class="lm-pks__heading-{{ uid }}">{{ block.settings.heading }}</h2>
+              {%- endif -%}
+              {%- if block.settings.button_text != blank -%}
+                <span class="lm-pks__btn-{{ uid }}">{{ block.settings.button_text }}</span>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </{{ tag }}>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.show_arrows and section.blocks.size > 1 -%}
+      <button type="button" class="lm-pks__arrow-{{ uid }} lm-pks__arrow--prev-{{ uid }}" data-lm-prev aria-label="Previous slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <button type="button" class="lm-pks__arrow-{{ uid }} lm-pks__arrow--next-{{ uid }}" data-lm-next aria-label="Next slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    {%- endif -%}
+
+  </div>
+
+  {%- if section.settings.show_dots and section.blocks.size > 1 -%}
+    <div class="lm-pks__dots-{{ uid }}" data-lm-dots role="tablist" aria-label="Slides" style="--lm-speed: {{ section.settings.autoplay_speed | default: 5 }}s;">
+      {%- for block in section.blocks -%}
+        <button type="button" class="lm-pks__dot-{{ uid }}{% if forloop.first %} lm-active{% endif %}" data-lm-dot="{{ forloop.index0 }}" aria-label="Go to slide {{ forloop.index }}"><span class="lm-pks__dotfill-{{ uid }}"></span></button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</div>
+
+<script>
+(function() {
+  var root = document.getElementById('lm-pks-{{ uid }}');
+  if (!root) return;
+
+  var track = root.querySelector('[data-lm-track]');
+  var realSlides = Array.prototype.slice.call(root.querySelectorAll('[data-lm-slide]'));
+  var dots = Array.prototype.slice.call(root.querySelectorAll('[data-lm-dot]'));
+  var prevBtn = root.querySelector('[data-lm-prev]');
+  var nextBtn = root.querySelector('[data-lm-next]');
+  if (!track || realSlides.length === 0) return;
+
+  var n = realSlides.length;
+  var designMode = !!(window.Shopify && Shopify.designMode);
+  var loop = n > 1;
+
+  var autoplay = {{ section.settings.autoplay | json }};
+  var autoplaySpeed = {{ section.settings.autoplay_speed | default: 5 }} * 1000;
+  var pauseOnHover = {{ section.settings.pause_on_hover | json }};
+
+  /* ---------- Seamless loop: clone full set before + after ---------- */
+  var slides = realSlides;
+  var offset = 0;
+  if (loop) {
+    var before = document.createDocumentFragment();
+    var after = document.createDocumentFragment();
+    realSlides.forEach(function(s) {
+      var c1 = s.cloneNode(true);
+      var c2 = s.cloneNode(true);
+      [c1, c2].forEach(function(c) {
+        c.setAttribute('data-lm-clone', '');
+        c.setAttribute('aria-hidden', 'true');
+        c.setAttribute('tabindex', '-1');
+        /* strip theme-editor bindings so the editor only sees the real blocks */
+        c.removeAttribute('data-shopify-editor-block');
+        var bound = c.querySelectorAll('[data-shopify-editor-block]');
+        for (var i = 0; i < bound.length; i++) bound[i].removeAttribute('data-shopify-editor-block');
+      });
+      before.appendChild(c1);
+      after.appendChild(c2);
+    });
+    track.insertBefore(before, track.firstChild);
+    track.appendChild(after);
+    slides = Array.prototype.slice.call(track.querySelectorAll('[data-lm-slide]'));
+    offset = n; /* real set sits in the middle */
+  }
+
+  var current = offset;
+  var timer = null;
+  var teleporting = false;
+
+  function slideCenter(i) {
+    var s = slides[i];
+    return s.offsetLeft + s.offsetWidth / 2 - track.clientWidth / 2;
+  }
+
+  function goTo(i, smooth) {
+    /* always wrap into range so autoplay can never run off the end and freeze */
+    current = ((i % slides.length) + slides.length) % slides.length;
+    track.scrollTo({ left: slideCenter(current), behavior: smooth === false ? 'auto' : 'smooth' });
+  }
+
+  function nearestIndex() {
+    var mid = track.scrollLeft + track.clientWidth / 2;
+    var best = 0, bestDist = Infinity;
+    slides.forEach(function(s, i) {
+      var c = s.offsetLeft + s.offsetWidth / 2;
+      var d = Math.abs(c - mid);
+      if (d < bestDist) { bestDist = d; best = i; }
+    });
+    return best;
+  }
+
+  var lastReal = -1;
+  var dotsWrap = root.querySelector('[data-lm-dots]');
+
+  function restartFill(dot) {
+    if (!dot) return;
+    var fill = dot.querySelector('.lm-pks__dotfill-{{ uid }}');
+    if (!fill) return;
+    fill.classList.remove('lm-run');
+    void fill.offsetWidth; /* reflow to retrigger the animation */
+    fill.classList.add('lm-run');
+  }
+
+  /* map every slide (clones included) to its real index, so the active zoom
+     state matches across clone/real pairs — the loop teleport swaps between
+     two visually identical elements */
+  var realIndexOf = slides.map(function(s, i) {
+    return loop ? ((i - offset) % n + n) % n : i;
+  });
+
+  function applyZoom(real) {
+    slides.forEach(function(s, i) {
+      s.classList.toggle('lm-zoom', realIndexOf[i] === real);
+    });
+  }
+
+  function updateDots() {
+    current = nearestIndex();
+    var real = loop ? ((current - offset) % n + n) % n : current;
+    dots.forEach(function(d, i) {
+      d.classList.toggle('lm-active', i === real);
+    });
+    if (real !== lastReal) {
+      lastReal = real;
+      restartFill(dots[real]);
+      scheduleNext(); /* keep the advance in step with the fill */
+      applyZoom(real);
+    }
+  }
+
+  /* teleport from clone zone back to the real middle set — invisible jump */
+  function normalize() {
+    if (!loop || teleporting) return;
+    var i = nearestIndex();
+    if (i < offset) {
+      teleporting = true;
+      goTo(i + n, false);
+      teleporting = false;
+    } else if (i >= offset + n) {
+      teleporting = true;
+      goTo(i - n, false);
+      teleporting = false;
+    }
+  }
+
+  var scrollDebounce;
+  track.addEventListener('scroll', function() {
+    clearTimeout(scrollDebounce);
+    updateDots();
+    scrollDebounce = setTimeout(normalize, 120);
+  }, { passive: true });
+
+  if (prevBtn) prevBtn.addEventListener('click', function() { normalize(); goTo(current - 1); restartAutoplay(); });
+  if (nextBtn) nextBtn.addEventListener('click', function() { normalize(); goTo(current + 1); restartAutoplay(); });
+
+  dots.forEach(function(d) {
+    d.addEventListener('click', function() {
+      var target = parseInt(d.getAttribute('data-lm-dot'), 10) + offset;
+      goTo(target);
+      restartAutoplay();
+    });
+  });
+
+  /* timeout-based scheduler: each slide change re-arms the next advance,
+     keeping the dot fill and the actual slide change perfectly in step */
+  var paused = false;
+  function scheduleNext() {
+    stopAutoplay();
+    if (!autoplay || n < 2 || paused) return;
+    timer = setTimeout(function() { normalize(); goTo(current + 1); }, autoplaySpeed);
+  }
+  function stopAutoplay() { if (timer) { clearTimeout(timer); timer = null; } }
+  function restartAutoplay() { scheduleNext(); }
+
+  function pausePlay() {
+    paused = true;
+    stopAutoplay();
+    if (dotsWrap) dotsWrap.classList.add('lm-paused');
+  }
+  function resumePlay() {
+    if (!paused) return;
+    paused = false;
+    if (dotsWrap) dotsWrap.classList.remove('lm-paused');
+    restartFill(dots[lastReal > -1 ? lastReal : 0]);
+    scheduleNext();
+  }
+
+  if (pauseOnHover) {
+    root.addEventListener('mouseenter', pausePlay);
+    root.addEventListener('mouseleave', resumePlay);
+  }
+  track.addEventListener('touchstart', pausePlay, { passive: true });
+  track.addEventListener('touchend', function() { setTimeout(resumePlay, 2000); }, { passive: true });
+  document.addEventListener('visibilitychange', function() {
+    document.hidden ? pausePlay() : resumePlay();
+  });
+
+  /* per-device links: swap href on mobile if a mobile link is set */
+  var mq = window.matchMedia('(max-width: 749px)');
+  function applyLinks() {
+    var all = track.querySelectorAll('[data-lm-slide]');
+    all.forEach ? all.forEach(swap) : Array.prototype.forEach.call(all, swap);
+    function swap(s) {
+      if (s.tagName !== 'A') return;
+      var m = s.getAttribute('data-link-mobile');
+      var d = s.getAttribute('data-link-desktop');
+      if (mq.matches && m) { s.setAttribute('href', m); }
+      else if (d) { s.setAttribute('href', d); }
+    }
+  }
+  applyLinks();
+  if (mq.addEventListener) { mq.addEventListener('change', applyLinks); }
+  else if (mq.addListener) { mq.addListener(applyLinks); }
+
+  /* re-center on resize (widths change) */
+  var resizeDebounce;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeDebounce);
+    resizeDebounce = setTimeout(function() { goTo(current, false); }, 150);
+  });
+
+  /* init: center the first REAL slide */
+  goTo(offset, false);
+  /* images loading can shift offsets — re-center once everything settles */
+  window.addEventListener('load', function() { goTo(current, false); });
+  restartFill(dots[0]);
+  lastReal = 0;
+  /* first slide settles gently: zoom state applied one frame after paint */
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() { applyZoom(0); });
+  });
+  scheduleNext();
+
+  if (designMode) {
+    document.addEventListener('shopify:block:select', function(e) {
+      var idx = slides.indexOf(e.target);
+      if (idx > -1) { pausePlay(); goTo(idx); }
+    });
+    document.addEventListener('shopify:block:deselect', resumePlay);
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Home — Peek Slideshow",
+  "tag": "section",
+  "class": "lm-hm-peek-slideshow",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "height_mode",
+      "label": "Slide height",
+      "options": [
+        { "value": "adapt", "label": "Adapt to image size" },
+        { "value": "fixed", "label": "Fixed height" }
+      ],
+      "default": "adapt",
+      "info": "Adapt: slides take the shape of the uploaded image (desktop image ratio on desktop, mobile image ratio on mobile). Use same-ratio images across slides for a clean look."
+    },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "label": "Fixed height (desktop)",
+      "min": 300,
+      "max": 700,
+      "step": 20,
+      "unit": "px",
+      "default": 480,
+      "info": "Only used in Fixed height mode"
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Fixed height (mobile)",
+      "min": 240,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "default": 400,
+      "info": "Only used in Fixed height mode"
+    },
+    {
+      "type": "range",
+      "id": "slide_width",
+      "label": "Slide width (desktop)",
+      "min": 60,
+      "max": 100,
+      "step": 2,
+      "unit": "%",
+      "default": 74,
+      "info": "Smaller = more of the neighboring slides peek in"
+    },
+    {
+      "type": "range",
+      "id": "slide_width_mobile",
+      "label": "Slide width (mobile)",
+      "min": 70,
+      "max": 100,
+      "step": 2,
+      "unit": "%",
+      "default": 88
+    },
+    {
+      "type": "range",
+      "id": "side_opacity",
+      "label": "Side slides opacity",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 20,
+      "info": "How visible the peeking left/right slides are. 100 = no dimming."
+    },
+    {
+      "type": "range",
+      "id": "slide_gap",
+      "label": "Gap between slides",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_block",
+      "label": "Section vertical padding",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause autoplay on hover",
+      "default": false,
+      "info": "Off: the slideshow keeps rotating even with the cursor over it."
+    },
+    {
+      "type": "checkbox",
+      "id": "zoom_effect",
+      "label": "Zoom-out on slide change",
+      "default": true,
+      "info": "The incoming image starts slightly zoomed in and settles to normal — subtle dynamic feel."
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Autoplay speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show arrows (desktop)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots",
+      "label": "Show dots",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Slide button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Slide button text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg",
+      "label": "Arrow background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Arrow icon",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "Dot color",
+      "default": "#999999"
+    },
+    {
+      "type": "color",
+      "id": "dot_active_color",
+      "label": "Active dot color",
+      "default": "#000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image — desktop",
+          "info": "Recommended: wide, e.g. 1600×900"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Image — mobile",
+          "info": "Recommended: tall, e.g. 900×1200. Falls back to desktop image if empty."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Slide link",
+          "info": "The entire slide becomes clickable"
+        },
+        {
+          "type": "url",
+          "id": "link_mobile",
+          "label": "Slide link — mobile (optional)",
+          "info": "Overrides the link on phones. Falls back to the main link if empty."
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button label",
+          "info": "Visual button — the whole slide already links. Leave empty to hide."
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "center", "label": "Center" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "right"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color",
+          "default": "#1A1A1A"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home — Peek Slideshow",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" },
+        { "type": "slide" }
+      ]
+    }
+  ]
+}
+{% endschema %}

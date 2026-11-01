@@ -1,0 +1,677 @@
+{%- comment -%}
+  Luxe Magics — Product Details: The Experience
+  Filename: sections/lm-pd-experience.liquid
+  "The Experience" — steps to a living memory
+  Dark background section. Eyebrow + headline + step blocks (blocks-based so
+  you can add, remove, reorder steps in the customizer).
+  Fully theme-adaptive via Dawn color-scheme classes.
+{%- endcomment -%}
+
+{%- liquid
+  assign pt     = section.settings.padding_top
+  assign pb     = section.settings.padding_bottom
+  assign accent = section.settings.accent_color
+-%}
+
+{%- style -%}
+
+  #lm-exp-{{ section.id }} {
+    padding-top: {{ pt | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ pb | times: 0.75 | round: 0 }}px;
+    --lm-accent: {{ accent }};
+    --lm-accent-20: {{ accent }}33;
+    border-top: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+  @media screen and (min-width: 750px) {
+    #lm-exp-{{ section.id }} {
+      padding-top: {{ pt }}px;
+      padding-bottom: {{ pb }}px;
+    }
+  }
+
+  /* ── Inner container ── */
+  .lm-exp__inner-{{ section.id }} {
+    max-width: {{ section.settings.content_width }}px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  @media screen and (min-width: 990px) {
+    .lm-exp__inner-{{ section.id }} {
+      padding: 0 3rem;
+    }
+  }
+
+  /* ── Header ── */
+  .lm-exp__header-{{ section.id }} {
+    text-align: {{ section.settings.header_align }};
+    margin-bottom: {{ section.settings.header_gap }}px;
+  }
+  .lm-exp__eyebrow-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: {{ section.settings.header_align }};
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--lm-accent);
+    margin-bottom: 1rem;
+  }
+  .lm-exp__eyebrow-line-{{ section.id }} {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--lm-accent);
+    flex-shrink: 0;
+  }
+  .lm-exp__headline-{{ section.id }} {
+    font-size: clamp(26px, 4vw, {{ section.settings.headline_size }}px);
+    font-weight: 400;
+    line-height: 1.18;
+    color: rgb(var(--color-foreground));
+    margin: 0 0 0.8rem;
+    letter-spacing: -0.01em;
+  }
+  .lm-exp__headline-{{ section.id }} em {
+    font-style: italic;
+    color: var(--lm-accent);
+  }
+  .lm-exp__subtext-{{ section.id }} {
+    font-size: 14px;
+    line-height: 1.75;
+    color: rgba(var(--color-foreground), 0.5);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* ── Steps connector line (desktop only) ── */
+  .lm-exp__steps-wrap-{{ section.id }} {
+    position: relative;
+  }
+  {% if section.settings.show_connector %}
+  @media screen and (min-width: 990px) {
+    .lm-exp__steps-wrap-{{ section.id }}::before {
+      content: '';
+      position: absolute;
+      top: {{ section.settings.connector_top }}px;
+      left: calc(100% / ({{ section.blocks.size }} * 2));
+      right: calc(100% / ({{ section.blocks.size }} * 2));
+      height: 1px;
+      background: rgba(var(--color-foreground), 0.1);
+      z-index: 0;
+    }
+  }
+  {% endif %}
+
+  /* ── Steps grid ── */
+  .lm-exp__steps-{{ section.id }} {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  @media screen and (min-width: 750px) {
+    .lm-exp__steps-{{ section.id }} {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+  }
+  @media screen and (min-width: 990px) {
+    .lm-exp__steps-{{ section.id }} {
+      grid-template-columns: repeat({{ section.blocks.size }}, 1fr);
+      gap: {{ section.settings.steps_gap }}px;
+    }
+  }
+
+  /* ── Individual step ── */
+  .lm-exp__step-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: {{ section.settings.step_align }};
+    text-align: {{ section.settings.step_align }};
+    position: relative;
+    z-index: 1;
+    padding: {{ section.settings.step_pad }}px;
+    border-radius: var(--border-radius-lg);
+    transition: background 0.25s;
+  }
+  {% if section.settings.step_hover_bg %}
+  .lm-exp__step-{{ section.id }}:hover {
+    background: rgba(var(--color-foreground), 0.04);
+  }
+  {% endif %}
+
+  /* Step number circle */
+  .lm-exp__step-num-{{ section.id }} {
+    width: {{ section.settings.num_size }}px;
+    height: {{ section.settings.num_size }}px;
+    border-radius: 50%;
+    border: 1.5px solid var(--lm-accent);
+    color: var(--lm-accent);
+    font-size: {{ section.settings.num_font_size }}px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    transition: background 0.25s, color 0.25s;
+    background: rgb(var(--color-background));
+  }
+  {% if section.settings.num_fill_first %}
+  .lm-exp__step-{{ section.id }}:first-child .lm-exp__step-num-{{ section.id }} {
+    background: var(--lm-accent);
+    color: #fff;
+  }
+  {% endif %}
+  .lm-exp__step-{{ section.id }}:hover .lm-exp__step-num-{{ section.id }} {
+    background: var(--lm-accent);
+    color: #fff;
+  }
+
+  /* Step icon (optional emoji) */
+  .lm-exp__step-icon-{{ section.id }} {
+    font-size: 22px;
+    margin-bottom: 1rem;
+    line-height: 1;
+  }
+
+  /* Step title */
+  .lm-exp__step-title-{{ section.id }} {
+    font-size: {{ section.settings.title_size }}px;
+    font-weight: 500;
+    color: rgb(var(--color-foreground));
+    line-height: 1.3;
+    margin: 0 0 0.5rem;
+  }
+
+  /* Step description */
+  .lm-exp__step-desc-{{ section.id }} {
+    font-size: {{ section.settings.desc_size }}px;
+    color: rgba(var(--color-foreground), 0.55);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ── Bottom CTA ── */
+  .lm-exp__cta-wrap-{{ section.id }} {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: {{ section.settings.cta_gap }}px;
+  }
+  .lm-exp__wa-btn-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #25D366;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 13px 26px;
+    border-radius: {{ settings.buttons_radius }}px;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: opacity 0.2s;
+  }
+  .lm-exp__wa-btn-{{ section.id }}:hover { opacity: 0.88; }
+  .lm-exp__wa-icon-{{ section.id }} {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #25D366;
+    flex-shrink: 0;
+  }
+  .lm-exp__wa-note-{{ section.id }} {
+    font-size: 12px;
+    color: rgba(var(--color-foreground), 0.4);
+  }
+
+  /* ── Scroll animation ── */
+  {% if settings.animations_reveal_on_scroll %}
+  .lm-exp__step-{{ section.id }} {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .lm-exp__step-{{ section.id }}.lm-vis {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  {% endif %}
+
+{%- endstyle -%}
+
+<div
+  id="lm-exp-{{ section.id }}"
+  class="gradient color-{{ section.settings.color_scheme }}"
+  {{ section.shopify_attributes }}
+>
+  <div class="lm-exp__inner-{{ section.id }}">
+
+    {%- comment -%}── Header ──{%- endcomment -%}
+    <div class="lm-exp__header-{{ section.id }}">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="lm-exp__eyebrow-{{ section.id }}">
+          {%- if section.settings.header_align == 'left' -%}
+            <span class="lm-exp__eyebrow-line-{{ section.id }}"></span>
+          {%- endif -%}
+          {{ section.settings.eyebrow }}
+        </div>
+      {%- endif -%}
+      {%- if section.settings.headline != blank -%}
+        <h2 class="lm-exp__headline-{{ section.id }}">{{ section.settings.headline }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtext != blank -%}
+        <p class="lm-exp__subtext-{{ section.id }}">{{ section.settings.subtext }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}── Steps ──{%- endcomment -%}
+    <div class="lm-exp__steps-wrap-{{ section.id }}">
+      <div class="lm-exp__steps-{{ section.id }}">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'step' -%}
+            <div
+              class="lm-exp__step-{{ section.id }}{% if settings.animations_reveal_on_scroll %} lm-exp-anim{% endif %}"
+              style="transition-delay: {{ forloop.index0 | times: 100 }}ms"
+              {{ block.shopify_attributes }}
+            >
+              {%- comment -%} Show number OR icon, not both {%- endcomment -%}
+              {%- if section.settings.show_numbers -%}
+                <div class="lm-exp__step-num-{{ section.id }}">{{ forloop.index }}</div>
+              {%- elsif block.settings.icon != blank -%}
+                <div class="lm-exp__step-icon-{{ section.id }}">{{ block.settings.icon }}</div>
+              {%- endif -%}
+
+              {%- if block.settings.title != blank -%}
+                <p class="lm-exp__step-title-{{ section.id }}">{{ block.settings.title }}</p>
+              {%- endif -%}
+              {%- if block.settings.description != blank -%}
+                <p class="lm-exp__step-desc-{{ section.id }}">{{ block.settings.description }}</p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- comment -%}── Bottom CTA ──{%- endcomment -%}
+    {%- if section.settings.show_wa_cta -%}
+      <div class="lm-exp__cta-wrap-{{ section.id }}">
+        <a
+          href="https://wa.me/{{ section.settings.whatsapp_number | remove: '+' | remove: ' ' | remove: '-' }}?text={{ section.settings.whatsapp_message | url_encode }}"
+          target="_blank"
+          rel="noopener"
+          class="lm-exp__wa-btn-{{ section.id }}"
+        >
+          <span class="lm-exp__wa-icon-{{ section.id }}">W</span>
+          {{ section.settings.wa_cta_text }}
+        </a>
+        {%- if section.settings.wa_note != blank -%}
+          <span class="lm-exp__wa-note-{{ section.id }}">{{ section.settings.wa_note }}</span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{%- if settings.animations_reveal_on_scroll -%}
+<script>
+(function() {
+  var steps = document.querySelectorAll('#lm-exp-{{ section.id }} .lm-exp-anim');
+  if (!steps.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('lm-vis'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  steps.forEach(function(el) { obs.observe(el); });
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PD — The Experience",
+  "tag": "section",
+  "class": "lm-pd-experience",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-4",
+      "info": "scheme-4 = black background (recommended for this section)"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#F26B6C"
+    },
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "The Experience"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Four steps to a <em>living memory</em>"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext (optional)",
+      "default": "You send us the photo and the video. We do everything else."
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header alignment",
+      "default": "center",
+      "options": [
+        { "value": "left",   "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "headline_size",
+      "label": "Headline size (desktop max)",
+      "min": 24,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "header_gap",
+      "label": "Space below header",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "header",
+      "content": "Steps"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_numbers",
+      "label": "Show step numbers",
+      "default": true,
+      "info": "When off, uses the emoji icon from each block instead."
+    },
+    {
+      "type": "checkbox",
+      "id": "num_fill_first",
+      "label": "Fill first step number (highlight step 1)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "step_hover_bg",
+      "label": "Highlight step on hover",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_connector",
+      "label": "Show connector line between steps",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "connector_top",
+      "label": "Connector line vertical position",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 36,
+      "info": "Align with center of step number circles."
+    },
+    {
+      "type": "select",
+      "id": "step_align",
+      "label": "Step content alignment",
+      "default": "center",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center",     "label": "Center" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "num_size",
+      "label": "Number circle size",
+      "min": 36,
+      "max": 72,
+      "step": 4,
+      "unit": "px",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "num_font_size",
+      "label": "Number font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Step title size",
+      "min": 13,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "desc_size",
+      "label": "Step description size",
+      "min": 12,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "step_pad",
+      "label": "Step internal padding",
+      "min": 0,
+      "max": 32,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "steps_gap",
+      "label": "Gap between steps (desktop)",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "WhatsApp CTA"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wa_cta",
+      "label": "Show WhatsApp button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "wa_cta_text",
+      "label": "Button text",
+      "default": "Send your photo & video on WhatsApp"
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_number",
+      "label": "WhatsApp number",
+      "default": "+917207219977",
+      "info": "Include country code. No spaces or dashes."
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_message",
+      "label": "Pre-filled WhatsApp message",
+      "default": "Hi! I just ordered an AR frame from Luxe Magics. Here is my photo and video."
+    },
+    {
+      "type": "text",
+      "id": "wa_note",
+      "label": "Note below WhatsApp button",
+      "default": "We reply within 2 hours · Mon–Sat"
+    },
+    {
+      "type": "range",
+      "id": "cta_gap",
+      "label": "Space above CTA",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 52
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Max content width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon / emoji",
+          "default": "✦",
+          "info": "Only shows when step numbers are turned off."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Step title",
+          "default": "Step title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Step description",
+          "default": "Describe what happens in this step and why it matters."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PD — The Experience",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "icon": "🛍",
+            "title": "Place your order",
+            "description": "Choose your size and frame finish. Complete checkout in 2 minutes."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "icon": "📸",
+            "title": "Send your photo & video",
+            "description": "WhatsApp them to us right after ordering. Any format works — phone camera, Reels, Google Photos."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "icon": "🤲",
+            "title": "We build it by hand",
+            "description": "Printed, framed, and QR-linked in our Hyderabad studio. Packed with care and shipped within 2–4 days."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "icon": "✨",
+            "title": "Scan it. Feel it.",
+            "description": "Point any phone camera at the QR. The memory plays. Every single time."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

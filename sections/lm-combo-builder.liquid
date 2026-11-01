@@ -1,0 +1,962 @@
+{%- comment -%}
+  Luxe Magics — Simple combo builder
+  File: sections/lm-combo-builder.liquid
+  Use on a product template (e.g. product.combo-deepam) assigned to the combo product (e.g. "Deepam Combo", ₹899).
+
+  How it works for the shopper:
+    Step 1: tap to pick N items from a collection (e.g. any 3 bookmarks)
+    Step 2: tap to pick N items from another collection (e.g. 1 notepad)
+    Optional: a name box (e.g. name to print on the notepad)
+    "Already included" items are shown and added automatically.
+    One sticky button adds the combo to the cart at the combo product's price.
+    Small optional add-ons (extra single products) are added at their own price.
+
+  The picks are saved on the cart line as line-item properties, so they show in the cart,
+  on the order and on the packing slip. Component stock is not deducted automatically.
+{%- endcomment -%}
+
+{%- liquid
+  assign combo_variant = product.selected_or_first_available_variant
+  assign step_no = 0
+-%}
+
+<div
+  class="lm-cb"
+  id="lm-cb-{{ section.id }}"
+  data-lm-cb
+  data-variant-id="{{ combo_variant.id }}"
+  data-combo-price="{{ combo_variant.price }}"
+  data-combo-title="{{ product.title | escape }}"
+  data-money-format="{{ shop.money_format | strip_html | escape }}"
+  data-show-deal="{{ section.settings.show_deal }}"
+  style="--lm-cb-brand: {{ section.settings.brand_color }}; --lm-cb-accent: {{ section.settings.accent_color }}; --lm-cb-bg: {{ section.settings.bg_color }}; --lm-cb-ink: {{ section.settings.text_color }};"
+  {{ section.shopify_attributes }}
+>
+  <div class="lm-cb__wrap">
+
+    {%- comment -%} ===== TOP ===== {%- endcomment -%}
+    <header class="lm-cb__top">
+      {%- if product.featured_image -%}
+        <div class="lm-cb__top-img">
+          {{ product.featured_image | image_url: width: 300 | image_tag: loading: 'eager', alt: product.title }}
+        </div>
+      {%- endif -%}
+      <div>
+        <h1 class="lm-cb__title">{{ product.title }}</h1>
+        {%- if section.settings.intro != blank -%}<p class="lm-cb__intro">{{ section.settings.intro }}</p>{%- endif -%}
+        <p class="lm-cb__price-line">
+          <strong>{{ combo_variant.price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</strong>
+          <span>{{ section.settings.price_note }}</span>
+        </p>
+      </div>
+    </header>
+
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+
+        {%- when 'pick' -%}
+          {%- assign step_no = step_no | plus: 1 -%}
+          {%- assign col = block.settings.collection -%}
+          <section
+            class="lm-cb__step"
+            data-pick-step
+            data-count="{{ block.settings.count }}"
+            data-prop="{{ block.settings.property_name | escape }}"
+            data-one="{{ block.settings.item_singular | escape }}"
+            data-many="{{ block.settings.item_plural | escape }}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="lm-cb__step-head">
+              <span class="lm-cb__num" aria-hidden="true">{{ step_no }}</span>
+              <div>
+                <h2 class="lm-cb__h2">{{ block.settings.heading }}</h2>
+                <p class="lm-cb__count" aria-live="polite"><span data-picked>0</span> of {{ block.settings.count }} selected</p>
+              </div>
+            </div>
+
+            <div class="lm-cb__picks" data-picks hidden></div>
+
+            {%- assign filter_list = block.settings.filter_tags | split: ',' -%}
+            {%- if block.settings.filter_tags != blank -%}
+              <div class="lm-cb__chips" role="group" aria-label="Filter">
+                <button type="button" class="lm-cb__chip" data-filter="all" aria-pressed="true">All</button>
+                {%- for f in filter_list -%}
+                  {%- assign fl = f | strip -%}
+                  {%- if fl != blank -%}
+                    <button type="button" class="lm-cb__chip" data-filter="{{ fl | handleize }}" aria-pressed="false">{{ fl }}</button>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+
+            {%- assign exclude_list = block.settings.exclude_words | downcase | split: ',' -%}
+            <div class="lm-cb__grid" data-initial="{{ block.settings.show_initial }}">
+              {%- if col != blank -%}
+                {%- for prod in col.products limit: block.settings.limit -%}
+                  {%- if prod.id == product.id -%}{%- continue -%}{%- endif -%}
+                  {%- assign tags_str = prod.tags | join: ' ' -%}
+                  {%- assign hay = prod.title | append: ' ' | append: prod.product_type | append: ' ' | append: tags_str | downcase -%}
+                  {%- assign skip = false -%}
+                  {%- for w in exclude_list -%}
+                    {%- assign ww = w | strip -%}
+                    {%- if ww != blank and hay contains ww -%}{%- assign skip = true -%}{%- break -%}{%- endif -%}
+                  {%- endfor -%}
+                  {%- if skip -%}{%- continue -%}{%- endif -%}
+                  {%- capture tag_handles -%}{%- for t in prod.tags -%} {{ t | handleize }}{%- endfor -%} {% endcapture -%}
+                  {%- assign split = false -%}
+                  {%- if block.settings.split_variants and prod.variants.size > 1 -%}{%- assign split = true -%}{%- endif -%}
+                  {%- for v in prod.variants -%}
+                    {%- unless v.available -%}{%- continue -%}{%- endunless -%}
+                    {%- unless split -%}
+                      {%- if v.id != prod.first_available_variant.id -%}{%- continue -%}{%- endif -%}
+                    {%- endunless -%}
+                    {%- if split -%}
+                      {%- assign item_title = prod.title | append: ' – ' | append: v.title -%}
+                    {%- else -%}
+                      {%- assign item_title = prod.title -%}
+                    {%- endif -%}
+                    {%- assign item_img = v.featured_image | default: prod.featured_image -%}
+                    <button type="button" class="lm-cb__card" data-card data-key="{{ v.id }}" data-title="{{ item_title | escape }}" data-price="{{ v.price }}" data-tags="{{ tag_handles }}" aria-pressed="false">
+                      <span class="lm-cb__card-img">
+                        {%- if item_img -%}
+                          {{ item_img | image_url: width: 360 | image_tag: loading: 'lazy', alt: '' }}
+                        {%- else -%}
+                          {{ 'product-1' | placeholder_svg_tag }}
+                        {%- endif -%}
+                        <span class="lm-cb__tick" aria-hidden="true">✓</span>
+                      </span>
+                      <span class="lm-cb__card-name">{{ item_title }}</span>
+                    </button>
+                  {%- endfor -%}
+                {%- endfor -%}
+              {%- else -%}
+                <p class="lm-cb__empty">Choose a collection for this step in the theme editor.</p>
+              {%- endif -%}
+            </div>
+            <button type="button" class="lm-cb__more" data-more hidden></button>
+          </section>
+
+        {%- when 'input' -%}
+          {%- assign step_no = step_no | plus: 1 -%}
+          <section class="lm-cb__step" {{ block.shopify_attributes }}>
+            <div class="lm-cb__step-head">
+              <span class="lm-cb__num" aria-hidden="true">{{ step_no }}</span>
+              <div>
+                <h2 class="lm-cb__h2"><label for="lm-cb-in-{{ block.id }}">{{ block.settings.heading }}</label></h2>
+                {%- if block.settings.help != blank -%}<p class="lm-cb__count">{{ block.settings.help }}</p>{%- endif -%}
+              </div>
+            </div>
+            <input
+              class="lm-cb__input"
+              id="lm-cb-in-{{ block.id }}"
+              type="text"
+              data-input
+              data-prop="{{ block.settings.property_name | escape }}"
+              data-required="{{ block.settings.required }}"
+              data-label="{{ block.settings.heading | escape }}"
+              maxlength="{{ block.settings.max_length }}"
+              placeholder="{{ block.settings.placeholder | escape }}"
+              autocomplete="off"
+            >
+          </section>
+
+        {%- when 'included' -%}
+          <section class="lm-cb__included" {{ block.shopify_attributes }}>
+            <h2 class="lm-cb__h3">{{ block.settings.heading }}</h2>
+            <ul>
+              {%- assign lines = block.settings.items | newline_to_br | split: '<br />' -%}
+              {%- for line in lines -%}
+                {%- assign clean = line | strip -%}
+                {%- if clean != blank -%}
+                  {%- assign parts = clean | split: '|' -%}
+                  {%- assign nm = parts[0] | strip -%}
+                  {%- assign pr = 0 -%}
+                  {%- assign pw = parts[1] | strip | downcase -%}
+                  {%- if parts.size > 1 and pw != 'free' -%}{%- assign pr = parts[1] | strip | remove: '₹' | remove: ',' | plus: 0 | times: 100 -%}{%- endif -%}
+                  <li data-included data-title="{{ nm | escape }}" data-price="{{ pr }}"{% if pw == 'free' %} data-free{% endif %}><span aria-hidden="true">✓</span> {{ nm }}{%- if pw == 'free' -%} <em class="lm-cb__free">{{ section.settings.free_label }}</em>{%- endif -%}</li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          </section>
+
+        {%- when 'addons' -%}
+          {%- assign acol = block.settings.collection -%}
+          {%- if acol != blank -%}
+            <details class="lm-cb__addons" {{ block.shopify_attributes }}>
+              <summary>{{ block.settings.heading }} <span>{{ block.settings.subheading }}</span></summary>
+              <div class="lm-cb__addon-list">
+                {%- for prod in acol.products limit: block.settings.limit -%}
+                  {%- if prod.id == product.id or prod.available == false -%}{%- continue -%}{%- endif -%}
+                  {%- assign av = prod.first_available_variant -%}
+                  <label class="lm-cb__addon">
+                    <input type="checkbox" data-addon data-id="{{ av.id }}" data-title="{{ prod.title | escape }}" data-price="{{ av.price }}">
+                    <span class="lm-cb__addon-img">
+                      {%- if prod.featured_image -%}{{ prod.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}{%- endif -%}
+                    </span>
+                    <span class="lm-cb__addon-name">{{ prod.title }}</span>
+                    <span class="lm-cb__addon-price">+{{ av.price | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </details>
+          {%- endif -%}
+
+      {%- endcase -%}
+    {%- endfor -%}
+
+    {%- comment -%} ===== SUMMARY / CHECKOUT CARD ===== {%- endcomment -%}
+    <section class="lm-cb__summary" id="lm-cb-sum-{{ section.id }}" aria-labelledby="lm-cb-sum-h-{{ section.id }}">
+      <div class="lm-cb__sum-head">
+        <h2 id="lm-cb-sum-h-{{ section.id }}" class="lm-cb__sum-title">{{ section.settings.summary_heading }} {{ product.title }}</h2>
+        <span class="lm-cb__sum-status" data-status></span>
+      </div>
+
+      <ul class="lm-cb__sum-list" data-sum-list></ul>
+
+      <div class="lm-cb__deal" aria-live="polite">
+        <div class="lm-cb__deal-row" data-worth-row hidden>
+          <span data-worth-label data-base="{{ section.settings.worth_label | escape }}">{{ section.settings.worth_label }}</span>
+          <s data-worth></s>
+        </div>
+        <div class="lm-cb__deal-row lm-cb__deal-row--combo">
+          <span>{{ section.settings.combo_label }}</span>
+          <strong data-combo></strong>
+        </div>
+        <div class="lm-cb__save-row" data-save-row hidden>
+          <span class="lm-cb__save" data-save></span>
+          <span class="lm-cb__save-pct" data-save-pct></span>
+        </div>
+        <p class="lm-cb__freebies" data-freebies hidden></p>
+        <div class="lm-cb__deal-row lm-cb__deal-row--muted" data-extra-row hidden>
+          <span>{{ section.settings.addons_label }}</span>
+          <span data-extra></span>
+        </div>
+        <div class="lm-cb__deal-row lm-cb__deal-row--total">
+          <span>{{ section.settings.pay_label }}</span>
+          <strong data-total></strong>
+        </div>
+      </div>
+
+      <div class="lm-cb__actions">
+        <button type="button" class="lm-cb__btn lm-cb__btn--buy" data-buy disabled {% unless combo_variant.available %}data-soldout{% endunless %}>{{ section.settings.buy_label }}</button>
+        <button type="button" class="lm-cb__btn lm-cb__btn--cart" data-cart disabled {% unless combo_variant.available %}data-soldout{% endunless %}>{{ section.settings.cart_label }}</button>
+      </div>
+      <p class="lm-cb__hint-main" data-hint-main></p>
+      <p class="lm-cb__error" data-error role="alert" hidden></p>
+      {%- if section.settings.trust_line != blank -%}
+        <p class="lm-cb__trust">{{ section.settings.trust_line }}</p>
+      {%- endif -%}
+      {%- unless combo_variant.available -%}
+        <p class="lm-cb__soldout">{{ section.settings.soldout_text }}</p>
+      {%- endunless -%}
+    </section>
+  </div>
+
+  {%- comment -%} ===== STICKY BAR ===== {%- endcomment -%}
+  <div class="lm-cb__bar" data-bar>
+    <div class="lm-cb__bar-inner">
+      <div class="lm-cb__bar-text">
+        <strong data-bar-total></strong>
+        <span data-hint></span>
+      </div>
+      <button type="button" class="lm-cb__btn lm-cb__btn--buy lm-cb__btn--bar" data-buy disabled {% unless combo_variant.available %}data-soldout{% endunless %}>{{ section.settings.buy_label }}</button>
+    </div>
+  </div>
+</div>
+
+{% javascript %}
+  (function () {
+    function init(root) {
+      if (!root || root.dataset.ready) return;
+      root.dataset.ready = '1';
+      var moneyFormat = (root.dataset.moneyFormat || '{{amount}}').replace(/Rs\.?\s*/i, '₹');
+      var fmt = function (c) {
+        var n = c / 100;
+        return moneyFormat.replace(/\{\{\s*(\w+)\s*\}\}/, function (_, k) {
+          var noDec = k.indexOf('no_decimals') > -1, euro = k.indexOf('comma_separator') > -1;
+          var out = noDec ? Math.round(n).toLocaleString('en-US') : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\.00$/, '');
+          if (euro) out = out.replace(/,/g, '#').replace(/\./g, ',').replace(/#/g, '.');
+          return out;
+        });
+      };
+      var comboPrice = +root.dataset.comboPrice || 0;
+      var showDeal = root.dataset.showDeal !== 'false';
+      var buyBtns = Array.prototype.slice.call(root.querySelectorAll('[data-buy]'));
+      var cartBtns = Array.prototype.slice.call(root.querySelectorAll('[data-cart]'));
+      var allBtns = buyBtns.concat(cartBtns);
+      var hint = root.querySelector('[data-hint]');
+      var hintMain = root.querySelector('[data-hint-main]');
+      var err = root.querySelector('[data-error]');
+      var summary = root.querySelector('.lm-cb__summary');
+      var bar = root.querySelector('[data-bar]');
+
+      var steps = Array.prototype.map.call(root.querySelectorAll('[data-pick-step]'), function (el) {
+        var grid = el.querySelector('.lm-cb__grid');
+        return { el: el, count: +el.dataset.count || 1, prop: el.dataset.prop, one: el.dataset.one, many: el.dataset.many, picks: [],
+          cards: Array.prototype.slice.call(el.querySelectorAll('[data-card]')), initial: +(grid && grid.dataset.initial) || 9,
+          filter: 'all', expanded: false, more: el.querySelector('[data-more]'), tray: el.querySelector('[data-picks]') };
+      });
+      var inputs = Array.prototype.slice.call(root.querySelectorAll('[data-input]'));
+      var included = Array.prototype.map.call(root.querySelectorAll('[data-included]'), function (li) {
+        return { title: li.dataset.title, price: +li.dataset.price || 0, free: li.hasAttribute('data-free') };
+      });
+      var addons = Array.prototype.slice.call(root.querySelectorAll('[data-addon]'));
+
+      steps.forEach(function (s) {
+        s.el.addEventListener('click', function (e) {
+          var chip = e.target.closest('[data-filter]');
+          if (chip) {
+            s.filter = chip.dataset.filter; s.expanded = false;
+            s.el.querySelectorAll('[data-filter]').forEach(function (c) { c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+            view(s); return;
+          }
+          if (e.target.closest('[data-more]')) { s.expanded = true; view(s); return; }
+          var rm = e.target.closest('[data-remove]');
+          if (rm) { s.picks = s.picks.filter(function (p) { return p.key !== rm.dataset.remove; }); update(); return; }
+          var card = e.target.closest('[data-card]');
+          if (!card) return;
+          var key = card.dataset.key;
+          var idx = s.picks.findIndex(function (p) { return p.key === key; });
+          if (idx > -1) {
+            s.picks.splice(idx, 1);
+          } else if (s.picks.length < s.count) {
+            s.picks.push({ key: key, title: card.dataset.title, price: +card.dataset.price || 0 });
+          } else if (s.count === 1) {
+            s.picks = [{ key: key, title: card.dataset.title, price: +card.dataset.price || 0 }];
+          } else {
+            s.el.classList.remove('is-nudge'); void s.el.offsetWidth; s.el.classList.add('is-nudge');
+            return;
+          }
+          update();
+        });
+      });
+      inputs.forEach(function (i) { i.addEventListener('input', update); });
+      addons.forEach(function (a) { a.addEventListener('change', update); });
+
+      function firstGap() {
+        for (var i = 0; i < steps.length; i++) {
+          var left = steps[i].count - steps[i].picks.length;
+          if (left > 0) return { step: steps[i], text: 'Pick ' + left + ' more ' + (left === 1 ? steps[i].one : steps[i].many) };
+        }
+        for (var j = 0; j < inputs.length; j++) {
+          if (inputs[j].dataset.required === 'true' && !inputs[j].value.trim()) return { input: inputs[j], text: 'Add ' + inputs[j].dataset.label.toLowerCase() };
+        }
+        return null;
+      }
+
+      function view(s) {
+        var matches = 0, shown = 0;
+        s.cards.forEach(function (c) {
+          var ok = s.filter === 'all' || (' ' + (c.dataset.tags || '') + ' ').indexOf(' ' + s.filter + ' ') > -1;
+          if (ok) matches++;
+          var vis = ok && (s.filter !== 'all' || s.expanded || matches <= s.initial);
+          if (vis) shown++;
+          c.hidden = !vis;
+        });
+        if (s.more) {
+          var hiddenCount = matches - shown;
+          s.more.hidden = hiddenCount <= 0;
+          s.more.textContent = 'Show all ' + matches + ' ' + s.many;
+        }
+      }
+      steps.forEach(view);
+
+      function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+      function minPrice(s) {
+        var m = 0;
+        s.cards.forEach(function (c) { var v = +c.dataset.price || 0; if (v > 0 && (m === 0 || v < m)) m = v; });
+        return m;
+      }
+
+      function row(name, right, cls) {
+        return '<li' + (cls ? ' class="' + cls + '"' : '') + '><span>' + esc(name) + '</span>' + (right ? '<span class="lm-cb__sum-right">' + right + '</span>' : '') + '</li>';
+      }
+
+      function update() {
+        var worth = 0, extra = 0, rows = [], estimated = false, stepsDone = 0;
+        steps.forEach(function (s) {
+          var full = s.picks.length >= s.count;
+          if (full) stepsDone++;
+          s.el.querySelector('[data-picked]').textContent = s.picks.length;
+          s.el.classList.toggle('is-done', full);
+          s.el.classList.toggle('is-full', full && s.count > 1);
+          s.el.querySelectorAll('[data-card]').forEach(function (c) {
+            var on = s.picks.some(function (p) { return p.key === c.dataset.key; });
+            c.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
+          s.picks.forEach(function (p) { worth += p.price; rows.push(row(p.title, p.price ? fmt(p.price) : '', 'is-pick')); });
+          var left = s.count - s.picks.length;
+          if (left > 0) {
+            worth += left * minPrice(s); estimated = true;
+            rows.push(row(left + ' more ' + (left === 1 ? s.one : s.many) + ' to pick', '', 'is-todo'));
+          }
+          if (s.tray) {
+            s.tray.hidden = s.picks.length === 0 || s.count === 1;
+            s.tray.innerHTML = s.picks.map(function (p) {
+              return '<button type="button" class="lm-cb__pick" data-remove="' + p.key + '" aria-label="Remove ' + esc(p.title) + '">' + esc(p.title) + ' <span aria-hidden="true">×</span></button>';
+            }).join('');
+          }
+        });
+        var freebies = [];
+        included.forEach(function (i) {
+          if (i.free) { freebies.push(i.title); rows.push(row(i.title, '<em class="lm-cb__free">FREE</em>', 'is-free')); }
+          else { worth += i.price; rows.push(row(i.title, i.price ? fmt(i.price) : '', 'is-included')); }
+        });
+        inputs.forEach(function (i) { if (i.value.trim()) rows.push(row(i.dataset.label + ': ' + i.value.trim(), '', 'is-note')); });
+        addons.forEach(function (a) { if (a.checked) { var ap = +a.dataset.price || 0; extra += ap; rows.push(row(a.dataset.title, '+' + fmt(ap), 'is-addon')); } });
+
+        root.querySelector('[data-sum-list]').innerHTML = rows.join('');
+        var total = comboPrice + extra;
+        var saving = worth - comboPrice;
+        var gapAll = firstGap();
+
+        root.querySelector('[data-combo]').textContent = fmt(comboPrice);
+        root.querySelector('[data-total]').textContent = fmt(total);
+        root.querySelector('[data-bar-total]').textContent = fmt(total);
+
+        var worthRow = root.querySelector('[data-worth-row]');
+        var saveRow = root.querySelector('[data-save-row]');
+        var dealOn = showDeal && saving > 0;
+        worthRow.hidden = !dealOn; saveRow.hidden = !dealOn;
+        if (dealOn) {
+          var wl = root.querySelector('[data-worth-label]');
+          wl.textContent = estimated ? wl.dataset.base + ' (from)' : wl.dataset.base;
+          root.querySelector('[data-worth]').textContent = fmt(worth);
+          root.querySelector('[data-save]').textContent = (estimated ? 'Save at least ' : 'You save ') + fmt(saving);
+          root.querySelector('[data-save-pct]').textContent = Math.round(saving / worth * 100) + '% off';
+        }
+        var fb = root.querySelector('[data-freebies]');
+        fb.hidden = freebies.length === 0;
+        if (freebies.length) fb.textContent = 'Plus free: ' + freebies.join(' & ');
+        var extraRow = root.querySelector('[data-extra-row]');
+        extraRow.hidden = extra === 0;
+        if (extra) root.querySelector('[data-extra]').textContent = '+' + fmt(extra);
+
+        var req = inputs.filter(function (i) { return i.dataset.required === 'true'; });
+        var totalSteps = steps.length + req.length;
+        var doneSteps = stepsDone + req.filter(function (i) { return i.value.trim(); }).length;
+        var st = root.querySelector('[data-status]');
+        st.textContent = gapAll ? doneSteps + ' of ' + totalSteps + ' done' : 'Ready';
+        st.classList.toggle('is-ready', !gapAll);
+
+        var soldout = allBtns.length > 0 && allBtns[0].hasAttribute('data-soldout');
+        allBtns.forEach(function (b) { b.disabled = !!gapAll || soldout; });
+        hint.textContent = soldout ? 'Sold out' : gapAll ? gapAll.text : (dealOn ? 'You save ' + fmt(saving) + ' · ready to order' : 'Ready to order');
+        hintMain.textContent = soldout ? '' : gapAll ? gapAll.text + ' to continue' : '';
+        err.hidden = true;
+      }
+
+      if (bar && summary && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function (en) { bar.classList.toggle('is-away', en[0].isIntersecting); }, { threshold: 0.15 }).observe(summary);
+      }
+
+      function add(goCheckout, clicked) {
+        var gap = firstGap();
+        if (gap) {
+          var target = gap.step ? gap.step.el : gap.input;
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (gap.input) gap.input.focus();
+          return;
+        }
+        var props = {};
+        steps.forEach(function (s) { props[s.prop] = s.picks.map(function (p) { return p.title; }).join(', '); });
+        inputs.forEach(function (i) { if (i.value.trim()) props[i.dataset.prop] = i.value.trim(); });
+        if (included.length) props['Included'] = included.map(function (i) { return i.title; }).join(', ');
+        var items = [{ id: +root.dataset.variantId, quantity: 1, properties: props }];
+        addons.forEach(function (a) {
+          if (a.checked) items.push({ id: +a.dataset.id, quantity: 1, properties: { '_Added with': root.dataset.comboTitle } });
+        });
+        var label = clicked.textContent;
+        allBtns.forEach(function (b) { b.disabled = true; });
+        clicked.textContent = goCheckout ? 'Taking you to checkout…' : 'Adding…';
+        var base = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || '/';
+        fetch(base + 'cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ items: items }) })
+          .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.description || j.message || 'Could not add to cart'); return j; }); })
+          .then(function () { window.location.href = base + (goCheckout ? 'checkout' : 'cart'); })
+          .catch(function (e) { clicked.textContent = label; update(); err.textContent = e.message; err.hidden = false; });
+      }
+      buyBtns.forEach(function (b) { b.addEventListener('click', function () { add(true, b); }); });
+      cartBtns.forEach(function (b) { b.addEventListener('click', function () { add(false, b); }); });
+
+      update();
+    }
+    function boot() { document.querySelectorAll('[data-lm-cb]').forEach(init); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+    document.addEventListener('shopify:section:load', function (e) { var r = e.target.querySelector('[data-lm-cb]'); if (r) init(r); });
+  })();
+{% endjavascript %}
+
+{% stylesheet %}
+  .lm-cb { background: var(--lm-cb-bg); color: var(--lm-cb-ink); padding: 24px 0 120px; line-height: 1.5; }
+  .lm-cb *, .lm-cb *::before, .lm-cb *::after { box-sizing: border-box; }
+  .lm-cb [hidden] { display: none !important; }
+  .lm-cb__wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+
+  .lm-cb__top { display: flex; gap: 16px; align-items: center; margin-bottom: 28px; }
+  .lm-cb__top-img { flex: 0 0 96px; }
+  .lm-cb__top-img img { width: 96px; height: 96px; object-fit: cover; border-radius: 16px; display: block; }
+  .lm-cb__title { margin: 0 0 4px; font-size: clamp(26px, 4vw, 34px); line-height: 1.15; }
+  .lm-cb__intro { margin: 0 0 6px; opacity: .8; }
+  .lm-cb__price-line { margin: 0; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .lm-cb__price-line strong { font-size: 22px; }
+  .lm-cb__price-line span { font-size: 14px; opacity: .7; }
+
+  .lm-cb__step { background: #fff; border-radius: 20px; padding: 20px 16px; margin-bottom: 16px; border: 2px solid transparent; transition: border-color .2s; }
+  .lm-cb__step.is-done { border-color: color-mix(in srgb, var(--lm-cb-brand) 45%, transparent); }
+  .lm-cb__step.is-nudge .lm-cb__count { animation: lm-cb-nudge .4s; color: var(--lm-cb-brand); font-weight: 700; }
+  @keyframes lm-cb-nudge { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+  .lm-cb__step-head { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+  .lm-cb__num { flex: 0 0 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--lm-cb-ink); color: #fff; font-weight: 700; }
+  .lm-cb__step.is-done .lm-cb__num { background: var(--lm-cb-brand); color: var(--lm-cb-ink); }
+  .lm-cb__h2 { margin: 0; font-size: 19px; line-height: 1.25; }
+  .lm-cb__h3 { margin: 0 0 10px; font-size: 17px; }
+  .lm-cb__count { margin: 2px 0 0; font-size: 14px; opacity: .75; }
+
+  .lm-cb__picks { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px 0 14px; }
+  .lm-cb__pick { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--lm-cb-brand); color: var(--lm-cb-ink); font-size: 13px; font-weight: 600; }
+  .lm-cb__pick span { font-size: 16px; line-height: 1; }
+  .lm-cb__pick:focus-visible, .lm-cb__chip:focus-visible, .lm-cb__more:focus-visible { outline: 3px solid var(--lm-cb-accent); outline-offset: 2px; }
+  .lm-cb__chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px 14px; padding: 0 16px 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .lm-cb__chips::-webkit-scrollbar { display: none; }
+  .lm-cb__chip { all: unset; cursor: pointer; flex: 0 0 auto; padding: 8px 14px; min-height: 20px; border-radius: 999px; border: 1.5px solid #e6e0d8; background: #fff; font-size: 14px; font-weight: 600; white-space: nowrap; }
+  .lm-cb__chip[aria-pressed="true"] { background: var(--lm-cb-ink); border-color: var(--lm-cb-ink); color: #fff; }
+  .lm-cb__more { all: unset; box-sizing: border-box; cursor: pointer; display: block; width: 100%; margin-top: 14px; padding: 12px; text-align: center; border-radius: 12px; border: 1.5px dashed #d9d1c7; font-weight: 600; font-size: 15px; }
+  .lm-cb__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .lm-cb__card { all: unset; box-sizing: border-box; cursor: pointer; display: flex; flex-direction: column; gap: 6px; border-radius: 12px; padding: 4px; border: 2px solid #eee; background: #fff; text-align: left; transition: border-color .15s, opacity .15s; }
+  .lm-cb__card:focus-visible { outline: 3px solid var(--lm-cb-accent); outline-offset: 2px; }
+  .lm-cb__card[aria-pressed="true"] { border-color: var(--lm-cb-brand); background: color-mix(in srgb, var(--lm-cb-brand) 6%, #fff); }
+  .lm-cb__step.is-full .lm-cb__card[aria-pressed="false"] { opacity: .45; }
+  .lm-cb__card-img { position: relative; display: block; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #f6f1ea; }
+  .lm-cb__card-img img, .lm-cb__card-img svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .lm-cb__tick { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--lm-cb-brand); color: var(--lm-cb-ink); font-weight: 700; font-size: 15px; transform: scale(0); transition: transform .15s; }
+  .lm-cb__card[aria-pressed="true"] .lm-cb__tick { transform: scale(1); }
+  .lm-cb__card-name { font-size: 12.5px; font-weight: 600; line-height: 1.25; padding: 0 2px 4px; }
+  .lm-cb__empty { margin: 0; opacity: .7; }
+
+  .lm-cb__input { width: 100%; min-height: 52px; padding: 0 16px; font-size: 17px; border-radius: 12px; border: 2px solid #e6e0d8; background: #fff; color: inherit; }
+  .lm-cb__input:focus { outline: none; border-color: var(--lm-cb-brand); }
+
+  .lm-cb__included { padding: 18px 16px; margin-bottom: 16px; border-radius: 20px; background: color-mix(in srgb, var(--lm-cb-accent) 14%, #fff); }
+  .lm-cb__included ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .lm-cb__included li span { color: var(--lm-cb-ink); font-weight: 700; margin-right: 4px; }
+  .lm-cb__free { font-style: normal; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--lm-cb-accent); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+
+  .lm-cb__addons { margin-bottom: 16px; border-radius: 20px; background: #fff; }
+  .lm-cb__addons summary { cursor: pointer; list-style: none; padding: 18px 48px 18px 16px; font-weight: 600; position: relative; }
+  .lm-cb__addons summary::-webkit-details-marker { display: none; }
+  .lm-cb__addons summary::after { content: "+"; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 22px; color: var(--lm-cb-brand); }
+  .lm-cb__addons[open] summary::after { content: "–"; }
+  .lm-cb__addons summary span { display: block; font-weight: 400; font-size: 14px; opacity: .7; }
+  .lm-cb__addon-list { padding: 0 16px 16px; display: grid; gap: 10px; }
+  .lm-cb__addon { display: grid; grid-template-columns: auto 48px 1fr auto; gap: 12px; align-items: center; padding: 8px; border-radius: 12px; border: 2px solid #eee; cursor: pointer; }
+  .lm-cb__addon:has(input:checked) { border-color: var(--lm-cb-brand); }
+  .lm-cb__addon input { width: 20px; height: 20px; accent-color: var(--lm-cb-brand); }
+  .lm-cb__addon-img img { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; display: block; }
+  .lm-cb__addon-name { font-size: 15px; }
+  .lm-cb__addon-price { font-weight: 600; white-space: nowrap; }
+
+
+  .lm-cb__summary { margin-top: 8px; padding: 22px 18px; border-radius: 22px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.08); border: 2px solid color-mix(in srgb, var(--lm-cb-brand) 35%, transparent); scroll-margin-top: 80px; }
+  .lm-cb__sum-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .lm-cb__sum-title { margin: 0; font-size: 20px; line-height: 1.25; }
+  .lm-cb__sum-status { flex: 0 0 auto; padding: 4px 10px; border-radius: 999px; background: #F1ECE6; font-size: 12px; font-weight: 700; }
+  .lm-cb__sum-status.is-ready { background: color-mix(in srgb, var(--lm-cb-brand) 25%, #fff); }
+  .lm-cb__sum-list { list-style: none; margin: 0 0 16px; padding: 0; font-size: 15px; }
+  .lm-cb__sum-list li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px dashed #EAE3DA; }
+  .lm-cb__sum-list li > span:first-child { position: relative; padding-left: 22px; }
+  .lm-cb__sum-list li > span:first-child::before { content: "✓"; position: absolute; left: 0; top: 0; font-weight: 700; }
+  .lm-cb__sum-list li.is-todo { color: #5C5C5C; font-style: italic; }
+  .lm-cb__sum-list li.is-todo > span:first-child::before { content: "○"; }
+  .lm-cb__sum-list li.is-addon > span:first-child::before { content: "+"; }
+  .lm-cb__sum-list li.is-note > span:first-child::before { content: "✎"; }
+  .lm-cb__sum-right { white-space: nowrap; color: #5C5C5C; font-variant-numeric: tabular-nums; }
+  .lm-cb__sum-right .lm-cb__free { margin: 0; color: var(--lm-cb-ink); }
+
+  .lm-cb__deal { padding: 16px; border-radius: 16px; background: color-mix(in srgb, var(--lm-cb-accent) 12%, #fff); display: grid; gap: 8px; }
+  .lm-cb__deal-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 15px; }
+  .lm-cb__deal-row s { color: #5C5C5C; font-variant-numeric: tabular-nums; }
+  .lm-cb__deal-row--combo span { font-weight: 600; }
+  .lm-cb__deal-row--combo strong { font-size: 24px; font-variant-numeric: tabular-nums; }
+  .lm-cb__deal-row--muted { color: #5C5C5C; }
+  .lm-cb__deal-row--total { margin-top: 4px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,.1); font-weight: 700; }
+  .lm-cb__deal-row--total strong { font-size: 22px; font-variant-numeric: tabular-nums; }
+  .lm-cb__save-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .lm-cb__save { padding: 6px 12px; border-radius: 999px; background: var(--lm-cb-ink); color: #fff; font-size: 14px; font-weight: 700; }
+  .lm-cb__save-pct { padding: 6px 12px; border-radius: 999px; background: var(--lm-cb-accent); color: var(--lm-cb-ink); font-size: 14px; font-weight: 700; }
+  .lm-cb__freebies { margin: 0; font-size: 14px; font-weight: 600; }
+
+  .lm-cb__actions { display: grid; gap: 10px; margin-top: 16px; }
+  .lm-cb__btn { min-height: 54px; padding: 0 24px; border-radius: 999px; font-size: 17px; font-weight: 700; cursor: pointer; transition: transform .12s, filter .12s; }
+  .lm-cb__btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(.97); }
+  .lm-cb__btn:focus-visible { outline: 3px solid var(--lm-cb-ink); outline-offset: 3px; }
+  .lm-cb__btn--buy { border: 0; background: var(--lm-cb-brand); color: var(--lm-cb-ink); box-shadow: 0 8px 20px color-mix(in srgb, var(--lm-cb-brand) 40%, transparent); }
+  .lm-cb__btn--cart { border: 2px solid var(--lm-cb-ink); background: #fff; color: var(--lm-cb-ink); }
+  .lm-cb__btn:disabled { background: #E6E0D8; border-color: #E6E0D8; color: #5C5C5C; box-shadow: none; }
+  .lm-cb__hint-main { margin: 10px 0 0; text-align: center; font-size: 14px; color: #5C5C5C; }
+  .lm-cb__hint-main:empty { display: none; }
+  .lm-cb__trust { margin: 14px 0 0; text-align: center; font-size: 13px; color: #5C5C5C; }
+  .lm-cb__soldout { margin: 12px 0 0; text-align: center; font-weight: 700; }
+
+  .lm-cb__bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: #fff; box-shadow: 0 -4px 20px rgba(0,0,0,.08); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); transition: transform .2s; }
+  .lm-cb__bar.is-away { transform: translateY(110%); }
+  .lm-cb__bar-inner { max-width: 760px; margin: 0 auto; display: flex; gap: 12px; align-items: center; }
+  .lm-cb__bar-text { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .lm-cb__bar-text strong { font-size: 20px; }
+  .lm-cb__bar-text span { font-size: 13px; color: #5C5C5C; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lm-cb__btn--bar { min-height: 50px; padding: 0 26px; font-size: 16px; }
+  .lm-cb__error { margin: 10px 0 0; color: #b42318; font-size: 14px; text-align: center; }
+
+  @media (min-width: 600px) { .lm-cb__grid { grid-template-columns: repeat(4, 1fr); gap: 12px; } .lm-cb__card-name { font-size: 14px; } }
+  @media (min-width: 900px) { .lm-cb__grid { grid-template-columns: repeat(5, 1fr); } .lm-cb__step { padding: 24px; } .lm-cb__chips { margin: 0 0 14px; padding: 0 0 4px; flex-wrap: wrap; } }
+  @media (prefers-reduced-motion: reduce) { .lm-cb * { animation: none !important; transition: none !important; } }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "LM Combo Builder",
+  "tag": "section",
+  "class": "lm-cb-section",
+  "enabled_on": {
+    "templates": [
+      "product"
+    ]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "brand_color",
+      "label": "Brand",
+      "default": "#F26B6C"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "default": "#E9A23B"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background",
+      "default": "#FFF8F0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "header",
+      "content": "Top"
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro line",
+      "default": "Pick what they'll love. Every combo comes with a free personalised Diwali card and sticker set."
+    },
+    {
+      "type": "text",
+      "id": "price_note",
+      "label": "Note next to price",
+      "default": "for the whole combo"
+    },
+    {
+      "type": "header",
+      "content": "Summary & button"
+    },
+    {
+      "type": "text",
+      "id": "summary_heading",
+      "label": "Summary heading (shown before the combo name)",
+      "default": "Your"
+    },
+    {
+      "type": "text",
+      "id": "worth_label",
+      "label": "Worth label",
+      "default": "Worth if bought separately"
+    },
+    {
+      "type": "text",
+      "id": "pay_label",
+      "label": "Pay label",
+      "default": "Total"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_deal",
+      "label": "Show savings (if bought separately vs combo price)",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "combo_label",
+      "label": "Combo price label",
+      "default": "Your combo price"
+    },
+    {
+      "type": "text",
+      "id": "addons_label",
+      "label": "Add-ons label",
+      "default": "Add-ons"
+    },
+    {
+      "type": "text",
+      "id": "buy_label",
+      "label": "Buy now button",
+      "default": "Buy now"
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Add to cart button",
+      "default": "Add to cart"
+    },
+    {
+      "type": "text",
+      "id": "trust_line",
+      "label": "Small line under the buttons",
+      "default": "Secure online payment · Packed by hand in Hyderabad"
+    },
+    {
+      "type": "text",
+      "id": "soldout_text",
+      "label": "Sold out message",
+      "default": "This combo is sold out right now."
+    },
+    {
+      "type": "text",
+      "id": "free_label",
+      "label": "Label for free items",
+      "default": "Free"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pick",
+      "name": "Pick step",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Pick any 3 bookmarks"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection to pick from"
+        },
+        {
+          "type": "range",
+          "id": "count",
+          "label": "How many to pick",
+          "min": 1,
+          "max": 8,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "text",
+          "id": "item_singular",
+          "label": "Item name (one)",
+          "default": "bookmark"
+        },
+        {
+          "type": "text",
+          "id": "item_plural",
+          "label": "Item name (many)",
+          "default": "bookmarks"
+        },
+        {
+          "type": "text",
+          "id": "property_name",
+          "label": "Label on order",
+          "default": "Bookmarks"
+        },
+        {
+          "type": "range",
+          "id": "limit",
+          "label": "Max products to load",
+          "min": 4,
+          "max": 50,
+          "step": 2,
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "show_initial",
+          "label": "Tiles shown before 'Show all'",
+          "min": 3,
+          "max": 24,
+          "step": 3,
+          "default": 9
+        },
+        {
+          "type": "text",
+          "id": "filter_tags",
+          "label": "Filter chips (product tags, comma separated)",
+          "info": "Each chip shows products with that tag. Leave empty for no chips.",
+          "default": "Harry Potter, Anime, Disney, Coquette"
+        },
+        {
+          "type": "text",
+          "id": "exclude_words",
+          "label": "Skip products containing these words",
+          "info": "Checked against title, product type and tags. Keeps combos and packs out of the tiles.",
+          "default": "combo, pack, set of, bundle"
+        },
+        {
+          "type": "checkbox",
+          "id": "split_variants",
+          "label": "Show each variant as its own tile",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "input",
+      "name": "Name box",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Name to print on the notepad"
+        },
+        {
+          "type": "text",
+          "id": "help",
+          "label": "Help text",
+          "default": "Up to 20 letters"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Placeholder",
+          "default": "e.g. Ananya"
+        },
+        {
+          "type": "number",
+          "id": "max_length",
+          "label": "Max characters",
+          "default": 20
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Required",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "property_name",
+          "label": "Label on order",
+          "default": "Name on notepad"
+        }
+      ]
+    },
+    {
+      "type": "included",
+      "name": "Already included",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Already included in your combo"
+        },
+        {
+          "type": "textarea",
+          "id": "items",
+          "label": "Items: one per line, as  Item | single price",
+          "info": "One per line as  Item | price, or  Item | free  for free extras.",
+          "default": "Memo pad | 199\nPersonalised Diwali card | free\nSticker set | free"
+        }
+      ]
+    },
+    {
+      "type": "addons",
+      "name": "Optional add-ons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Want to add something extra?"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": "Optional, added at its own price"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Add-on collection"
+        },
+        {
+          "type": "range",
+          "id": "limit",
+          "label": "Max products to show",
+          "min": 2,
+          "max": 12,
+          "step": 1,
+          "default": 4
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "LM Combo Builder",
+      "blocks": [
+        {
+          "type": "pick",
+          "settings": {
+            "heading": "Pick any 3 bookmarks",
+            "count": 3,
+            "item_singular": "bookmark",
+            "item_plural": "bookmarks",
+            "property_name": "Bookmarks"
+          }
+        },
+        {
+          "type": "pick",
+          "settings": {
+            "heading": "Pick 1 notepad",
+            "count": 1,
+            "item_singular": "notepad",
+            "item_plural": "notepads",
+            "property_name": "Notepad",
+            "limit": 12,
+            "filter_tags": "",
+            "show_initial": 6
+          }
+        },
+        {
+          "type": "input"
+        },
+        {
+          "type": "included"
+        },
+        {
+          "type": "addons"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

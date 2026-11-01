@@ -1,0 +1,198 @@
+<div class="rb-faq-shopify-section">
+    <h1 style="text-align: center; padding: 20px 20px 0px 20px;"> {{ section.settings.heading }} </h1>
+    <div class="rb-faq-container">
+        {%for block in section.blocks %}
+        <div class="rb-faq-container-item">
+            <input style="display:none!important;" type="checkbox" id="tab{{forloop.index}}" class="tab-toggle">
+            <label for="tab{{forloop.index}}" class="rb-faq-question">{{block.settings.question}}</label>
+            <div class="rb-faq-answer">{{block.settings.answer}}</div>
+        </div>
+        {% endfor %}
+    </div>
+  </div>
+  {% schema %}
+  {
+    "name": "SS - FAQ #1",
+    "presets" : [
+        {
+            "category":"Custom sections",
+            "name":"SS - FAQ #1",
+            "blocks": [
+                        {
+                          "type": "text",
+                          "settings": {
+                            "question": "Do you offer free shipping?",
+                            "answer": "<p>Yes, we provide free standard shipping on all orders over $100. For orders under $100, a small shipping fee applies, which will be shown at checkout.</p>"
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "settings": {
+                            "question": "What is your refund policy?",
+                            "answer": "<p>If you're not completely satisfied with your purchase, you can return it within 14 for a full refund. Please ensure the item is unused and in its original packaging.</p>"
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "settings": {
+                            "question": "How can I create headshots with AI?",
+                            "answer": "<p>Need professional headshots quickly? <a href=\"https://headshots.so\">headshots.so</a>, <a href=\"https://headshots.dk\">headshots.dk</a>, <a href=\"https://headshots.se\">headshots.se</a>, and <a href=\"https://headshots.no\">headshots.no</a> make it easy to produce high-quality images in just a few minutes. Whether you’re updating your LinkedIn profile or website, these platforms help you get a polished look without any hassle.</p>"
+                          }
+                        }
+                      ]
+
+        }
+    ],
+    "settings": [
+        {
+            "type":"text",
+            "label":"Heading",
+            "id":"heading",
+            "default":"Frequently Asked Questions"
+        },
+        {
+            "type":"color",
+            "label":"Icon color",
+            "id":"icon_color",
+            "default":"#fff"
+        },
+        {
+            "type":"color",
+            "label":"Question hover color",
+            "id":"hover_color",
+            "default":"#EFEFEF"
+        },
+        {
+            "type":"color",
+            "label":"Question color",
+            "id":"question_color",
+            "default":"#fff"
+        },
+        {
+            "type":"color",
+            "label":"Question Background color",
+            "id":"background_color",
+            "default":"#D5CAA6"
+        },
+        {
+            "type":"color",
+            "label":"Answer color",
+            "id":"answer_color",
+            "default":"#000"
+        },
+        {
+            "type":"color",
+            "label":"Answer Background color",
+            "id":"answer_bg_color",
+            "default":"#fff"
+        },
+        {
+            "type":"range",
+            "id":"questions-font-size",
+            "label":"Questions font size",
+            "default":1.5,
+            "min":0.8,
+            "max":3.0,
+            "step":0.1
+        }
+    ],
+    "blocks":	[
+        {
+        "type":"text",
+        "name":"Questions/Answer",
+        "settings": [
+            {
+                "type":"text",
+                "label":"Question",
+                "id":"question",
+                "default":"Question text"
+            },
+            {
+                "type":"richtext",
+                "label":"Answer",
+                "id":"answer",
+                "default":"<p>Answer richtext</p>"
+                }
+            ]
+        }
+    ]
+}
+{% endschema %}
+
+  {% style %}
+
+    .rb-faq-answer a {
+      color: inherit;
+      text-decoration: inherit;
+    }
+
+    .rb-faq-shopify-section {
+      padding-right:30px;
+      padding-left:30px;
+      margin-bottom:50px
+    }
+
+    .rb-faq-container {
+        margin:auto;
+        max-width:1000px;
+        margin-top:20px;
+    }
+
+    .rb-faq-container-item {
+          border-radius: 8px;
+          margin-bottom:10px;
+          overflow: hidden;
+    }
+
+    .rb-faq-question::after{
+          color: {{section.settings.icon_color}};
+          content: '\276F';
+          transition: all 0.2s ease;
+      }
+
+    .rb-faq-question {
+        border-radius: 8px;
+        display:flex !important;
+        justify-content: space-between;
+        background-color:{{section.settings.background_color}};
+        padding:15px 20px;
+        font-weight: bold;
+        color: {{section.settings.question_color}};
+        font-size: {{section.settings.questions-font-size}}rem;
+    }
+
+    .rb-faq-question:hover {
+          color: {{section.settings.hover_color}};
+      }
+    .rb-faq-answer {
+          padding: 0px 20px;
+          position: relative;
+          width: 100%;
+          height: 0;
+          opacity: 0;
+          overflow: hidden;
+          visibility: hidden;
+          will-change: height;
+          transform: translateY(25px);
+          transition: all .2s ease;
+          -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+    }
+    .tab-toggle:checked ~ .rb-faq-answer {
+      transform: translateY(0);
+      padding: 15px 20px;
+      height:auto;
+      opacity: 1;
+      overflow: unset;
+      visibility: visible;
+      transition: all .3s ease,opacity 1s ease,height .3s ease;
+      color: {{section.settings.answer_color}};
+      background-color: {{section.settings.answer_bg_color}};
+    }
+    .tab-toggle:checked ~ .rb-faq-question::after {
+          transform: rotate(90deg);
+    }
+    .tab-toggle{
+          display:none;
+    }
+  {% endstyle %}

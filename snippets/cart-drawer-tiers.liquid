@@ -1,0 +1,167 @@
+{% comment %}
+  Reward milestone progress bar for the cart drawer (display only; the discounts live in Shopify admin).
+  Configured in Theme settings > Cart. Up to 3 tiers; a tier with goal 0 is off.
+  The wrapper is always rendered so cart-drawer.js can read data-tiers-achieved after each re-render.
+
+  Usage:
+  {% render 'cart-drawer-tiers' %}
+{% endcomment %}
+
+{%- liquid
+  assign tier_mode = settings.tier_condition
+  assign tier_scope = settings.tier_applies
+  assign tier_unit = 100
+  if tier_mode == 'quantity'
+    assign tier_unit = 1
+  endif
+  assign tier_value = 0
+  assign tier_max = 0
+  assign tiers_achieved = 0
+  assign tier_count = 0
+  assign show_tiers = false
+
+  for i in (1..3)
+    assign goal_key = 'tier_' | append: i | append: '_goal'
+    if settings[goal_key] > 0
+      assign tier_count = tier_count | plus: 1
+    endif
+  endfor
+
+  if settings.tier_enable and tier_count > 0 and cart.item_count > 0
+    if tier_scope == 'all'
+      case tier_mode
+        when 'quantity'
+          assign tier_value = cart.item_count
+        when 'subtotal'
+          assign tier_value = cart.original_total_price
+        else
+          assign tier_value = cart.total_price
+      endcase
+    else
+      assign tier_collection_ids = settings.tier_collections | map: 'id'
+      assign tier_product_ids = settings.tier_products | map: 'id'
+      for item in cart.items
+        assign eligible = false
+        if tier_scope == 'products'
+          if tier_product_ids contains item.product_id
+            assign eligible = true
+          endif
+        else
+          assign item_collection_ids = item.product.collections | map: 'id'
+          for collection_id in tier_collection_ids
+            if item_collection_ids contains collection_id
+              assign eligible = true
+              break
+            endif
+          endfor
+        endif
+        if eligible
+          case tier_mode
+            when 'quantity'
+              assign tier_value = tier_value | plus: item.quantity
+            when 'subtotal'
+              assign tier_value = tier_value | plus: item.original_line_price
+            else
+              assign tier_value = tier_value | plus: item.final_line_price
+          endcase
+        endif
+      endfor
+    endif
+
+    assign next_goal = -1
+    assign next_text = ''
+    for i in (1..3)
+      assign goal_key = 'tier_' | append: i | append: '_goal'
+      assign text_key = 'tier_' | append: i | append: '_text'
+      if settings[goal_key] > 0
+        assign goal = settings[goal_key] | times: tier_unit
+        if goal > tier_max
+          assign tier_max = goal
+        endif
+        if tier_value >= goal
+          assign tiers_achieved = tiers_achieved | plus: 1
+        elsif next_goal == -1 or goal < next_goal
+          assign next_goal = goal
+          assign next_text = settings[text_key]
+        endif
+      endif
+    endfor
+
+    if tier_max > 0
+      assign show_tiers = true
+      assign tier_pct = tier_value | times: 100.0 | divided_by: tier_max
+      if tier_pct > 100
+        assign tier_pct = 100
+      endif
+
+      if next_goal == -1
+        assign tier_message = settings.tier_complete_text | escape
+      else
+        assign remaining = next_goal | minus: tier_value
+        if tier_mode != 'quantity'
+          assign remaining = remaining | money_without_trailing_zeros
+        endif
+        assign tier_message = next_text | escape | replace: '{{goal}}', remaining | replace: '{{ goal }}', remaining
+      endif
+    endif
+  endif
+-%}
+
+<div class="cd-tiers-wrap" data-tiers-achieved="{{ tiers_achieved }}" data-confetti="{{ settings.tier_confetti }}">
+  {%- if show_tiers -%}
+    <div
+      class="cd-tiers"
+      style="--tier-primary: {{ settings.tier_primary }}; --tier-secondary: {{ settings.tier_secondary }};"
+    >
+      <p class="cd-tiers__text">{{ tier_message }}</p>
+      <div
+        class="cd-tiers__bar"
+        role="progressbar"
+        aria-label="Rewards progress"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="{{ tier_pct | round }}"
+      >
+        <span class="cd-tiers__track"><span class="cd-tiers__fill" style="width: {{ tier_pct }}%;"></span></span>
+        {%- for i in (1..3) -%}
+          {%- liquid
+            assign goal_key = 'tier_' | append: i | append: '_goal'
+            assign type_key = 'tier_' | append: i | append: '_type'
+            assign label_key = 'tier_' | append: i | append: '_label'
+            assign goal_setting = settings[goal_key] | default: 0
+            assign goal = goal_setting | times: tier_unit
+            assign goal_pos = goal | times: 100.0 | divided_by: tier_max
+            if tier_mode == 'quantity'
+              assign goal_label = goal_setting | append: ' Item'
+              if goal_setting != 1
+                assign goal_label = goal_label | append: 's'
+              endif
+            else
+              assign goal_label = goal | money_without_trailing_zeros
+            endif
+          -%}
+          {%- if goal_setting > 0 -%}
+          <div class="cd-tier{% if goal == tier_max %} cd-tier--end{% elsif goal_pos < 12 %} cd-tier--start{% endif %}{% if tier_value >= goal %} is-done{% endif %}" style="--tier-pos: {{ goal_pos }}%;">
+            <span class="cd-tier__goal">{{ goal_label }}</span>
+            <span class="cd-tier__dot" aria-hidden="true">
+              {%- if tier_value >= goal -%}
+                <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {%- else -%}
+                {%- case settings[type_key] -%}
+                  {%- when 'free_shipping' -%}
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M2 6h11v9H2zM13 9h4l3 3v3h-7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="6" cy="17" r="1.8" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="17" r="1.8" stroke="currentColor" stroke-width="2"/></svg>
+                  {%- when 'free_gift' -%}
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="8" width="18" height="4" rx="1" stroke="currentColor" stroke-width="2"/><path d="M5 12v8h14v-8M12 8v12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                  {%- else -%}
+                    <svg width="13" height="13" viewBox="0 0 24 24"><path fill="currentColor" d="M21.4 11.6 12.4 2.6A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7c0 .6.2 1.1.6 1.4l9 9a2 2 0 0 0 2.8 0l7-7a2 2 0 0 0 0-2.8ZM6.5 8A1.5 1.5 0 1 1 6.5 5a1.5 1.5 0 0 1 0 3Z"/></svg>
+                {%- endcase -%}
+              {%- endif -%}
+            </span>
+            <span class="cd-tier__label">{{ settings[label_key] | escape }}</span>
+          </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  {%- endif -%}
+</div>

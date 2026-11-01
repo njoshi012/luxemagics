@@ -1,0 +1,672 @@
+{% comment %}
+---------------------------------------------------------
+Copyright © 2023 Section Store. All rights reserved.
+Unauthorized copying, modification, distribution, or use
+of this code or any portion of it, is strictly prohibited.
+Violators will be prosecuted to the fullest extent of the law.
+For inquiries or permissions, contact daniel@section.store
+---------------------------------------------------------
+{% endcomment %}
+
+
+{%- liquid 
+  assign padding_horizontal = section.settings.padding_horizontal
+  assign padding_horizontal_mobile = section.settings.padding_horizontal_mobile
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+  assign border_color = section.settings.border_color
+  assign border_thickness = section.settings.border_thickness
+  assign margin_top = section.settings.margin_top
+  assign margin_bottom = section.settings.margin_bottom
+  assign background_color = section.settings.background_color
+  assign background_gradient = section.settings.background_gradient
+  assign full_width = section.settings.full_width
+  assign content_width = section.settings.content_width
+
+  assign trust_position = section.settings.trust_position
+
+  assign title_size = section.settings.title_size
+  assign title_size_mobile = section.settings.title_size_mobile
+  assign title_color = section.settings.title_color
+  assign title_custom = section.settings.title_custom
+  assign title_font = section.settings.title_font
+  assign title_height = section.settings.title_height
+
+  assign sub_title_size = section.settings.sub_title_size
+  assign sub_title_size_mobile = section.settings.sub_title_size_mobile
+  assign sub_title_color = section.settings.sub_title_color
+  assign sub_title_custom = section.settings.sub_title_custom
+  assign sub_title_font = section.settings.sub_title_font
+  assign sub_title_height = section.settings.sub_title_height
+
+  assign line_border_color = section.settings.line_border_color
+-%}
+
+{%- style -%}
+
+  {{  title_font | font_face: font_display: 'swap' }}
+  {{  sub_title_font | font_face: font_display: 'swap' }}
+  
+  .section-{{ section.id }} {
+    border-top: solid {{ border_color }} {{ border_thickness }}px;
+    border-bottom: solid {{ border_color }} {{ border_thickness }}px;
+    margin-top: {{ margin_top | times: 0.75 | round: 0 }}px;
+    margin-bottom: {{ margin_bottom | times: 0.75 | round: 0 }}px;
+  }
+  
+  .section-{{ section.id }}-settings {
+    margin: 0 auto;
+    padding-top: {{ padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ padding_bottom | times: 0.75 | round: 0 }}px;
+    padding-left: {{ padding_horizontal_mobile }}rem;
+    padding-right: {{ padding_horizontal_mobile }}rem;
+  }
+
+  .ss-trust-badges-list-{{ section.id }} {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .ss-trust-badge-item-{{ section.id }} {
+    text-align: center;
+    padding: .75rem;
+    flex: 1;
+    display: flex;
+    border-color: {{ line_border_color }};
+    border-style: solid;
+    border-width: 0px;
+  }
+  
+  .ss-trust-badge-item-{{ section.id }}:nth-child(even) {
+    border-right-width: 0;
+    border-bottom-width: 1px;
+  }
+  
+  .ss-trust-badge-item-{{ section.id }}:nth-child(odd) {
+    border-left-width: 0;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+  }
+  
+  .ss-trust-badge-item-{{ section.id }}:nth-child(-n+2) {
+    border-top-width: 0;
+  }
+  
+  .ss-trust-badge-icon-{{ section.id }} {
+    margin:0 10px 0 2.5px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-bottom: 0;
+    font-size: calc(var(--emoji-font-size) * 0.9);
+  }
+  
+  .ss-trust-badge-icon-{{ section.id }} svg {
+    height: 30px;
+  }
+  
+  .ss-trust-badge-text-{{ section.id }} {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+  
+  .ss-trust-badge-text-{{ section.id }} p {
+    line-height: 1.2;
+    margin-top: 0;
+    margin-bottom: 0;
+    text-align: left;
+  }
+  
+  .ss-trust-badge-title-{{ section.id }} {
+    margin: 0;
+    font-size: {{ title_size_mobile }}px;
+    color: {{ title_color }};
+    line-height: {{ title_height }}%;
+    text-transform: unset;
+  }
+  
+  .ss-trust-badge-subtitle-{{ section.id }} {
+    margin: 0;
+    font-size: {{ sub_title_size_mobile }}px;
+    color: {{ sub_title_color }};
+    line-height: {{ sub_title_height }}%;
+    text-transform: unset;
+  }
+
+   .ss-trust-badge-image-{{ section.id }} {
+     flex: 0 0 40px;
+   }
+
+  .ss-trust-badge-image-{{ section.id }} img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  @media(min-width: 1024px) {
+
+    .section-{{ section.id }} {
+      margin-top: {{ margin_top }}px;
+      margin-bottom: {{ margin_bottom }}px;
+    }
+    
+    .section-{{ section.id }}-settings {
+      padding: 0 5rem;
+      padding-top: {{ padding_top }}px;
+      padding-bottom: {{ padding_bottom }}px;
+      padding-left: {{ padding_horizontal }}rem;
+      padding-right: {{ padding_horizontal }}rem;
+    }
+
+    .ss-trust-badge-icon-{{ section.id }} {
+      margin:0 10px 0 7.5px;
+      font-size: var(--emoji-font-size);
+    }
+    
+    .ss-trust-badge-title-{{ section.id }} {
+      font-size: {{ title_size }}px;
+    }
+    
+    .ss-trust-badge-subtitle-{{ section.id }} {
+      font-size: {{ sub_title_size }}px;
+    }
+  }
+  
+{%- endstyle -%}
+
+{% unless full_width %}
+  <style>
+    .section-{{ section.id }}-settings {
+      max-width: {{ content_width }}rem;
+    }
+  </style>
+{% endunless %}
+
+{% if title_custom %}
+  <style>
+    .ss-trust-badge-title-{{ section.id }} {
+      font-family: {{ title_font.family }}, {{ title_font.fallback_families }};
+      font-weight: {{ title_font.weight }};
+      font-style: {{ title_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if sub_title_custom %}
+  <style>
+    .ss-trust-badge-subtitle-{{ section.id }} {
+      font-family: {{ sub_title_font.family }}, {{ sub_title_font.fallback_families }};
+      font-weight: {{ sub_title_font.weight }};
+      font-style: {{ sub_title_font.style }};
+    }
+  </style>
+{% endif %}
+
+<script>
+  (function () {
+    function loadProductForm() {
+
+      var productForm = document.querySelector('#ss-emoji');
+      
+      if (!productForm){
+        var productForm = document.querySelector('{% if trust_position == "below_title" or trust_position == "above_title" %}.product__title{% elsif trust_position == "below_description" %}.product__description{% else %}.button--add-to-cart, .product .product-form, .product-single__add-to-cart, .shopify-payment-button, .shopify-payment-button__button, .ProductForm__BuyButtons, .add-to-cart{% endif %}');
+        if (!productForm) return;
+      }
+
+      const templateContent = document.querySelector(
+        '#ss-trust-badges-template-{{ section.id }}'
+      ).content;
+
+      {%- comment -%}
+        if the section.blocks.size is even, the last two blocks will have no border-bottom
+        if the section.blocks.size is odd, the last block will have no border-bottom
+      {%- endcomment -%}
+      const trustBadgesList = templateContent.querySelector(
+        '#ss-trust-badges-list-{{ section.id }}'
+      );
+      const trustBadgeItems = trustBadgesList.querySelectorAll(
+        '.ss-trust-badge-item-{{ section.id }}'
+      );
+      const trustBadgeItemsCount = trustBadgeItems.length;
+      const trustBadgeItemsLastIndex = trustBadgeItemsCount - 1;
+      if(trustBadgeItemsCount % 2 == 0) {
+        trustBadgeItems[trustBadgeItemsLastIndex].style.borderBottomWidth = '0';
+        trustBadgeItems[trustBadgeItemsLastIndex - 1].style.borderBottomWidth = '0';
+      } else {
+        trustBadgeItems[trustBadgeItemsLastIndex].style.borderBottomWidth = '0';
+      }
+
+      productForm.insertAdjacentElement(
+        '{% if trust_position == "below_buy" or trust_position == "below_title" or trust_position == "below_description" %}afterend{% else %}beforebegin{% endif %}',
+        templateContent.firstElementChild
+      );
+    }
+    function unloadProductForm() {
+      var productForm = document.querySelector('#ss-emoji');
+      
+      if (!productForm){
+        var productForm = document.querySelector('{% if trust_position == "below_title" or trust_position == "above_title" %}.product__title{% elsif trust_position == "below_description" %}.product__description{% else %}.button--add-to-cart, .product .product-form, .product-single__add-to-cart, .shopify-payment-button, .shopify-payment-button__button, .ProductForm__BuyButtons, .add-to-cart{% endif %}');
+        if (!productForm) return;
+      }
+
+      const trustBadgesList = document.querySelector(
+        '#ss-trust-badges-list-{{ section.id }}'
+      );
+
+      if (trustBadgesList) trustBadgesList.remove();
+    }
+    window.addEventListener('DOMContentLoaded', loadProductForm);
+
+  })();
+</script>
+
+<template id="ss-trust-badges-template-{{ section.id }}">
+  <div class="section-{{ section.id }}" style="background-color:{{ background_color }}; background-image: {{ background_gradient }};">
+    <div class="section-{{ section.id }}-settings">
+      <ul
+        id="ss-trust-badges-list-{{ section.id }}"
+        class="ss-trust-badges-list-{{ section.id }}"
+        aria-label="{{ section.settings.list_label }}"
+        style="
+          --emoji-font-size: {{ section.settings.emoji_font_size }}px;
+        "
+      >
+        {% for block in section.blocks %}
+          <li
+            class="ss-trust-badge-item-{{ section.id }}"
+          >
+            {% if block.settings.image != blank %}
+              <div class="ss-trust-badge-image-{{ section.id }}">
+                <img src="{{ block.settings.image | image_url }}" alt="{{ block.settings.image }}">
+              </div>
+            {% else %}
+              {% unless block.settings.icon == blank %}
+                <div class="ss-trust-badge-icon-{{ section.id }}">
+                  {{ block.settings.icon }}
+                </div>
+              {% endunless %}
+            {% endif %}
+            <div class="ss-trust-badge-text-{{ section.id }}">
+              <div
+                class="ss-trust-badge-title-{{ section.id }}"
+              >
+                {{ block.settings.title }}
+              </div>
+              {% if block.settings.subtitle != blank %}
+                <div
+                  class="ss-trust-badge-subtitle-{{ section.id }}"
+                >
+                  {{ block.settings.subtitle }}
+                </div>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</template>
+
+{% schema %}
+{
+  "name": "SS - Trust badges emojis",
+  "settings": [
+    {
+      "type": "header",
+      "content": "⚠️ Save settings to view updates",
+      "info":"Learn how to add snippet sections with [this tutorial](https://section-store.helpscoutdocs.com/article/10-adding-product-page-snippets)"
+    },
+    {
+      "type": "header",
+      "content":"Default placement is below buy buttons",
+      "info": "To change placement - Copy this code: <div id='ss-emoji'></div> - Click 'Add block' -> Custom Liquid/HTML -> Paste."
+    },
+    {
+      "type": "select",
+      "id": "trust_position",
+      "label": "Trust Badges Position",
+      "default": "below_buy",
+      "options": [
+        {
+          "label": "Above Buy Buttons",
+          "value": "above_buy"
+        },
+        {
+          "label": "Below Buy Buttons",
+          "value": "below_buy"
+        },
+        {
+          "label": "Above Product Title",
+          "value": "above_title"
+        },
+        {
+          "label": "Below Product Title",
+          "value": "below_title"
+        },
+        {
+          "label": "Above Product Description",
+          "value": "above_description"
+        },
+        {
+          "label": "Below Product Description",
+          "value": "below_description"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Emoji Settings"
+    },
+    {
+      "type": "range",
+      "id": "emoji_font_size",
+      "label": "Emoji Font size",
+      "min": 6,
+      "max": 50,
+      "step": 1,
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Title Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "title_custom",
+      "label": "Use Custom Font",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "title_font",
+      "label": "Title Font Family",
+      "default": "josefin_sans_n4"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 0,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Title Size",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "min": 0,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Title Size - Mobile",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "title_height",
+      "min": 50,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "label": "Title Line Height",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Sub-Title Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "sub_title_custom",
+      "label": "Use Custom Font",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "sub_title_font",
+      "label": "Sub-Title Font Family",
+      "default": "josefin_sans_n4"
+    },
+    {
+      "type": "range",
+      "id": "sub_title_size",
+      "min": 0,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Sub-Title Size",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "sub_title_size_mobile",
+      "min": 0,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Sub-Title Size - Mobile",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "sub_title_height",
+      "min": 50,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "label": "Sub-Title Line Height",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Section Colors"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "sub_title_color",
+      "label": "Subtitle color",
+      "default": "#716969"
+    },
+    {
+      "type": "color",
+      "id": "line_border_color",
+      "label": "Border Between Items Color",
+      "default": "#DEDEDE"
+    },
+    {
+      "type": "color",
+      "label": "Section background",
+      "id": "background_color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "background_gradient",
+      "label": "Section background gradient"
+    },
+    {
+      "type": "color",
+      "label": "Border",
+      "id": "border_color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Section margin (outside)"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Margin top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Margin bottom",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section padding (inside)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 36
+    },
+    {
+       "type": "range",
+       "id": "padding_bottom",
+       "min": 0,
+       "max": 100,
+       "step": 4,
+       "unit": "px",
+       "label": "Padding bottom",
+       "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "rem",
+      "label": "Padding sides",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal_mobile",
+      "min": 0,
+      "max": 15,
+      "step": 0.5,
+      "unit": "rem",
+      "label": "Padding sides mobile",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full Width",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "min": 0,
+      "max": 400,
+      "step": 10,
+      "unit": "rem",
+      "label": "Section content width",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Border thickness",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon/emoji",
+          "default": "⭐"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Will Replace the Icon/emoji"
+        },
+        {
+          "type": "richtext",
+          "id": "title",
+          "label": "Title",
+          "default": "<p>Title</p>"
+        },
+        {
+          "type": "richtext",
+          "id": "subtitle",
+          "label": "Subtitle"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "SS - Trust badges emojis",
+      "blocks": [
+        {
+          "type": "item",
+          "settings": {
+            "title": "<p>Ships Free + Saves</p>",
+            "subtitle": "<p>Subscribing save you 33%</p>",
+            "icon": "🏆"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "title": "<p>100% Plastic free</p>",
+            "subtitle": "<p>Refillable glass far</p>",
+            "icon": "🌏"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "title": "<p>Tackles sensitivity</p>",
+            "icon": "💪"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "title": "<p>Clean ingredients</p>",
+            "icon": "🍃"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

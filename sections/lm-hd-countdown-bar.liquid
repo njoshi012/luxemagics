@@ -1,0 +1,426 @@
+{%- comment -%}
+  Luxe Magics — Header: Sticky Countdown Bar
+  Filename: sections/lm-hd-countdown-bar.liquid
+  Sticky top bar: label + live countdown (days/hours/mins/secs) + coupon code
+  with copy-to-clipboard button. Optional evergreen mode (repeats daily),
+  hide-on-expiry, sticky on/off, full color control.
+  Fully customizable via theme editor.
+{%- endcomment -%}
+
+{%- liquid
+  assign uid = section.id
+-%}
+
+{%- style -%}
+
+  #lm-cdb-{{ uid }} {
+    {% if section.settings.sticky %}
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    {% endif %}
+    width: 100%;
+    background: {{ section.settings.bg_color }};
+    {% if section.settings.bg_gradient != blank %}
+    background: {{ section.settings.bg_gradient }};
+    {% endif %}
+    padding: {{ section.settings.padding_block }}px 20px;
+    box-sizing: border-box;
+  }
+
+  .lm-cdb__inner-{{ uid }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px 32px;
+  }
+
+  /* Label */
+  .lm-cdb__label-{{ uid }} {
+    font-size: {{ section.settings.label_size }}px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: {{ section.settings.label_color }};
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  /* Timer */
+  .lm-cdb__timer-{{ uid }} {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+  }
+  .lm-cdb__unit-{{ uid }} {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    white-space: nowrap;
+  }
+  .lm-cdb__num-{{ uid }} {
+    font-size: {{ section.settings.number_size }}px;
+    font-weight: 800;
+    color: {{ section.settings.number_color }};
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .lm-cdb__unitlabel-{{ uid }} {
+    font-size: 13px;
+    font-weight: 400;
+    color: {{ section.settings.unit_label_color }};
+  }
+
+  /* Coupon pill */
+  .lm-cdb__code-{{ uid }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1.5px dashed {{ section.settings.code_border_color }};
+    border-radius: 999px;
+    padding: 8px 18px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: {{ section.settings.code_text_color }};
+    transition: background 0.2s ease;
+  }
+  .lm-cdb__code-{{ uid }}:hover {
+    background: rgba(255,255,255,0.08);
+  }
+  .lm-cdb__code-{{ uid }} svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .lm-cdb__code-{{ uid }}.lm-copied {
+    border-style: solid;
+  }
+
+  @media screen and (max-width: 749px) {
+    .lm-cdb__inner-{{ uid }} {
+      gap: 8px 18px;
+    }
+    .lm-cdb__timer-{{ uid }} { gap: 12px; }
+    .lm-cdb__label-{{ uid }} { font-size: {{ section.settings.label_size | times: 0.85 | round: 0 }}px; }
+    .lm-cdb__num-{{ uid }} { font-size: {{ section.settings.number_size | times: 0.8 | round: 0 }}px; }
+    .lm-cdb__unitlabel-{{ uid }} { font-size: 11px; }
+  }
+
+{%- endstyle -%}
+
+<div id="lm-cdb-{{ uid }}" {{ section.shopify_attributes }}>
+  <div class="lm-cdb__inner-{{ uid }}">
+
+    {%- if section.settings.label != blank -%}
+      <p class="lm-cdb__label-{{ uid }}">{{ section.settings.label }}</p>
+    {%- endif -%}
+
+    <div class="lm-cdb__timer-{{ uid }}" data-lm-timer>
+      {%- if section.settings.show_days -%}
+        <span class="lm-cdb__unit-{{ uid }}">
+          <span class="lm-cdb__num-{{ uid }}" data-lm-days>00</span>
+          <span class="lm-cdb__unitlabel-{{ uid }}">Days</span>
+        </span>
+      {%- endif -%}
+      <span class="lm-cdb__unit-{{ uid }}">
+        <span class="lm-cdb__num-{{ uid }}" data-lm-hours>00</span>
+        <span class="lm-cdb__unitlabel-{{ uid }}">Hours</span>
+      </span>
+      <span class="lm-cdb__unit-{{ uid }}">
+        <span class="lm-cdb__num-{{ uid }}" data-lm-mins>00</span>
+        <span class="lm-cdb__unitlabel-{{ uid }}">Minutes</span>
+      </span>
+      <span class="lm-cdb__unit-{{ uid }}">
+        <span class="lm-cdb__num-{{ uid }}" data-lm-secs>00</span>
+        <span class="lm-cdb__unitlabel-{{ uid }}">Seconds</span>
+      </span>
+    </div>
+
+    {%- if section.settings.coupon_code != blank -%}
+      <button type="button" class="lm-cdb__code-{{ uid }}" data-lm-copy data-code="{{ section.settings.coupon_code | escape }}" aria-label="Copy discount code">
+        <span data-lm-code-text>{{ section.settings.coupon_code }}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      </button>
+    {%- endif -%}
+
+  </div>
+</div>
+
+<script>
+(function() {
+  var root = document.getElementById('lm-cdb-{{ uid }}');
+  if (!root) return;
+
+  /* ---------- Countdown ---------- */
+  var endStr   = '{{ section.settings.end_date }} {{ section.settings.end_time | default: "23:59" }}';
+  var evergreen = {{ section.settings.evergreen | json }};
+  var evergreenHours = {{ section.settings.evergreen_hours | default: 24 }};
+  var hideExpired = {{ section.settings.hide_expired | json }};
+
+  var dEl = root.querySelector('[data-lm-days]');
+  var hEl = root.querySelector('[data-lm-hours]');
+  var mEl = root.querySelector('[data-lm-mins]');
+  var sEl = root.querySelector('[data-lm-secs]');
+
+  function getTarget() {
+    if (evergreen) {
+      var key = 'lm-cdb-end-{{ uid }}';
+      var saved = localStorage.getItem(key);
+      var now = Date.now();
+      if (saved && parseInt(saved, 10) > now) return parseInt(saved, 10);
+      var t = now + evergreenHours * 3600 * 1000;
+      localStorage.setItem(key, String(t));
+      return t;
+    }
+    var t = new Date(endStr.replace(/-/g, '/')).getTime();
+    return isNaN(t) ? 0 : t;
+  }
+
+  var target = getTarget();
+  var pad = function(n) { return String(n).padStart(2, '0'); };
+
+  function tick() {
+    var diff = target - Date.now();
+    if (diff <= 0) {
+      if (evergreen) { localStorage.removeItem('lm-cdb-end-{{ uid }}'); target = getTarget(); return; }
+      if (hideExpired) { root.style.display = 'none'; }
+      diff = 0;
+      clearInterval(iv);
+    }
+    var secs  = Math.floor(diff / 1000);
+    var days  = Math.floor(secs / 86400);
+    var hours = Math.floor((secs % 86400) / 3600);
+    {% unless section.settings.show_days %}
+    hours = hours + days * 24;
+    days = 0;
+    {% endunless %}
+    var mins  = Math.floor((secs % 3600) / 60);
+    var s     = secs % 60;
+    if (dEl) dEl.textContent = pad(days);
+    if (hEl) hEl.textContent = pad(hours);
+    if (mEl) mEl.textContent = pad(mins);
+    if (sEl) sEl.textContent = pad(s);
+  }
+
+  tick();
+  var iv = setInterval(tick, 1000);
+
+  /* ---------- Copy code ---------- */
+  var btn = root.querySelector('[data-lm-copy]');
+  if (btn) {
+    btn.addEventListener('click', function() {
+      var code = btn.getAttribute('data-code');
+      var label = btn.querySelector('[data-lm-code-text]');
+      var original = label.textContent;
+      function done() {
+        btn.classList.add('lm-copied');
+        label.textContent = '{{ section.settings.copied_text | default: "Copied!" }}';
+        setTimeout(function() {
+          btn.classList.remove('lm-copied');
+          label.textContent = original;
+        }, 1600);
+      }
+      function fallbackCopy() {
+        var ta = document.createElement('textarea');
+        ta.value = code;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        ta.setAttribute('readonly', '');
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, 99999);
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        done();
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(done).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
+    });
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Header — Countdown Bar",
+  "tag": "div",
+  "class": "lm-hd-countdown-bar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "JUST LAUNCHED"
+    },
+    {
+      "type": "text",
+      "id": "coupon_code",
+      "label": "Discount code",
+      "default": "LMWELCOME10",
+      "info": "Shown as a pill. Customers tap to copy. Leave empty to hide."
+    },
+    {
+      "type": "text",
+      "id": "copied_text",
+      "label": "Text after copying",
+      "default": "Copied!"
+    },
+    {
+      "type": "header",
+      "content": "Countdown"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "End date",
+      "default": "2026-07-31",
+      "info": "Format: YYYY-MM-DD"
+    },
+    {
+      "type": "text",
+      "id": "end_time",
+      "label": "End time (24h)",
+      "default": "23:59",
+      "info": "Format: HH:MM — store's local timezone of the visitor"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_days",
+      "label": "Show days unit",
+      "default": false,
+      "info": "Off: days roll into hours (e.g. 49 Hours)"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_expired",
+      "label": "Hide bar when countdown ends",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "evergreen",
+      "label": "Evergreen mode",
+      "default": false,
+      "info": "Ignores end date. Each visitor gets their own personal countdown that restarts when it hits zero."
+    },
+    {
+      "type": "range",
+      "id": "evergreen_hours",
+      "label": "Evergreen duration",
+      "min": 1,
+      "max": 72,
+      "step": 1,
+      "unit": "hr",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#0A0A0A"
+    },
+    {
+      "type": "text",
+      "id": "bg_gradient",
+      "label": "Background gradient (optional, overrides color)",
+      "info": "CSS value, e.g. linear-gradient(90deg, #000 0%, #2b1a12 50%, #000 100%)"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "number_color",
+      "label": "Timer numbers color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "unit_label_color",
+      "label": "Timer unit labels color",
+      "default": "#CFCFCF"
+    },
+    {
+      "type": "color",
+      "id": "code_text_color",
+      "label": "Code text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "code_border_color",
+      "label": "Code border color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "label": "Label size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "number_size",
+      "label": "Timer number size",
+      "min": 14,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_block",
+      "label": "Vertical padding",
+      "min": 6,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Stick to top on scroll",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header — Countdown Bar"
+    }
+  ]
+}
+{% endschema %}

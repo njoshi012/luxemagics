@@ -1,0 +1,178 @@
+
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div style="background-color:{{section.settings.background-color}};">
+  <div class="hero-container-{{ section.id }} section-{{ section.id }}-padding">
+      <div class="desktop-img {% if section.settings.mobile-img != blank %} hide-desktop-img-on-mobile {% endif %}">
+        <a href="{{ section.settings.desktop-url }}">
+           <img
+              srcSet="{%- if section.settings.image.width >= 375 -%}{{ section.settings.desktop-img | image_url: width: 375 }} 375w,{%- endif -%}
+                {%- if section.settings.desktop-img.width >= 550 -%}{{ section.settings.desktop-img | image_url: width: 550 }} 550w,{%- endif -%}
+                {%- if section.settings.desktop-img.width >= 750 -%}{{ section.settings.desktop-img | image_url: width: 750 }} 750w,{%- endif -%}
+                {%- if section.settings.desktop-img.width >= 1100 -%}{{ section.settings.desktop-img | image_url: width: 1100 }} 1100w,{%- endif -%}
+                {%- if section.settings.desktop-img.width >= 1500 -%}{{ section.settings.desktop-img | image_url: width: 1500 }} 1500w,{%- endif -%}
+                {%- if section.settings.desktop-img.width >= 1780 -%}{{ section.settings.desktop-img | image_url: width: 1780 }} 1780w,{%- endif -%}
+                {%- if section.settings.desktop-img.width >= 2000 -%}{{ section.settings.desktop-img | image_url: width: 2000 }} 2000w,{%- endif -%}
+                {%- if section.settings.desktop-img.width >= 3000 -%}{{ section.settings.desktop-img | image_url: width: 3000 }} 3000w,{%- endif -%}
+                {%- if section.settings.desktop-img.width >= 3840 -%}{{ section.settings.desktop-img | image_url: width: 3840 }} 3840w,{%- endif -%}"
+                  src="{{ section.settings.desktop-img | image_url: width: 1500 }}"
+                  loading="lazy"
+                  alt="{{ section.settings.desktop-img.alt | escape }}"
+                  width="{{ section.settings.desktop-img.width }}"
+                  height="{{ section.settings.desktop-img.width | divided_by: section.settings.desktop-img.aspect_ratio }}"
+            ></a>
+      </div>
+    {% if section.settings.mobile-img != blank %}
+      <div class="mobile-img">
+        <a href="{{ section.settings.mobile-url }}">
+        <img
+              srcSet="{%- if section.settings.image.width >= 375 -%}{{ section.settings.mobile-img | image_url: width: 375 }} 375w,{%- endif -%}
+                {%- if section.settings.mobile-img.width >= 550 -%}{{ section.settings.mobile-img | image_url: width: 550 }} 550w,{%- endif -%}
+                {%- if section.settings.mobile-img.width >= 750 -%}{{ section.settings.mobile-img | image_url: width: 750 }} 750w,{%- endif -%}
+                {%- if section.settings.mobile-img.width >= 1100 -%}{{ section.settings.mobile-img | image_url: width: 1100 }} 1100w,{%- endif -%}
+                {%- if section.settings.mobile-img.width >= 1500 -%}{{ section.settings.mobile-img | image_url: width: 1500 }} 1500w,{%- endif -%}
+                {%- if section.settings.mobile-img.width >= 1780 -%}{{ section.settings.mobile-img | image_url: width: 1780 }} 1780w,{%- endif -%}
+                {%- if section.settings.mobile-img.width >= 2000 -%}{{ section.settings.mobile-img | image_url: width: 2000 }} 2000w,{%- endif -%}
+                {%- if section.settings.mobile-img.width >= 3000 -%}{{ section.settings.mobile-img | image_url: width: 3000 }} 3000w,{%- endif -%}
+                {%- if section.settings.mobile-img.width >= 3840 -%}{{ section.settings.mobile-img | image_url: width: 3840 }} 3840w,{%- endif -%}"
+                  src="{{ section.settings.mobile-img | image_url: width: 1500 }}"
+                  loading="lazy"
+                  alt="{{ section.settings.mobile-img.alt | escape }}"
+                  width="{{ section.settings.mobile-img.width }}"
+                  height="{{ section.settings.mobile-img.width | divided_by: section.settings.mobile-img.aspect_ratio }}"
+            ></a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  
+  .hero-container-{{ section.id }} {
+    text-align: center;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+  }
+
+  .desktop-img img {
+    vertical-align: middle;
+    width: 100%;
+    height: auto;
+  }
+
+  .desktop-img, .mobile-img {
+    
+    width: 100%;
+    left: 0;
+    top: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .mobile-img img {
+    display:none!important;
+    vertical-align: middle;
+    width: 100%;
+    height: auto;
+  }
+
+
+   @media screen and (max-width: 768px) {
+    .hide-desktop-img-on-mobile {
+      display:none!important;
+    }
+
+    .mobile-img img {
+      display:inline!important;
+    }
+  }
+  
+</style>
+
+{% schema %}
+  {
+    "name": "SS - Fullscreen Banner",
+	"class": "section",
+	"tag": "section",
+    "settings": [
+		{
+          "type": "header",
+          "content": "Images"
+        },
+	    {
+		  "type": "image_picker",
+		  "label": "Desktop image",
+		  "id": "desktop-img"
+		},
+        {
+		  "type": "url",
+		  "label": "Desktop url",
+		  "id": "desktop-url"
+		},
+        {
+		  "type": "image_picker",
+		  "label": "Mobile image",
+		  "id": "mobile-img"
+		},
+        {
+		  "type": "url",
+		  "label": "Mobile url",
+		  "id": "mobile-url"
+		},
+        {
+          "type": "header",
+          "content": "t:sections.all.padding.section_padding_heading"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "min": 0,
+          "max": 100,
+          "step": 4,
+          "unit": "px",
+          "label": "t:sections.all.padding.padding_top",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "min": 0,
+          "max": 100,
+          "step": 4,
+          "unit": "px",
+          "label": "t:sections.all.padding.padding_bottom",
+          "default": 0
+        }
+	],
+   "blocks":[
+    
+  
+   ],
+ 	"presets": [
+      {
+          "name": "SS - Fullscreen Banner"
+      }
+	]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

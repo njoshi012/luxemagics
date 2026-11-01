@@ -1,0 +1,111 @@
+{%- comment -%}
+  Luxe Magics — Bulk order catalogue download + sample product
+{%- endcomment -%}
+
+{{ 'section-lm-bulk-order.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign sample = section.settings.sample_product
+  assign sample_url = section.settings.sample_link
+  if sample != blank
+    assign sample_url = sample.url
+  endif
+-%}
+
+<div id="bulk-sample" class="lmb color-{{ section.settings.color_scheme }} gradient">
+  <div class="page-width section-{{ section.id }}-padding">
+    <div class="lmb__section-head">
+      <h2>{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p>{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="lmb-res__grid">
+      {%- if section.settings.catalogue_heading != blank -%}
+        <div class="lmb-res__card">
+          <div class="lmb__eyebrow">{{ section.settings.catalogue_eyebrow | escape }}</div>
+          <h3>{{ section.settings.catalogue_heading | escape }}</h3>
+          <p>{{ section.settings.catalogue_text | escape }}</p>
+          {%- if section.settings.catalogue_link != blank -%}
+            <a href="{{ section.settings.catalogue_link }}" class="lmb-btn lmb-btn--accent" target="_blank" rel="noopener">
+              {{- section.settings.catalogue_button | escape -}}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.sample_heading != blank -%}
+        <div class="lmb-res__card">
+          <div class="lmb__eyebrow">{{ section.settings.sample_eyebrow | escape }}</div>
+          <h3>{{ section.settings.sample_heading | escape }}</h3>
+          <p>{{ section.settings.sample_text | escape }}</p>
+          {%- if sample != blank or section.settings.sample_price != blank -%}
+            <div class="lmb-res__price">
+              <strong>
+                {%- if sample != blank -%}
+                  {{- sample.price | money_without_trailing_zeros -}}
+                {%- else -%}
+                  {{- section.settings.sample_price | escape -}}
+                {%- endif -%}
+              </strong>
+              <span class="lmb__muted">per sample</span>
+            </div>
+          {%- endif -%}
+          {%- if sample_url != blank -%}
+            <a href="{{ sample_url }}" class="lmb-btn lmb-btn--dark">{{ section.settings.sample_button | escape }}</a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Bulk order – Catalogue",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Not ready to enquire yet?" },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Take the catalogue with you, or hold a sample in your hands before you decide."
+    },
+    { "type": "header", "content": "Catalogue" },
+    { "type": "text", "id": "catalogue_eyebrow", "label": "Eyebrow", "default": "Catalogue" },
+    { "type": "text", "id": "catalogue_heading", "label": "Heading", "default": "Download the 2027 calendar catalogue" },
+    { "type": "text", "id": "catalogue_text", "label": "Text", "default": "All four formats with details, in one PDF you can share with your team." },
+    { "type": "text", "id": "catalogue_button", "label": "Button label", "default": "Download PDF" },
+    { "type": "url", "id": "catalogue_link", "label": "PDF link", "info": "Upload the PDF in Content > Files and paste its link here." },
+    { "type": "header", "content": "Sample" },
+    { "type": "text", "id": "sample_eyebrow", "label": "Eyebrow", "default": "Sample" },
+    { "type": "text", "id": "sample_heading", "label": "Heading", "default": "Order a sample calendar" },
+    { "type": "text", "id": "sample_text", "label": "Text", "default": "See the paper, print and finish before you place your bulk order." },
+    { "type": "product", "id": "sample_product", "label": "Sample product", "info": "Price and link are taken from this product." },
+    { "type": "text", "id": "sample_price", "label": "Price (if no product selected)" },
+    { "type": "url", "id": "sample_link", "label": "Link (if no product selected)" },
+    { "type": "text", "id": "sample_button", "label": "Button label", "default": "Order a sample" },
+    { "type": "header", "content": "Colors and spacing" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "t:sections.all.colors.label", "default": "scheme-2" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "t:sections.all.padding.padding_top", "default": 72 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "t:sections.all.padding.padding_bottom", "default": 80 }
+  ],
+  "presets": [{ "name": "Bulk order – Catalogue" }]
+}
+{% endschema %}

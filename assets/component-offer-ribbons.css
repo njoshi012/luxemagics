@@ -1,0 +1,174 @@
+/* Offer ribbons on product cards. Top-left, because this store's sale/sold-out badges sit bottom-left. */
+.offer-ribbons {
+  position: absolute;
+  top: 1rem;
+  left: 0;
+  z-index: 2;
+  display: grid;
+  pointer-events: none;
+}
+
+.offer-ribbon {
+  grid-area: 1 / 1;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  height: 22px;
+  padding: 0 18px 0 8px;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 50%, 100% 100%, 0 100%);
+}
+
+.offer-ribbon::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.55) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: skewX(-20deg);
+  animation: offer-ribbon-shine 2.5s ease-in-out infinite;
+}
+
+@keyframes offer-ribbon-shine {
+  0% {
+    left: -60%;
+  }
+  60%,
+  100% {
+    left: 130%;
+  }
+}
+
+.offer-ribbon {
+  background: var(--ribbon-bg, #000);
+  color: var(--ribbon-fg, #fff);
+}
+
+/* Several offers: each ribbon shows for one slot of the cycle, offset by --offer-delay. */
+.offer-ribbons--rotate .offer-ribbon {
+  animation-duration: var(--offer-cycle, 6s);
+  animation-delay: var(--offer-delay, 0s);
+  animation-iteration-count: infinite;
+}
+
+.offer-ribbons--n2 .offer-ribbon {
+  animation-name: offer-ribbon-swap-2;
+}
+
+@keyframes offer-ribbon-swap-2 {
+  0%,
+  45% {
+    opacity: 1;
+    visibility: visible;
+  }
+  50%,
+  95% {
+    opacity: 0;
+    visibility: hidden;
+  }
+  100% {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.offer-ribbons--n3 .offer-ribbon {
+  animation-name: offer-ribbon-swap-3;
+}
+
+@keyframes offer-ribbon-swap-3 {
+  0%,
+  30% {
+    opacity: 1;
+    visibility: visible;
+  }
+  33.33%,
+  96.67% {
+    opacity: 0;
+    visibility: hidden;
+  }
+  100% {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.offer-ribbons--n4 .offer-ribbon {
+  animation-name: offer-ribbon-swap-4;
+}
+
+@keyframes offer-ribbon-swap-4 {
+  0%,
+  22.5% {
+    opacity: 1;
+    visibility: visible;
+  }
+  25%,
+  97.5% {
+    opacity: 0;
+    visibility: hidden;
+  }
+  100% {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* Product page gallery: below the zoom icon (top-left, 1.2rem + 3rem). */
+.offer-ribbons--pdp {
+  top: 5rem;
+  z-index: 3;
+}
+
+.offer-ribbons--pdp .offer-ribbon {
+  height: 28px;
+  padding: 0 22px 0 12px;
+  font-size: 13px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 11px) 50%, 100% 100%, 0 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offer-ribbons--rotate .offer-ribbon {
+    animation-duration: calc(var(--offer-cycle, 6s) * 2);
+    animation-delay: calc(var(--offer-delay, 0s) * 2);
+  }
+
+  .offer-ribbon::after {
+    animation: none;
+    display: none;
+  }
+}
+
+@media (max-width: 749px) {
+  .offer-ribbons {
+    top: 0.8rem;
+  }
+
+  .offer-ribbon {
+    height: 20px;
+    font-size: 10px;
+    padding: 0 15px 0 6px;
+  }
+}
+
+@media (max-width: 749px) {
+  /* The mobile gallery has a 1.5rem gutter before the first image. */
+  .offer-ribbons--pdp {
+    top: 1.2rem;
+    left: 1.5rem;
+  }
+
+  .offer-ribbons--pdp .offer-ribbon {
+    height: 24px;
+    padding: 0 18px 0 8px;
+    font-size: 12px;
+  }
+}

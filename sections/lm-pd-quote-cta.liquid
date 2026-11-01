@@ -1,0 +1,515 @@
+{%- comment -%}
+  Luxe Magics — Product Details: Brand Quote + CTA
+  Filename: sections/lm-pd-quote-cta.liquid
+  Full-width coral section. Large italic serif quote, subtext, trust strip,
+  CTA button that scrolls smoothly to the top of the page (or a custom anchor).
+  Fully customizable via theme editor.
+{%- endcomment -%}
+
+{%- liquid
+  assign pt     = section.settings.padding_top
+  assign pb     = section.settings.padding_bottom
+-%}
+
+{%- style -%}
+
+  #lm-qcta-{{ section.id }} {
+    padding-top: {{ pt | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ pb | times: 0.75 | round: 0 }}px;
+    background: {{ section.settings.bg_color }};
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  @media screen and (min-width: 750px) {
+    #lm-qcta-{{ section.id }} {
+      padding-top: {{ pt }}px;
+      padding-bottom: {{ pb }}px;
+    }
+  }
+
+  /* Large decorative quote mark behind text */
+  {% if section.settings.show_deco %}
+  #lm-qcta-{{ section.id }}::before {
+    content: '\201C';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: Georgia, serif;
+    font-size: 320px;
+    line-height: 1;
+    color: rgba(255,255,255,0.07);
+    pointer-events: none;
+    user-select: none;
+  }
+  {% endif %}
+
+  .lm-qcta__inner-{{ section.id }} {
+    position: relative;
+    z-index: 1;
+    max-width: {{ section.settings.content_width }}px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* Quote text */
+  .lm-qcta__quote-{{ section.id }} {
+    font-size: clamp(22px, 4vw, {{ section.settings.quote_size }}px);
+    font-weight: {{ section.settings.quote_weight }};
+    font-style: italic;
+    line-height: 1.35;
+    color: {{ section.settings.text_color }};
+    margin: 0 0 1.4rem;
+    letter-spacing: -0.01em;
+  }
+
+  /* Subtext */
+  .lm-qcta__sub-{{ section.id }} {
+    font-size: {{ section.settings.sub_size }}px;
+    color: {{ section.settings.text_color }};
+    opacity: 0.7;
+    line-height: 1.7;
+    margin: 0 0 2.4rem;
+  }
+
+  /* CTA button */
+  .lm-qcta__btn-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: {{ section.settings.btn_size }}px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: {{ section.settings.btn_text_color }};
+    background: {{ section.settings.btn_bg_color }};
+    border: 1.5px solid {{ section.settings.btn_border_color }};
+    padding: {{ section.settings.btn_pad_v }}px {{ section.settings.btn_pad_h }}px;
+    border-radius: {{ settings.buttons_radius }}px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+    margin-bottom: 2.8rem;
+  }
+  .lm-qcta__btn-{{ section.id }}:hover {
+    background: {{ section.settings.btn_hover_bg }};
+    color: {{ section.settings.btn_hover_text }};
+    transform: translateY(-1px);
+  }
+
+  /* Trust strip */
+  .lm-qcta__trust-{{ section.id }} {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 24px;
+  }
+  .lm-qcta__trust-item-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: {{ section.settings.trust_size }}px;
+    color: {{ section.settings.text_color }};
+    opacity: 0.65;
+    letter-spacing: 0.04em;
+  }
+  .lm-qcta__trust-sep-{{ section.id }} {
+    font-size: {{ section.settings.trust_size }}px;
+    color: {{ section.settings.text_color }};
+    opacity: 0.3;
+  }
+
+  /* Scroll animation */
+  {% if settings.animations_reveal_on_scroll %}
+  .lm-qcta__inner-{{ section.id }} {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .lm-qcta__inner-{{ section.id }}.lm-vis {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  {% endif %}
+
+{%- endstyle -%}
+
+<div
+  id="lm-qcta-{{ section.id }}"
+  {{ section.shopify_attributes }}
+>
+  <div class="lm-qcta__inner-{{ section.id }}{% if settings.animations_reveal_on_scroll %} lm-qcta-anim{% endif %}">
+
+    {%- if section.settings.quote != blank -%}
+      <p class="lm-qcta__quote-{{ section.id }}">{{ section.settings.quote }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.subtext != blank -%}
+      <p class="lm-qcta__sub-{{ section.id }}">{{ section.settings.subtext }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.btn_text != blank -%}
+      {%- if section.settings.scroll_to_top -%}
+        <button
+          class="lm-qcta__btn-{{ section.id }}"
+          id="lm-qcta-btn-{{ section.id }}"
+          type="button"
+          aria-label="{{ section.settings.btn_text }}"
+        >
+          {{ section.settings.btn_text }}
+          {%- if section.settings.show_arrow -%}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          {%- endif -%}
+        </button>
+      {%- else -%}
+        <a
+          href="{{ section.settings.btn_url | default: product.url | default: '#' }}"
+          class="lm-qcta__btn-{{ section.id }}"
+        >
+          {{ section.settings.btn_text }}
+          {%- if section.settings.show_arrow -%}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          {%- endif -%}
+        </a>
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- comment -%} Trust strip from blocks {%- endcomment -%}
+    {%- if section.blocks.size > 0 -%}
+      <div class="lm-qcta__trust-{{ section.id }}">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'trust' and block.settings.text != blank -%}
+            <span class="lm-qcta__trust-item-{{ section.id }}" {{ block.shopify_attributes }}>
+              {%- if block.settings.icon != blank -%}{{ block.settings.icon }}{%- endif -%}
+              {{ block.settings.text }}
+            </span>
+            {%- unless forloop.last -%}
+              <span class="lm-qcta__trust-sep-{{ section.id }}">·</span>
+            {%- endunless -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{%- comment -%} Scroll-to-top JS — only loads if option is enabled {%- endcomment -%}
+{%- if section.settings.scroll_to_top and section.settings.btn_text != blank -%}
+<script>
+(function() {
+  var btn = document.getElementById('lm-qcta-btn-{{ section.id }}');
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    var target = '{{ section.settings.scroll_anchor }}';
+    if (target && target !== 'top') {
+      var el = document.getElementById(target) || document.querySelector(target);
+      if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+{%- endif -%}
+
+{%- if settings.animations_reveal_on_scroll -%}
+<script>
+(function() {
+  var el = document.querySelector('#lm-qcta-{{ section.id }} .lm-qcta-anim');
+  if (!el) return;
+  new IntersectionObserver(function(entries, obs) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('lm-vis'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 }).observe(el);
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PD — Quote & CTA",
+  "tag": "section",
+  "class": "lm-pd-quote-cta",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Quote"
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "Quote text",
+      "default": "The memory is already there.\nGive it somewhere to live."
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext below quote",
+      "default": "Handcrafted. Personalised. Delivered in 5 days.\nStarting at ₹1,799 — free delivery across India."
+    },
+    {
+      "type": "range",
+      "id": "quote_size",
+      "label": "Quote font size (desktop max)",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "quote_weight",
+      "label": "Quote font weight",
+      "default": "300",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "sub_size",
+      "label": "Subtext size",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "checkbox",
+      "id": "show_deco",
+      "label": "Show decorative quote mark",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "CTA button"
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button text",
+      "default": "Order Your Frame →"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrow",
+      "label": "Show arrow icon on button",
+      "default": false,
+      "info": "Use this if you are not putting an arrow in the button text itself."
+    },
+    {
+      "type": "checkbox",
+      "id": "scroll_to_top",
+      "label": "Scroll to top of page on click",
+      "default": true,
+      "info": "When on, button smoothly scrolls to the top of the page. When off, paste a URL below."
+    },
+    {
+      "type": "text",
+      "id": "scroll_anchor",
+      "label": "Scroll target (ID or selector)",
+      "default": "top",
+      "info": "Leave as 'top' to scroll to the very top. Or enter a CSS ID like 'MainContent' to scroll to that element."
+    },
+    {
+      "type": "url",
+      "id": "btn_url",
+      "label": "Button link URL",
+      "info": "Only used when 'Scroll to top' is off. Leave blank to link to current product."
+    },
+    {
+      "type": "range",
+      "id": "btn_size",
+      "label": "Button font size",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "btn_pad_v",
+      "label": "Button padding (top/bottom)",
+      "min": 8,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "btn_pad_h",
+      "label": "Button padding (left/right)",
+      "min": 16,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#F26B6C"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_color",
+      "label": "Button background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_text_color",
+      "label": "Button text color",
+      "default": "#F26B6C"
+    },
+    {
+      "type": "color",
+      "id": "btn_border_color",
+      "label": "Button border color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_hover_bg",
+      "label": "Button hover background",
+      "default": "#F26B6C"
+    },
+    {
+      "type": "color",
+      "id": "btn_hover_text",
+      "label": "Button hover text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Trust strip"
+    },
+    {
+      "type": "range",
+      "id": "trust_size",
+      "label": "Trust text size",
+      "min": 10,
+      "max": 15,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Max content width",
+      "min": 500,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "default": 750
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 40,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 40,
+      "max": 160,
+      "step": 8,
+      "unit": "px",
+      "default": 96
+    }
+  ],
+  "blocks": [
+    {
+      "type": "trust",
+      "name": "Trust item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon / symbol",
+          "default": "✦"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Trust text",
+          "default": "Free delivery across India"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PD — Quote & CTA",
+      "blocks": [
+        {
+          "type": "trust",
+          "settings": {
+            "icon": "✦",
+            "text": "Free delivery across India"
+          }
+        },
+        {
+          "type": "trust",
+          "settings": {
+            "icon": "✦",
+            "text": "Ships in 3–5 days"
+          }
+        },
+        {
+          "type": "trust",
+          "settings": {
+            "icon": "✦",
+            "text": "Lifetime AR access included"
+          }
+        },
+        {
+          "type": "trust",
+          "settings": {
+            "icon": "✦",
+            "text": "Quality guaranteed"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

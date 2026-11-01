@@ -1,0 +1,565 @@
+/* Luxe Magics — bulk order landing page (sections/lm-bulk-*.liquid) */
+
+/* Re-declared on nested colour-scheme containers so they pick up their own scheme. */
+.lmb,
+.lmb-enquiry__form,
+.lmb-enquiry__aside {
+  --lmb-ink: rgb(var(--color-foreground));
+  --lmb-accent: rgb(var(--color-button));
+  --lmb-line: 0.2rem solid rgb(var(--color-foreground));
+  --lmb-radius: 2rem;
+  color: var(--lmb-ink);
+}
+
+.lmb h1,
+.lmb h2,
+.lmb h3 {
+  margin: 0;
+  font-family: var(--font-heading-family);
+  font-weight: 700;
+  color: var(--lmb-ink);
+  letter-spacing: -0.02em;
+}
+
+.lmb p {
+  margin: 0;
+}
+
+.lmb__eyebrow {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.2rem;
+  text-transform: uppercase;
+  color: var(--lmb-accent);
+}
+
+.lmb__muted {
+  color: rgba(var(--color-foreground), 0.78);
+}
+
+.lmb__section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  max-width: 64rem;
+  margin-bottom: 4rem;
+}
+
+.lmb__section-head h2 {
+  font-size: clamp(3rem, 4.5vw, 4.8rem);
+  line-height: 1.05;
+}
+
+.lmb__section-head p {
+  font-size: 1.8rem;
+  line-height: 1.5;
+}
+
+.lmb__border-y {
+  border-top: var(--lmb-line);
+  border-bottom: var(--lmb-line);
+}
+
+/* Buttons */
+.lmb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 4.8rem;
+  padding: 1.4rem 2.8rem;
+  border: var(--lmb-line);
+  border-radius: 99rem;
+  font: inherit;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: transform var(--duration-short, 0.1s) ease, box-shadow var(--duration-short, 0.1s) ease;
+}
+
+.lmb-btn:hover {
+  transform: translate(-0.2rem, -0.2rem);
+  box-shadow: 0.4rem 0.4rem 0 rgb(var(--color-foreground));
+}
+
+.lmb-btn--accent {
+  background: var(--lmb-accent);
+  color: var(--lmb-ink);
+}
+
+.lmb-btn--outline {
+  background: transparent;
+  color: var(--lmb-ink);
+}
+
+.lmb-btn--dark {
+  background: var(--lmb-ink);
+  color: rgb(var(--color-background));
+}
+
+.lmb a:focus-visible,
+.lmb button:focus-visible {
+  outline: 0.3rem solid var(--lmb-ink);
+  outline-offset: 0.3rem;
+}
+
+/* Hero */
+.lmb-hero__grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4rem;
+}
+
+.lmb-hero__copy {
+  flex: 1 1 42rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+
+.lmb-hero__copy h1 {
+  font-size: clamp(3.8rem, 6vw, 7.2rem);
+  line-height: 1.02;
+}
+
+.lmb-hero__text {
+  font-size: 2rem;
+  line-height: 1.5;
+  max-width: 56rem;
+}
+
+.lmb-hero__quote {
+  font-size: 1.5rem;
+  line-height: 1.5;
+  font-style: italic;
+  max-width: 52rem;
+}
+
+.lmb__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+}
+
+.lmb-hero__visual {
+  flex: 1 1 34rem;
+  min-width: 0;
+}
+
+.lmb-hero__card {
+  display: flex;
+  flex-direction: column;
+  gap: 2.8rem;
+  padding: 4rem 3.2rem;
+  border: var(--lmb-line);
+  border-radius: 3.2rem;
+  background: var(--lmb-accent);
+}
+
+.lmb-hero__card img {
+  width: 100%;
+  height: auto;
+  border-radius: 2rem;
+  border: var(--lmb-line);
+}
+
+.lmb-hero__big {
+  font-family: var(--font-heading-family);
+  font-weight: 700;
+  font-size: clamp(8.8rem, 15vw, 17.6rem);
+  line-height: 0.9;
+  letter-spacing: -0.4rem;
+  color: var(--lmb-ink);
+  overflow-wrap: anywhere;
+}
+
+.lmb__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.lmb__pill {
+  padding: 0.8rem 1.6rem;
+  border: var(--lmb-line);
+  border-radius: 99rem;
+  background: rgb(var(--color-background));
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Product range */
+.lmb-range__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.lmb-range__card {
+  flex: 1 1 25rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--lmb-line);
+  border-radius: var(--lmb-radius);
+  background: rgb(var(--color-background));
+  transition: box-shadow var(--duration-short, 0.1s) ease;
+}
+
+.lmb-range__media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20rem;
+  border-bottom: var(--lmb-line);
+  background: rgba(var(--color-button), 0.18);
+  overflow: hidden;
+}
+
+.lmb-range__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lmb-range__media svg {
+  width: 100%;
+  height: 100%;
+}
+
+.lmb-range__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 2.2rem;
+}
+
+.lmb-range__body h3 {
+  font-size: 2.4rem;
+}
+
+.lmb-range__body p {
+  font-size: 1.6rem;
+  line-height: 1.45;
+}
+
+.lmb-range__body ul {
+  margin: 0;
+  padding-left: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 1.5rem;
+  line-height: 1.4;
+}
+
+.lmb-range__best {
+  font-size: 1.4rem;
+  line-height: 1.4;
+}
+
+.lmb-range__pick {
+  margin-top: auto;
+  min-height: 4.8rem;
+  padding: 1.2rem 1.8rem;
+  font-size: 1.6rem;
+  background: rgb(var(--color-background));
+  color: var(--lmb-ink);
+}
+
+.lmb-range__pick[aria-pressed='true'] {
+  background: var(--lmb-ink);
+  color: rgb(var(--color-background));
+}
+
+.lmb-range__card:has(.lmb-range__pick[aria-pressed='true']) {
+  box-shadow: 0 0 0 0.2rem var(--lmb-ink);
+}
+
+/* Steps */
+.lmb-steps__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.lmb-steps__card {
+  flex: 1 1 26rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 2.4rem;
+  border: var(--lmb-line);
+  border-radius: var(--lmb-radius);
+  background: rgb(var(--color-background));
+}
+
+.lmb-steps__num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  border: var(--lmb-line);
+  border-radius: 50%;
+  background: var(--lmb-accent);
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.lmb-steps__card h3 {
+  font-size: 2.2rem;
+}
+
+.lmb-steps__card p {
+  font-size: 1.6rem;
+  line-height: 1.5;
+}
+
+/* Enquiry */
+.lmb-enquiry__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3.2rem;
+  align-items: flex-start;
+}
+
+.lmb-enquiry__form {
+  flex: 2 1 52rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  padding: clamp(2rem, 4vw, 4rem);
+  border: 0.2rem solid rgb(var(--color-foreground));
+  border-radius: 2.4rem;
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+}
+
+.lmb-enquiry__form h2 {
+  font-size: clamp(2.8rem, 4vw, 4.2rem);
+  line-height: 1.05;
+}
+
+.lmb-enquiry__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  font-size: 1.7rem;
+  line-height: 1.5;
+}
+
+.lmb-enquiry__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6rem;
+}
+
+.lmb-field {
+  flex: 1 1 24rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.lmb-field label {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.lmb-field__input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 4.8rem;
+  padding: 1.2rem 1.4rem;
+  border: 0.2rem solid rgb(var(--color-foreground));
+  border-radius: 1.2rem;
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+  font: inherit;
+  font-size: 1.6rem;
+}
+
+.lmb-field__input:focus {
+  outline: 0.3rem solid rgb(var(--color-button));
+  outline-offset: 0.2rem;
+}
+
+textarea.lmb-field__input {
+  resize: vertical;
+}
+
+.lmb-field__hint {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: rgb(var(--color-foreground));
+}
+
+.lmb-enquiry__submit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.lmb-enquiry__submit .lmb-btn {
+  background: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+}
+
+.lmb-enquiry__note {
+  max-width: 32rem;
+  font-size: 1.4rem;
+  line-height: 1.4;
+}
+
+.lmb-enquiry__status {
+  padding: 1.4rem 1.6rem;
+  border: 0.2rem solid rgb(var(--color-foreground));
+  border-radius: 1.2rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.lmb-enquiry__status ul {
+  margin: 0.6rem 0 0;
+  padding-left: 2rem;
+  font-weight: 400;
+}
+
+.lmb-enquiry__aside {
+  flex: 1 1 28rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2.8rem;
+  border-radius: 2.4rem;
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+}
+
+.lmb-enquiry__aside .lmb__eyebrow {
+  color: rgb(var(--color-button));
+}
+
+.lmb-enquiry__selection {
+  font-family: var(--font-heading-family);
+  font-weight: 700;
+  font-size: 2.8rem;
+  line-height: 1.1;
+}
+
+.lmb-enquiry__divider {
+  height: 0.2rem;
+  background: rgb(var(--color-foreground));
+  opacity: 0.25;
+}
+
+.lmb-enquiry__aside .rte {
+  font-size: 1.6rem;
+  line-height: 1.45;
+  color: rgb(var(--color-foreground));
+}
+
+.lmb-enquiry__aside .rte ul {
+  padding-left: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Catalogue + sample */
+.lmb-res__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.lmb-res__card {
+  flex: 1 1 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  padding: 3.2rem;
+  border: var(--lmb-line);
+  border-radius: 2.4rem;
+  background: rgb(var(--color-background));
+}
+
+.lmb-res__card h3 {
+  font-size: 2.8rem;
+  line-height: 1.15;
+}
+
+.lmb-res__card p {
+  font-size: 1.6rem;
+  line-height: 1.5;
+}
+
+.lmb-res__card .lmb-btn {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.lmb-res__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.lmb-res__price strong {
+  font-family: var(--font-heading-family);
+  font-size: 4.8rem;
+  line-height: 1;
+  letter-spacing: -0.1rem;
+}
+
+@media screen and (max-width: 749px) {
+  .lmb__section-head {
+    margin-bottom: 2.8rem;
+  }
+
+  .lmb-hero__text {
+    font-size: 1.8rem;
+  }
+
+  .lmb-hero__card {
+    padding: 3rem 2.4rem;
+  }
+}
+
+/* Illustration colours (snippets/lm-bulk-illustration.liquid) */
+.lmb-i-ink {
+  fill: rgb(var(--color-foreground));
+}
+
+.lmb-i-accent {
+  fill: rgb(var(--color-button));
+}
+
+.lmb-i-pale {
+  fill: rgba(var(--color-button), 0.25);
+}
+
+.lmb-i-paper {
+  fill: rgb(var(--color-background));
+}
+
+.lmb-i-stroke {
+  stroke: rgb(var(--color-foreground));
+}
+
+.lmb-i-text {
+  font-family: var(--font-heading-family);
+}

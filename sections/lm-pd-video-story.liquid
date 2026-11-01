@@ -1,0 +1,620 @@
+{%- comment -%}
+  Luxe Magics — Product Details: Video + Emotional Story
+  Filename: sections/lm-pd-video-story.liquid
+  Section 1 of the product detail sections — sits directly below main-product.
+  Left : portrait video (Shopify CDN upload OR YouTube/Vimeo link)
+  Right: emotional copy — eyebrow, headline, body, CTA
+  Fully customizable via theme editor. Zero hardcoded text.
+{%- endcomment -%}
+
+{%- liquid
+  assign pt        = section.settings.padding_top
+  assign pb        = section.settings.padding_bottom
+  assign accent    = section.settings.accent_color
+  assign bg        = section.settings.bg_color
+  assign vid_file  = section.settings.video_file_url
+  assign vid_embed = section.settings.video_embed_url
+  assign has_vid   = false
+  assign is_embed  = false
+  if vid_file != blank
+    assign has_vid = true
+  elsif vid_embed != blank
+    assign has_vid = true
+    assign is_embed = true
+    assign embed_src = ''
+    if vid_embed contains 'youtu'
+      assign vid_id = vid_embed | split: 'v=' | last | split: '&' | first
+      if vid_embed contains 'youtu.be/'
+        assign vid_id = vid_embed | split: 'youtu.be/' | last | split: '?' | first
+      endif
+      assign embed_src = 'https://www.youtube.com/embed/' | append: vid_id | append: '?autoplay=1&mute=1&loop=1&playlist=' | append: vid_id | append: '&playsinline=1&controls=0&rel=0'
+    elsif vid_embed contains 'vimeo'
+      assign vid_id = vid_embed | split: 'vimeo.com/' | last | split: '?' | first
+      assign embed_src = 'https://player.vimeo.com/video/' | append: vid_id | append: '?autoplay=1&muted=1&loop=1&background=1'
+    endif
+  endif
+-%}
+
+{%- style -%}
+
+  #lm-pvs-{{ section.id }} {
+    padding-top: {{ pt | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ pb | times: 0.75 | round: 0 }}px;
+    background: {{ bg }};
+    --lm-accent: {{ accent }};
+    --lm-accent-10: {{ accent }}1a;
+    border-top: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+  @media screen and (min-width: 750px) {
+    #lm-pvs-{{ section.id }} {
+      padding-top: {{ pt }}px;
+      padding-bottom: {{ pb }}px;
+    }
+  }
+
+  /* ── Grid ── */
+  .lm-pvs__grid-{{ section.id }} {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: {{ section.settings.content_width }}px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    gap: 2.5rem;
+    align-items: center;
+  }
+  @media screen and (min-width: 990px) {
+    .lm-pvs__grid-{{ section.id }} {
+      grid-template-columns: {{ section.settings.video_col }}fr {{ section.settings.text_col }}fr;
+      gap: 0;
+      padding: 0;
+    }
+    {%- if section.settings.flip_layout -%}
+    .lm-pvs__grid-{{ section.id }} { direction: rtl; }
+    .lm-pvs__grid-{{ section.id }} > * { direction: ltr; }
+    {%- endif -%}
+  }
+
+  /* ── Video column ── */
+  .lm-pvs__video-col-{{ section.id }} {
+    position: relative;
+    background: {{ section.settings.video_bg_color }};
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: {{ section.settings.video_min_height }}px;
+  }
+  @media screen and (min-width: 990px) {
+    .lm-pvs__video-col-{{ section.id }} {
+      min-height: {{ section.settings.video_min_height }}px;
+    }
+  }
+
+  /* video/iframe fills the column */
+  .lm-pvs__video-col-{{ section.id }} video,
+  .lm-pvs__video-col-{{ section.id }} iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: {{ section.settings.video_fit }};
+    border: none;
+    display: block;
+  }
+
+  /* Portrait crop wrapper — keeps aspect ratio for portrait video */
+  .lm-pvs__video-inner-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: {{ section.settings.video_min_height }}px;
+    overflow: hidden;
+  }
+
+  /* AR badge */
+  .lm-pvs__ar-badge-{{ section.id }} {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 2;
+    background: var(--lm-accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    will-change: transform;
+  }
+  .lm-pvs__ar-dot-{{ section.id }} {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    flex-shrink: 0;
+    animation: lm-pvs-blink-{{ section.id }} 1.4s ease-in-out infinite;
+    will-change: opacity;
+  }
+  @keyframes lm-pvs-blink-{{ section.id }} {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.2; }
+  }
+
+  /* Placeholder when no video set */
+  .lm-pvs__placeholder-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    height: 100%;
+    min-height: {{ section.settings.video_min_height }}px;
+    color: rgba(255,255,255,0.3);
+  }
+  .lm-pvs__placeholder-icon-{{ section.id }} {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lm-pvs__placeholder-label-{{ section.id }} {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── Text column ── */
+  .lm-pvs__text-col-{{ section.id }} {
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+  @media screen and (min-width: 990px) {
+    .lm-pvs__text-col-{{ section.id }} {
+      padding: {{ section.settings.text_padding_v }}px {{ section.settings.text_padding_h }}px;
+    }
+  }
+
+  /* Eyebrow */
+  .lm-pvs__eyebrow-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--lm-accent);
+    margin-bottom: 1.2rem;
+  }
+  .lm-pvs__eyebrow-line-{{ section.id }} {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--lm-accent);
+    flex-shrink: 0;
+  }
+
+  /* Headline */
+  .lm-pvs__headline-{{ section.id }} {
+    font-size: clamp(24px, 3.5vw, {{ section.settings.headline_size }}px);
+    font-weight: 400;
+    line-height: 1.15;
+    color: rgb(var(--color-foreground));
+    margin: 0 0 1rem;
+    letter-spacing: -0.01em;
+  }
+  .lm-pvs__headline-{{ section.id }} em {
+    font-style: italic;
+    color: var(--lm-accent);
+  }
+
+  /* Body */
+  .lm-pvs__body-{{ section.id }} {
+    font-size: {{ section.settings.body_size }}px;
+    line-height: 1.85;
+    color: rgba(var(--color-foreground), 0.62);
+    margin: 0 0 2rem;
+    max-width: 420px;
+    font-style: italic;
+  }
+
+  /* CTA */
+  .lm-pvs__cta-row-{{ section.id }} {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .lm-pvs__cta-secondary-{{ section.id }} {
+    font-size: 13px;
+    color: rgba(var(--color-foreground), 0.5);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+    text-decoration-color: rgba(var(--color-foreground), 0.25);
+  }
+  .lm-pvs__cta-secondary-{{ section.id }}:hover {
+    color: var(--lm-accent);
+    text-decoration-color: var(--lm-accent);
+  }
+
+  /* Scroll animation */
+  {% if settings.animations_reveal_on_scroll %}
+  .lm-pvs__video-col-{{ section.id }},
+  .lm-pvs__text-col-{{ section.id }} {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .lm-pvs__text-col-{{ section.id }} { transition-delay: 0.1s; }
+  .lm-pvs__video-col-{{ section.id }}.lm-vis,
+  .lm-pvs__text-col-{{ section.id }}.lm-vis {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  {% endif %}
+
+{%- endstyle -%}
+
+<div
+  id="lm-pvs-{{ section.id }}"
+  class="gradient color-{{ section.settings.color_scheme }}"
+  {{ section.shopify_attributes }}
+>
+  <div class="lm-pvs__grid-{{ section.id }}">
+
+    {%- comment -%}── VIDEO COLUMN ──{%- endcomment -%}
+    <div class="lm-pvs__video-col-{{ section.id }}{% if settings.animations_reveal_on_scroll %} lm-pvs-anim-v{% endif %}">
+
+      {%- if section.settings.ar_badge != blank -%}
+        <div class="lm-pvs__ar-badge-{{ section.id }}">
+          <span class="lm-pvs__ar-dot-{{ section.id }}"></span>
+          {{ section.settings.ar_badge }}
+        </div>
+      {%- endif -%}
+
+      <div class="lm-pvs__video-inner-{{ section.id }}">
+        {%- if has_vid -%}
+          {%- if is_embed -%}
+            <iframe
+              src="{{ embed_src }}"
+              allow="autoplay; fullscreen"
+              allowfullscreen
+              loading="lazy"
+              title="{{ section.settings.eyebrow }}"
+            ></iframe>
+          {%- else -%}
+            <video
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              {%- if section.settings.video_poster != blank %}
+                poster="{{ section.settings.video_poster | image_url: width: 800 }}"
+              {%- endif %}
+            >
+              <source src="{{ vid_file }}" type="video/mp4">
+            </video>
+          {%- endif -%}
+        {%- else -%}
+          <div class="lm-pvs__placeholder-{{ section.id }}">
+            <div class="lm-pvs__placeholder-icon-{{ section.id }}">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+            </div>
+            <span class="lm-pvs__placeholder-label-{{ section.id }}">Add video in customizer</span>
+          </div>
+        {%- endif -%}
+      </div>
+
+    </div>
+
+    {%- comment -%}── TEXT COLUMN ──{%- endcomment -%}
+    <div class="lm-pvs__text-col-{{ section.id }}{% if settings.animations_reveal_on_scroll %} lm-pvs-anim-t{% endif %}">
+
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="lm-pvs__eyebrow-{{ section.id }}">
+          <span class="lm-pvs__eyebrow-line-{{ section.id }}"></span>
+          {{ section.settings.eyebrow }}
+        </span>
+      {%- endif -%}
+
+      {%- if section.settings.headline != blank -%}
+        <h2 class="lm-pvs__headline-{{ section.id }}">{{ section.settings.headline }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.body != blank -%}
+        <p class="lm-pvs__body-{{ section.id }}">{{ section.settings.body }}</p>
+      {%- endif -%}
+
+      <div class="lm-pvs__cta-row-{{ section.id }}">
+        {%- if section.settings.cta_primary_text != blank -%}
+          <a href="{{ section.settings.cta_primary_url | default: product.url | default: '#' }}" class="button">
+            {{ section.settings.cta_primary_text }}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.cta_secondary_text != blank -%}
+          <a href="{{ section.settings.cta_secondary_url | default: '#' }}" class="lm-pvs__cta-secondary-{{ section.id }}">
+            {{ section.settings.cta_secondary_text }}
+          </a>
+        {%- endif -%}
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+{%- if settings.animations_reveal_on_scroll -%}
+<script>
+(function() {
+  var els = document.querySelectorAll('#lm-pvs-{{ section.id }} .lm-pvs-anim-v, #lm-pvs-{{ section.id }} .lm-pvs-anim-t');
+  if (!els.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('lm-vis'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(function(el) { obs.observe(el); });
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PD — Video & Story",
+  "tag": "section",
+  "class": "lm-pd-video-story",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#F26B6C"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section background override",
+      "default": "#FFF8F0",
+      "info": "Overrides color scheme background. Use #FFF8F0 for cream."
+    },
+    {
+      "type": "header",
+      "content": "Video"
+    },
+    {
+      "type": "text",
+      "id": "video_file_url",
+      "label": "Shopify CDN video URL (MP4)",
+      "info": "Upload your MP4 to Shopify Admin → Content → Files. Paste the CDN URL here. Takes priority over embed URL below."
+    },
+    {
+      "type": "video_url",
+      "id": "video_embed_url",
+      "label": "YouTube or Vimeo link",
+      "accept": ["youtube", "vimeo"],
+      "info": "Used only if no Shopify CDN URL is set above. Autoplays muted."
+    },
+    {
+      "type": "image_picker",
+      "id": "video_poster",
+      "label": "Video poster image",
+      "info": "Shows while video loads. Recommended for fast LCP."
+    },
+    {
+      "type": "color",
+      "id": "video_bg_color",
+      "label": "Video column background",
+      "default": "#1A1410"
+    },
+    {
+      "type": "select",
+      "id": "video_fit",
+      "label": "Video fit",
+      "default": "cover",
+      "options": [
+        { "value": "cover",   "label": "Cover — fills area, crops edges" },
+        { "value": "contain", "label": "Contain — fits fully, shows background" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "video_min_height",
+      "label": "Video column height",
+      "min": 300,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "default": 520
+    },
+    {
+      "type": "text",
+      "id": "ar_badge",
+      "label": "Badge text on video",
+      "default": "AR Memory Inside",
+      "info": "Leave blank to hide."
+    },
+    {
+      "type": "header",
+      "content": "Emotional copy"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Your eyebrow line"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Your headline. <em>The emotional part.</em>",
+      "info": "Wrap words in <em> for italic accent color."
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Body copy",
+      "default": "Two or three lines. Not explaining the product — telling them what this moment means. Why it matters. What they'd feel.",
+      "info": "Displays in italic. Keep it short. Emotion over information."
+    },
+    {
+      "type": "range",
+      "id": "headline_size",
+      "label": "Headline size (desktop max)",
+      "min": 24,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Body text size",
+      "min": 13,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "header",
+      "content": "CTA buttons"
+    },
+    {
+      "type": "text",
+      "id": "cta_primary_text",
+      "label": "Primary button text",
+      "default": "Order this frame"
+    },
+    {
+      "type": "url",
+      "id": "cta_primary_url",
+      "label": "Primary button link",
+      "info": "Leave blank to link to the current product page."
+    },
+    {
+      "type": "text",
+      "id": "cta_secondary_text",
+      "label": "Secondary link text",
+      "default": "See how it works"
+    },
+    {
+      "type": "url",
+      "id": "cta_secondary_url",
+      "label": "Secondary link URL"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "flip_layout",
+      "label": "Flip layout (text left, video right)",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "video_col",
+      "label": "Video column width",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 1,
+      "info": "Ratio vs text column. 1:1 = equal halves."
+    },
+    {
+      "type": "range",
+      "id": "text_col",
+      "label": "Text column width",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Max content width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "text_padding_v",
+      "label": "Text padding top/bottom",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "text_padding_h",
+      "label": "Text padding left/right",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Section spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "PD — Video & Story"
+    }
+  ]
+}
+{% endschema %}

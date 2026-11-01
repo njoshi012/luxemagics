@@ -1,0 +1,2265 @@
+{% comment %}
+---------------------------------------------------------
+Copyright © 2023 Section Store. All rights reserved.
+Unauthorized copying, modification, distribution, or use
+of this code or any portion of it, is strictly prohibited.
+Violators will be prosecuted to the fullest extent of the law.
+For inquiries or permissions, contact daniel@section.store
+---------------------------------------------------------
+{% endcomment %}
+
+{%- liquid 
+  assign padding_horizontal = section.settings.padding_horizontal
+  assign padding_horizontal_mobile = section.settings.padding_horizontal_mobile
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+  assign border_color = section.settings.border_color
+  assign border_thickness = section.settings.border_thickness
+  assign margin_top = section.settings.margin_top
+  assign margin_bottom = section.settings.margin_bottom
+  assign margin_horizontal_mobile = section.settings.margin_horizontal_mobile
+  assign margin_horizontal = section.settings.margin_horizontal
+  assign background_color = section.settings.background_color
+  assign background_gradient = section.settings.background_gradient
+  assign full_width = section.settings.full_width
+  assign content_width = section.settings.content_width
+  assign lazy = section.settings.lazy
+  assign section_radius = section.settings.section_radius
+
+  assign block_padding_vertical = section.settings.block_padding_vertical
+  assign block_padding_vertical_mobile = section.settings.block_padding_vertical_mobile
+  assign block_padding_horizontal = section.settings.block_padding_horizontal
+  assign block_padding_horizontal_mobile = section.settings.block_padding_horizontal_mobile
+  assign block_border_thickness = section.settings.block_border_thickness
+  assign block_border_color = section.settings.block_border_color
+
+  assign text = section.settings.text
+  assign text_size = section.settings.text_size
+  assign text_size_mobile = section.settings.text_size_mobile
+  assign text_color = section.settings.text_color
+  assign text_custom = section.settings.text_custom
+  assign text_font = section.settings.text_font
+  assign text_height = section.settings.text_height
+  assign text_align = section.settings.text_align
+  assign text_align_mobile = section.settings.text_align_mobile
+
+  assign use_newsletter = section.settings.use_newsletter
+  assign newsletter_gap = section.settings.newsletter_gap
+  assign newsletter_gap_mobile = section.settings.newsletter_gap_mobile
+  assign newsletter_mt = section.settings.newsletter_mt
+  assign newsletter_mt_mobile = section.settings.newsletter_mt_mobile
+  assign newsletter_radius = section.settings.newsletter_radius
+  assign newsletter_border_thickness = section.settings.newsletter_border_thickness
+  assign newsletter_border_color = section.settings.newsletter_border_color
+  assign use_redirect = section.settings.use_redirect
+  assign redirect_url = section.settings.redirect_url
+
+  assign input_size = section.settings.input_size
+  assign input_size_mobile = section.settings.input_size_mobile
+  assign input_color = section.settings.input_color
+  assign input_custom = section.settings.input_custom
+  assign input_font = section.settings.input_font
+  assign input_height = section.settings.input_height
+  assign input_padding_vertical = section.settings.input_padding_vertical
+  assign input_padding_vertical_mobile = section.settings.input_padding_vertical_mobile
+  assign input_padding_horizontal = section.settings.input_padding_horizontal
+  assign input_padding_horizontal_mobile = section.settings.input_padding_horizontal_mobile
+  assign input_radius = section.settings.input_radius
+  assign input_border_thickness = section.settings.input_border_thickness
+  assign input_border_color = section.settings.input_border_color
+  assign input_placeholder_color = section.settings.input_placeholder_color
+  assign input_bg_color = section.settings.input_bg_color
+
+  assign thanks_text = section.settings.thanks_text
+  assign thanks_text_size = section.settings.thanks_text_size
+  assign thanks_text_size_mobile = section.settings.thanks_text_size_mobile
+  assign thanks_text_color = section.settings.thanks_text_color
+  assign thanks_text_custom = section.settings.thanks_text_custom
+  assign thanks_text_font = section.settings.thanks_text_font
+  assign thanks_text_height = section.settings.thanks_text_height
+  assign thanks_text_mt = section.settings.thanks_text_mt
+  assign thanks_text_mt_mobile = section.settings.thanks_text_mt_mobile
+
+  assign input_placeholder = section.settings.input_placeholder
+
+  assign submit = section.settings.submit
+  assign submit_size = section.settings.submit_size
+  assign submit_size_mobile = section.settings.submit_size_mobile
+  assign submit_color = section.settings.submit_color
+  assign submit_hover_color = section.settings.submit_hover_color
+  assign submit_custom = section.settings.submit_custom
+  assign submit_font = section.settings.submit_font
+  assign submit_height = section.settings.submit_height
+  assign submit_padding_vertical = section.settings.submit_padding_vertical
+  assign submit_padding_vertical_mobile = section.settings.submit_padding_vertical_mobile
+  assign submit_padding_horizontal = section.settings.submit_padding_horizontal
+  assign submit_padding_horizontal_mobile = section.settings.submit_padding_horizontal_mobile
+  assign submit_radius = section.settings.submit_radius
+  assign submit_border_thickness = section.settings.submit_border_thickness
+  assign submit_border_color = section.settings.submit_border_color
+  assign submit_border_hover_color = section.settings.submit_border_hover_color
+  assign submit_bg_color = section.settings.submit_bg_color
+  assign submit_bg_hover_color = section.settings.submit_bg_hover_color
+
+  assign privacy_text = section.settings.privacy_text
+  assign privacy_text_size = section.settings.privacy_text_size
+  assign privacy_text_size_mobile = section.settings.privacy_text_size_mobile
+  assign privacy_text_color = section.settings.privacy_text_color
+  assign privacy_text_custom = section.settings.privacy_text_custom
+  assign privacy_text_font = section.settings.privacy_text_font
+  assign privacy_text_height = section.settings.privacy_text_height
+  assign privacy_text_align = section.settings.privacy_text_align
+  assign privacy_text_align_mobile = section.settings.privacy_text_align_mobile
+  assign privacy_text_mt = section.settings.privacy_text_mt
+  assign privacy_text_mt_mobile = section.settings.privacy_text_mt_mobile
+
+  assign column_heading_size = section.settings.column_heading_size
+  assign column_heading_size_mobile = section.settings.column_heading_size_mobile
+  assign column_heading_color = section.settings.column_heading_color
+  assign column_heading_custom = section.settings.column_heading_custom
+  assign column_heading_font = section.settings.column_heading_font
+  assign column_heading_height = section.settings.column_heading_height
+
+  assign list_gap_mobile = section.settings.list_gap_mobile
+  assign list_gap = section.settings.list_gap
+  assign list_mt = section.settings.list_mt
+  assign list_mt_mobile = section.settings.list_mt_mobile
+
+  assign link_size = section.settings.link_size
+  assign link_size_mobile = section.settings.link_size_mobile
+  assign link_color = section.settings.link_color
+  assign link_hover_color = section.settings.link_hover_color
+  assign link_custom = section.settings.link_custom
+  assign link_font = section.settings.link_font
+  assign link_height = section.settings.link_height
+
+  assign column_text_size = section.settings.column_text_size
+  assign column_text_size_mobile = section.settings.column_text_size_mobile
+  assign column_text_color = section.settings.column_text_color
+  assign column_text_custom = section.settings.column_text_custom
+  assign column_text_font = section.settings.column_text_font
+  assign column_text_height = section.settings.column_text_height
+  assign column_text_mt = section.settings.column_text_mt
+  assign column_text_mt_mobile = section.settings.column_text_mt_mobile
+  
+-%}
+
+{%- style -%}
+
+  {{  text_font | font_face: font_display: 'swap' }}
+  {{  input_font | font_face: font_display: 'swap' }}
+  {{  submit_font | font_face: font_display: 'swap' }}
+  {{  privacy_text_font | font_face: font_display: 'swap' }}
+  {{  column_heading_font | font_face: font_display: 'swap' }}
+  {{  link_font | font_face: font_display: 'swap' }}
+  {{  column_text_font | font_face: font_display: 'swap' }}
+  {{  thanks_text_font | font_face: font_display: 'swap' }}      
+  
+  .section-{{ section.id }} {
+    border-top: solid {{ border_color }} {{ border_thickness }}px;
+    border-bottom: solid {{ border_color }} {{ border_thickness }}px;
+    margin-top: {{ margin_top | times: 0.75 | round: 0 }}px;
+    margin-bottom: {{ margin_bottom | times: 0.75 | round: 0 }}px;
+    margin-left: {{ margin_horizontal_mobile }}rem;
+    margin-right: {{ margin_horizontal_mobile }}rem;
+    border-radius: {{ section_radius | times: 0.6 | round: 0 }}px;
+    overflow: hidden;
+  }
+  
+  .section-{{ section.id }}-settings {
+    margin: 0 auto;
+    padding-top: {{ padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ padding_bottom | times: 0.75 | round: 0 }}px;
+    padding-left: {{ padding_horizontal_mobile }}rem;
+    padding-right: {{ padding_horizontal_mobile }}rem;
+  }
+
+  .footer-body-{{ section.id }} {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .footer-left-{{ section.id }},
+  .footer-right-{{ section.id }} {
+    padding: {{ block_padding_vertical_mobile }}px {{ block_padding_horizontal_mobile }}px;
+  }
+
+  .footer-right-{{ section.id }} {
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
+    flex-wrap: wrap;
+    border-top: {{ block_border_thickness }}px solid {{ block_border_color }};
+  }
+
+  .footer-column-{{ section.id }} {
+    flex: 1 0;
+  }
+
+  .footer-text-column-{{ section.id }} {
+    flex: 1 0 100%;
+  }
+
+  .footer-text-{{ section.id }} {
+    text-align: {{ text_align_mobile }};
+  }
+
+  .footer-text-{{ section.id }} * {
+    margin: 0;
+    font-size: {{ text_size_mobile }}px;
+    color: {{ text_color }};
+    line-height: {{ text_height }}%;
+    text-transform: unset;
+  }
+
+  .footer-newsletter-row-{{ section.id }} {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: {{ newsletter_gap_mobile }}px;
+    border-radius: {{ newsletter_radius }}px;
+    overflow: hidden;
+    margin-top: {{ newsletter_mt_mobile }}px;
+  }
+
+  .footer-newsletter-input-{{ section.id }} {
+    width: 100%;
+    margin: 0;
+    box-shadow: none;
+    border: 0px;
+    padding: {{ input_padding_vertical_mobile }}px {{ input_padding_horizontal_mobile }}px;
+    font-size: {{ input_size_mobile }}px;
+    color: {{ input_color }};
+    line-height: {{ input_height }}%;
+    text-transform: unset;
+    border-radius: {{ input_radius }}px;
+    border: {{ input_border_thickness }}px solid {{ input_border_color }};
+    background-color: transparent;
+    background-color: {{ input_bg_color }};
+  }
+
+  .footer-newsletter-input-{{ section.id }}:focus,
+  .footer-newsletter-input-{{ section.id }}:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .footer-newsletter-input-{{ section.id }}::placeholder {
+    color: {{ input_placeholder_color }};
+  }
+
+  .footer-newsletter-submit-{{ section.id }} {
+    margin-top: 0px;
+    width: 100%;
+    max-width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: {{ submit_size_mobile }}px;
+    color: {{ submit_color }};
+    line-height: {{ submit_height }}%;
+    text-align: center;
+    text-transform: unset;
+    text-decoration: none;
+    padding: {{ submit_padding_vertical_mobile }}px {{ submit_padding_horizontal_mobile }}px;
+    border-radius: {{ submit_radius }}px;
+    border: 0px;
+    border: {{ submit_border_thickness }}px solid {{ submit_border_color }};
+    background-color: transparent;
+    background-color: {{ submit_bg_color }};
+    transition: all 0.25s ease 0s;
+    box-shadow: none;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .footer-newsletter-submit-{{ section.id }}:hover {
+    color: {{ submit_hover_color }};
+    border: {{ submit_border_thickness }}px solid {{ submit_border_hover_color }};
+    background-color: {{ submit_bg_hover_color }};
+    transition: all 0.25s ease 0s;
+  }
+
+  .footer-newsletter-submit-{{ section.id }}::before {
+    content: '';
+    position: absolute;
+    left: -{{ newsletter_border_thickness }}px;
+    top: 0;
+    display: block;
+    width: {{ newsletter_border_thickness }}px;
+    height: 100%;
+    background-color: {{ newsletter_border_color }};
+  }
+
+ .footer-newsletter-thanks-text-{{ section.id }} {
+    display: none;
+    margin: 0px;
+    margin-top: {{ thanks_text_mt_mobile }}px;
+    font-size: {{ thanks_text_size_mobile }}px;
+    color: {{ thanks_text_color }};
+    line-height: {{ thanks_text_height }}%;
+    text-transform: unset;
+ }
+
+ .footer-newsletter-thanks-text-{{ section.id }}.active {
+   display: block;
+ }
+
+
+  .footer-privacy-text-{{ section.id }} {
+    margin-top: {{ privacy_text_mt_mobile }}px;
+    text-align: {{ privacy_text_align_mobile }};
+  }
+
+  .footer-privacy-text-{{ section.id }} * {
+    margin: 0;
+    font-size: {{ privacy_text_size_mobile }}px;
+    color: {{ privacy_text_color }};
+    line-height: {{ privacy_text_height }}%;
+    text-transform: unset;
+  }
+
+  .footer-column-heading-{{ section.id }} {
+    margin: 0;
+    font-size: {{ column_heading_size_mobile }}px;
+    color: {{ column_heading_color }};
+    line-height: {{ column_heading_height }}%;
+    text-transform: unset;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .footer-menu-list-{{ section.id }},
+  .footer-social-list-{{ section.id }} {
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: {{ list_gap_mobile }}px;
+    margin-top: {{ list_mt_mobile }}px;
+    list-style: none;
+  }
+
+  .footer-menu-item-{{ section.id }},
+  .footer-social-item-{{ section.id }} {
+    line-height: 100%;
+  }
+
+  .footer-menu-link-{{ section.id }},
+  .footer-social-link-{{ section.id }} {
+    margin: 0;
+    font-size: {{ link_size_mobile }}px;
+    color: {{ link_color }};
+    line-height: {{ link_height }}%;
+    text-transform: unset;
+    text-decoration: none;
+  }
+
+  .footer-social-link-{{ section.id }} {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer-social-link-{{ section.id }} svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+  }
+
+  .footer-social-link-{{ section.id }} svg path {
+    fill: {{ link_color }};
+    transition: all 0.25s ease 0s;
+  }
+
+  .footer-column-text-{{ section.id }} {
+    margin-top: {{ column_text_mt_mobile }}px;
+  }
+
+  .footer-column-text-{{ section.id }} * {
+    margin: 0;
+    font-size: {{ column_text_size_mobile }}px;
+    color: {{ column_text_color }};
+    line-height: {{ column_text_height }}%;
+    text-transform: unset;
+    text-decoration: none;
+  }
+
+  .footer-column-text-{{ section.id }} *:not(:first-child) {
+    margin-top: 10px;
+  }
+  
+  @media(min-width: 1024px) {
+
+    .section-{{ section.id }} {
+      margin-top: {{ margin_top }}px;
+      margin-bottom: {{ margin_bottom }}px;
+      margin-left: {{ margin_horizontal }}rem;
+      margin-right: {{ margin_horizontal }}rem;
+      border-radius: {{ section_radius }}px;
+    }
+    
+    .section-{{ section.id }}-settings {
+      padding: 0 5rem;
+      padding-top: {{ padding_top }}px;
+      padding-bottom: {{ padding_bottom }}px;
+      padding-left: {{ padding_horizontal }}rem;
+      padding-right: {{ padding_horizontal }}rem;
+    }
+
+    .footer-body-{{ section.id }} {
+      grid-template-columns: 40% 60%;
+    }
+
+    .footer-left-{{ section.id }},
+    .footer-right-{{ section.id }}{
+      padding: {{ block_padding_vertical }}px {{ block_padding_horizontal }}px;
+    }
+
+    .footer-right-{{ section.id }} {
+      border-top: 0px;
+      border-left: {{ block_border_thickness }}px solid {{ block_border_color }};
+    }
+
+    .footer-text-column-{{ section.id }} {
+      flex: 1 0 15%;
+    }
+
+    .footer-text-{{ section.id }} {
+      text-align: {{ text_align }};
+    }
+  
+    .footer-text-{{ section.id }} * {
+      font-size: {{ text_size }}px;
+    }
+
+    .footer-newsletter-row-{{ section.id }} {
+      margin-top: {{ newsletter_mt }}px;
+      gap: {{ newsletter_gap }}px;
+    }
+
+    .footer-newsletter-input-{{ section.id }} {
+      padding: {{ input_padding_vertical }}px {{ input_padding_horizontal }}px;
+      font-size: {{ input_size }}px;
+    }
+
+    .footer-newsletter-submit-{{ section.id }} {
+      padding: {{ submit_padding_vertical }}px {{ submit_padding_horizontal }}px;
+      font-size: {{ submit_size }}px;
+    }
+
+     .footer-newsletter-thanks-text-{{ section.id }} {
+     margin-top: {{ thanks_text_mt }}px;
+     font-size: {{ thanks_text_size }}px;
+   }
+
+    .footer-privacy-text-{{ section.id }} {
+      margin-top: {{ privacy_text_mt }}px;
+      text-align: {{ privacy_text_align }};
+    }
+  
+    .footer-privacy-text-{{ section.id }} * {
+      font-size: {{ privacy_text_size }}px;
+    }
+
+    .footer-column-heading-{{ section.id }} {
+      font-size: {{ column_heading_size }}px;
+    }
+
+    .footer-menu-list-{{ section.id }},
+    .footer-social-list-{{ section.id }}{
+      gap: {{ list_gap }}px;
+      margin-top: {{ list_mt }}px;
+    }
+
+    .footer-menu-link-{{ section.id }},
+    .footer-social-link-{{ section.id }} {
+      font-size: {{ link_size }}px;
+      transition: all 0.25s ease 0s;
+    }
+
+    .footer-menu-link-{{ section.id }}:hover,
+    .footer-social-link-{{ section.id }}:hover {
+      transition: all 0.25s ease 0s;
+      color: {{ link_hover_color }};
+    }
+
+    .footer-social-link-{{ section.id }}:hover svg path {
+       fill: {{ link_hover_color }};
+       transition: all 0.25s ease 0s;
+    }
+
+    .footer-column-text-{{ section.id }} {
+      margin-top: {{ column_text_mt }}px;
+    }
+  
+    .footer-column-text-{{ section.id }} * {
+      font-size: {{ column_text_size }}px;
+    }
+  }
+  
+{%- endstyle -%}
+
+{% unless full_width %}
+  <style>
+    .section-{{ section.id }}-settings {
+      max-width: {{ content_width }}rem;
+    }
+  </style>
+{% endunless %}
+
+{% if margin_horizontal_mobile > 0 %}
+  <style>
+    .section-{{ section.id }} {
+      border-left: solid {{ border_color }} {{ border_thickness }}px;
+      border-right: solid {{ border_color }} {{ border_thickness }}px;
+    }
+    
+    @media(min-width: 1024px) {
+      .section-{{ section.id }} {
+        border-left: 0px;
+        border-right: 0px;
+      }
+    }
+  </style>
+{% endif %}
+
+{% if margin_horizontal > 0 %}
+  <style>
+    @media(min-width: 1024px) {
+      .section-{{ section.id }} {
+        border-left: solid {{ border_color }} {{ border_thickness }}px;
+        border-right: solid {{ border_color }} {{ border_thickness }}px;
+      }
+    }
+  </style>
+{% endif %}
+
+{% if input_custom %}
+  <style>
+    .footer-newsletter-input-{{ section.id }} {
+      font-family: {{ input_font.family }}, {{ input_font.fallback_families }};
+      font-weight: {{ input_font.weight }};
+      font-style: {{ input_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if thanks_text_custom %}
+  <style>
+    .footer-newsletter-thanks-text-{{ section.id }} {
+      font-family: {{ thanks_text_font.family }}, {{ thanks_text_font.fallback_families }};
+      font-weight: {{ thanks_text_font.weight }};
+      font-style: {{ thanks_text_font.style }};
+    }
+  </style>
+{% endif %}
+
+
+{% if submit_custom %}
+  <style>
+    .footer-newsletter-submit-{{ section.id }} {
+      font-family: {{ submit_font.family }}, {{ submit_font.fallback_families }};
+      font-weight: {{ submit_font.weight }};
+      font-style: {{ submit_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if text_custom %}
+  <style>
+    .footer-text-{{ section.id }} * {
+      font-family: {{ text_font.family }}, {{ text_font.fallback_families }};
+      font-weight: {{ text_font.weight }};
+      font-style: {{ text_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if privacy_text_custom %}
+  <style>
+    .footer-privacy-text-{{ section.id }} * {
+      font-family: {{ privacy_text_font.family }}, {{ privacy_text_font.fallback_families }};
+      font-weight: {{ privacy_text_font.weight }};
+      font-style: {{ privacy_text_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if column_heading_custom %}
+  <style>
+    .footer-column-heading-{{ section.id }} {
+      font-family: {{ column_heading_font.family }}, {{ column_heading_font.fallback_families }};
+      font-weight: {{ column_heading_font.weight }};
+      font-style: {{ column_heading_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if link_custom %}
+  <style>
+    .footer-menu-link-{{ section.id }},
+    .footer-social-link-{{ section.id }} {
+      font-family: {{ link_font.family }}, {{ link_font.fallback_families }};
+      font-weight: {{ link_font.weight }};
+      font-style: {{ link_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% if column_text_custom %}
+  <style>
+    .footer-column-text-{{ section.id }} {
+      font-family: {{ column_text_font.family }}, {{ column_text_font.fallback_families }};
+      font-weight: {{ column_text_font.weight }};
+      font-style: {{ column_text_font.style }};
+    }
+  </style>
+{% endif %}
+
+{% for block in section.blocks %}
+  {% case block.type %}
+    {% when 'logo' %}
+
+      <style>
+      
+      {{ block.settings.text_font | font_face: font_display: 'swap' }}
+      
+      .footer-logo-{{ block.id }} {
+        padding: {{ block_padding_vertical_mobile }}px {{ block_padding_horizontal_mobile }}px;
+        border-bottom: {{ block_border_thickness }}px solid {{ block_border_color }};
+      }
+
+      .footer-logo-image-{{ block.id }} {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+        max-width: {{ block.settings.image_width_mobile }}%;
+      }
+
+      .footer-logo-image-{{ block.id }} img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .footer-logo-text-{{ block.id }} {
+        display: block;
+        text-decoration: none;
+        max-width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .footer-logo-text-{{ block.id }} * {
+        margin: 0;
+        font-size: {{ block.settings.text_size_mobile }}px;
+        color: {{ block.settings.text_color }};
+        line-height: {{ block.settings.text_height }}%;
+        text-transform: unset;
+        text-decoration: none;
+      }
+
+      @media(min-width: 1024px) {
+        
+        .footer-logo-{{ block.id }} {
+          padding: {{ block_padding_vertical }}px {{ block_padding_horizontal }}px;
+        }
+
+        .footer-logo-image-{{ block.id }} {
+          max-width: {{ block.settings.image_width }}%;
+        }
+
+        .footer-logo-text-{{ block.id }} * {
+          font-size: {{ block.settings.text_size }}px;
+        }
+      }
+    </style>
+
+    {% if block.settings.text_custom %}
+      <style>
+        .footer-logo-text-{{ block.id }} * {
+          font-family: {{ block.settings.text_font.family }}, {{ block.settings.text_font.fallback_families }};
+          font-weight: {{ block.settings.text_font.weight }};
+          font-style: {{ block.settings.text_font.style }};
+        }
+      </style>
+    {% endif %}
+
+    
+  {% endcase %}
+{% endfor %}
+
+<div class="section-{{ section.id }} footer-{{ section.id }}" style="background-color:{{ background_color }}; background-image: {{ background_gradient }};">
+    <div class="section-{{ section.id }}-settings">
+      {% for block in section.blocks %}
+        {% if block.type == "logo" %}
+          <div class="footer-logo-{{ block.id }}">
+            {% if block.settings.logo != blank %}
+              <a href="{{ shop.url }}" class="footer-logo-image-{{ block.id }}">
+                <img src="{{ block.settings.logo | image_url }}" alt="{{ block.settings.logo.alt }}" {% if lazy %}loading="lazy"{% endif %}>
+              </a>
+            {% endif %}
+            {% if block.settings.text != blank %}
+              <a href="{{ shop.url }}" class="footer-logo-text-{{ block.id }}">{{ block.settings.text }}</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <div class="footer-body-{{ section.id }}">
+        <div class="footer-left-{{ section.id }}">
+          {% if text != blank %}
+            <div class="footer-text-{{ section.id }}">
+              {{ text }}
+            </div>
+          {% endif %}
+          {% if use_newsletter %}
+            {% form 'customer', class: 'footer-newsletter-form' %}
+              <input type="hidden" name="contact[tags]" value="newsletter">
+  
+              <div class="footer-newsletter-row-{{ section.id }}">
+                <input
+                  type="email"
+                  name="contact[email]"
+                  class="footer-newsletter-input-{{ section.id }}"
+                  value="{{ form.email }}"
+                  aria-required="true"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  autocomplete="email"
+                  {% if form.errors %}
+                    autofocus
+                    aria-invalid="true"
+                    aria-describedby="Newsletter-error--{{ section.id }}"
+                  {% elsif form.posted_successfully? %}
+                    aria-describedby="Newsletter-success--{{ section.id }}"
+                  {% endif %}
+                  placeholder="{{ input_placeholder }}"
+                  required
+                >
+                <button type="submit" class="footer-newsletter-submit-{{ section.id }}" name="commit">
+                  {{ submit }}
+                </button>
+              </div>
+               {% if form.posted_successfully? %}
+                <p class="footer-newsletter-thanks-text-{{ section.id }}">{{ thanks_text }}</p>
+              {% endif %}
+            {% endform %}
+          {% endif %}
+
+          {% if privacy_text != blank %}
+            <div class="footer-privacy-text-{{ section.id }}">
+              {{ privacy_text }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="footer-right-{{ section.id }}">
+          {% for block in section.blocks %}
+            {% if block.type == "column" %}
+              <div class="footer-column-{{ section.id }}">
+                {% if block.settings.heading != blank %}
+                  <p class="footer-column-heading-{{ section.id }}">{{ block.settings.heading }}</p>
+                {% endif %}
+
+                {% if block.settings.menu != blank %}
+                  <ul class="footer-menu-list-{{ section.id }}">
+                    {% for link in block.settings.menu.links %}
+                      <li class="footer-menu-item-{{ section.id }}">
+                        <a href="{{ link.url }}" class="footer-menu-link-{{ section.id }}">{{ link.title }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+              </div>
+            {% elsif block.type == "text" %}
+              <div class="footer-column-{{ section.id }} footer-text-column-{{ section.id }}">
+                {% if block.settings.heading != blank %}
+                  <p class="footer-column-heading-{{ section.id }}">{{ block.settings.heading }}</p>
+                {% endif %}
+                
+                {% if block.settings.text != blank %}
+                  <div class="footer-column-text-{{ section.id }}">
+                    {{ block.settings.text }}
+                  </div>
+                {% endif %}
+                
+              </div>
+
+            {% elsif block.type == "socials" %}
+              <div class="footer-column-{{ section.id }}">
+                {% if block.settings.heading != blank %}
+                  <p class="footer-column-heading-{{ section.id }}">{{ block.settings.heading }}</p>
+                {% endif %}
+                
+                <ul class="footer-social-list-{{ section.id }}">
+                  {% if block.settings.instagram != blank %}
+                    <li class="footer-social-item-{{ section.id }}">
+                      <a class="footer-social-link-{{ section.id }}" href="{{ block.settings.instagram }}">
+                        <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <title>Instagram icon</title><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"></path>
+                        </svg>
+                        {{ block.settings.instagram_text }}
+                      </a>
+                    </li>
+                  {% endif %}
+                  {% if block.settings.facebook != blank %}
+                    <li class="footer-social-item-{{ section.id }}">
+                      <a class="footer-social-link-{{ section.id }}" href="{{ block.settings.facebook }}">
+                        <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 18" fill="none" class="w-16 h-16">
+                    		<path d="M5.15 17.14h-3.1v-8.5H0V5.72h2.06V3.99c0-2.4.62-3.85 3.35-3.85h2.27v2.94H6.26c-1.06 0-1.11.4-1.11 1.16v1.47H7.7l-.3 2.93H5.14v8.5Z" fill="currentColor"></path>
+                    	</svg>
+                        {{ block.settings.facebook_text }}
+                      </a>
+                    </li>
+                  {% endif %}
+                  {% if block.settings.twitter != blank %}
+                    <li class="footer-social-item-{{ section.id }}">
+                      <a class="footer-social-link-{{ section.id }}" href="{{ block.settings.twitter }}">
+                        <svg alt="" width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" clip-rule="evenodd" d="M19 9.5C19 14.7467 14.7467 19 9.5 19C4.25329 19 0 14.7467 0 9.5C0 4.25329 4.25329 0 9.5 0C14.7467 0 19 4.25329 19 9.5ZM8.18721 10.0675L3.64633 3.99603H7.14609L10.123 7.97639L13.8073 3.99603H14.8358L10.5825 8.59099L15.379 15.0039H11.8792L8.64689 10.6819L4.6462 15.0039H3.61771L8.18721 10.0675ZM6.76655 4.75353H5.15877L12.2586 14.2464H13.8663L6.76655 4.75353Z" fill="{{ footer_border_color }}"></path>
+                        </svg>
+                        {{ block.settings.twitter_text }}
+                      </a>
+                    </li>
+                  {% endif %}
+                  {% if block.settings.linkedin != blank %}
+                    <li class="footer-social-item-{{ section.id }}">
+                      <a class="footer-social-link-{{ section.id }}" href="{{ block.settings.linkedin }}">
+                        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        	<path d="M1.82 0C.82 0 0 .82 0 1.82v12.36C0 15.18.82 16 1.82 16h12.36c1 0 1.82-.82 1.82-1.82V1.82c0-1-.82-1.82-1.82-1.82H1.82Zm0 1.45h12.36c.2 0 .37.16.37.37v12.36c0 .2-.16.37-.37.37H1.82a.36.36 0 0 1-.37-.37V1.82c0-.2.16-.37.37-.37ZM3.95 2.7a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm6.57 3.32c-1.04 0-1.73.57-2.02 1.12h-.05v-.96H6.41v6.91h2.14V9.7c0-.9.17-1.78 1.3-1.78 1.09 0 1.1 1.02 1.1 1.82v3.36h2.14V9.3c0-1.85-.4-3.27-2.57-3.27Zm-7.61.16v6.91h2.16V6.2H2.9Z" fill="currentColor"></path>
+                    	</svg>
+                        {{ block.settings.linkedin_text }}
+                      </a>
+                    </li>
+                  {% endif %}
+                  {% if block.settings.youtube != blank %}
+                    <li class="footer-social-item-{{ section.id }}">
+                      <a class="footer-social-link-{{ section.id }}" href="{{ block.settings.youtube }}">
+                        <svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <title>YouTube icon</title><path d="M23.499 6.203a3.008 3.008 0 00-2.089-2.089c-1.87-.501-9.4-.501-9.4-.501s-7.509-.01-9.399.501a3.008 3.008 0 00-2.088 2.09A31.258 31.26 0 000 12.01a31.258 31.26 0 00.523 5.785 3.008 3.008 0 002.088 2.089c1.869.502 9.4.502 9.4.502s7.508 0 9.399-.502a3.008 3.008 0 002.089-2.09 31.258 31.26 0 00.5-5.784 31.258 31.26 0 00-.5-5.808zm-13.891 9.4V8.407l6.266 3.604z"></path>
+                        </svg>
+                        {{ block.settings.youtube_text }}
+                      </a>
+                    </li>
+                  {% endif %}
+                  {% if block.settings.pinterest != blank %}
+                    <li class="footer-social-item-{{ section.id }}">
+                      <a class="footer-social-link-{{ section.id }}" href="{{ block.settings.pinterest }}">
+                        <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <title>Pinterest icon</title><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"></path>
+                        </svg>
+                        {{ block.settings.pinterest_text }}
+                      </a>
+                    </li>
+                  {% endif %}
+                  {% if block.settings.whatsapp != blank %}
+                    <li class="footer-social-item-{{ section.id }}">
+                      <a class="footer-social-link-{{ section.id }}" href="{{ block.settings.whatsapp }}">
+                        <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <title>WhatsApp</title><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path>
+                        </svg>
+                        {{ block.settings.whatsapp_text }}
+                      </a>
+                    </li>
+                  {% endif %}
+                  {% if block.settings.tiktok != blank %}
+                    <li class="footer-social-item-{{ section.id }}">
+                      <a class="footer-social-link-{{ section.id }}" href="{{ block.settings.tiktok }}">
+                        <svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <title>TikTok icon</title><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path>
+                        </svg>
+                        {{ block.settings.tiktok_text }}
+                      </a>
+                    </li>
+                  {% endif %}
+                </ul>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+</div>
+
+<script>
+  function initFooter7() {
+    let thanksText = document.querySelector('.footer-newsletter-thanks-text-{{ section.id }}');
+    let submitButton = document.querySelector('.footer-newsletter-submit-{{ section.id }}');
+    
+    const url = window.location.href;
+    if (url.includes('customer_posted=true')) {
+      if(thanksText) { 
+        thanksText.classList.add('active');
+        setTimeout(() => {
+          thanksText.classList.remove('active');
+        }, 5000);
+      }
+      if(submitButton) {
+        submitButton.setAttribute('disabled', true);
+      }
+    }
+
+    {% if use_redirect %}
+      const redirectUrl = '{{ redirect_url }}';
+      const delayInMilliseconds = 2000;
+    
+      if (thanksText) {
+        setTimeout(function() {
+          window.location.href = redirectUrl;
+        }, delayInMilliseconds);
+      }
+    {% endif %}
+  }
+
+  document.addEventListener('DOMContentLoaded', initFooter7);
+
+  if (Shopify.designMode) {
+     document.addEventListener('shopify:section:unload', initFooter7);
+     document.addEventListener('shopify:section:load', initFooter7);
+  }
+</script>
+
+{% schema %}
+  {
+    "name": "SS - Footer #7",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Blocks settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "content_padding_advanced",
+        "label": "Advanced padding settings",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "block_padding_vertical",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical",
+        "default": 40,
+        "visible_if": "{{ section.settings.content_padding_advanced }}"
+      },
+      {
+        "type": "range",
+        "id": "block_padding_vertical_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical - mobile",
+        "default": 28,
+        "visible_if": "{{ section.settings.content_padding_advanced }}"
+      },
+      {
+         "type": "range",
+         "id": "block_padding_horizontal",
+         "min": 0,
+         "max": 100,
+         "step": 2,
+         "unit": "px",
+         "label": "Padding horizontal",
+         "default": 40,
+         "visible_if": "{{ section.settings.content_padding_advanced }}"
+      },
+      {
+         "type": "range",
+         "id": "block_padding_horizontal_mobile",
+         "min": 0,
+         "max": 100,
+         "step": 2,
+         "unit": "px",
+         "label": "Padding horizontal - mobile",
+         "default": 16,
+         "visible_if": "{{ section.settings.content_padding_advanced }}"
+      },
+      {
+         "type": "range",
+         "id": "block_border_thickness",
+         "min": 0,
+         "max": 10,
+         "step": 1,
+         "unit": "px",
+         "label": "Border thickness",
+         "default": 1,
+         "visible_if": "{{ section.settings.content_padding_advanced }}"
+      },
+      {
+        "type": "header",
+        "content": "Text settings"
+      },
+      {
+        "type": "richtext",
+        "id": "text",
+        "label": "Text",
+        "default": "<p>Subscribe to our newsletter for weekly excerpts, exclusive content, and special offers delivered straight to your inbox.</p>"
+      },
+      {
+        "type": "checkbox",
+        "id": "text_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "text_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "text_size",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "text_size_mobile",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 14
+      },
+      {
+        "type": "range",
+        "id": "text_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 150
+      },
+      {
+        "type": "text_alignment",
+        "id": "text_align",
+        "label": "Alignment"
+      },
+      {
+        "type": "text_alignment",
+        "id": "text_align_mobile",
+        "label": "Alignmnet - mobile"
+      },
+      {
+        "type": "header",
+        "content": "Newsletter settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "use_newsletter",
+        "label": "Use newsletter form",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "use_redirect",
+        "label": "Redirect after submit",
+        "default": true
+      },  
+      {
+        "type": "url",
+        "id": "redirect_url",
+        "label": "Redirect URL",
+        "visible_if": "{{ section.settings.use_redirect }}"
+      },
+      {
+        "type": "range",
+        "id": "newsletter_radius",
+        "min": 0,
+        "max": 50,
+        "step": 2,
+        "unit": "px",
+        "label": "Roundness",
+        "default": 12
+      },
+      {
+        "type": "range",
+        "id": "newsletter_border_thickness",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Border thickness between items",
+        "default": 1
+      },
+      {
+         "type": "range",
+         "id": "newsletter_gap",
+         "min": 0,
+         "max": 50,
+         "step": 2,
+         "unit": "px",
+         "label": "Gap",
+         "default": 0
+      },
+      {
+         "type": "range",
+         "id": "newsletter_gap_mobile",
+         "min": 0,
+         "max": 50,
+         "step": 2,
+         "unit": "px",
+         "label": "Gap - mobile",
+         "default": 0
+      },
+      {
+         "type": "range",
+         "id": "newsletter_mt",
+         "min": 0,
+         "max": 100,
+         "step": 2,
+         "unit": "px",
+         "label": "Margin top",
+         "default": 16
+      },
+      {
+         "type": "range",
+         "id": "newsletter_mt_mobile",
+         "min": 0,
+         "max": 100,
+         "step": 2,
+         "unit": "px",
+         "label": "Margin top - mobile",
+         "default": 14
+      },
+      {
+        "type": "header",
+        "content": "Newsletter input settings"
+      },
+            {
+        "type": "text",
+        "id": "input_placeholder",
+        "label": "Placeholder text",
+        "default": "Email Address" 
+      },
+      {
+        "type": "checkbox",
+        "id": "input_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "input_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "input_size",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "input_size_mobile",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "input_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "input_padding_vertical",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "input_padding_vertical_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical - mobile",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "input_padding_horizontal",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding horizontal",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "input_padding_horizontal_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding horizontal - mobile",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "input_radius",
+        "min": 0,
+        "max": 50,
+        "step": 2,
+        "unit": "px",
+        "label": "Roundness",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "input_border_thickness",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Border thickness",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Newsletter button settings"
+      },
+      {
+        "type": "text",
+        "id": "submit",
+        "label": "Text",
+        "default": "SUBSCRIBE"
+      },
+      {
+        "type": "checkbox",
+        "id": "submit_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "submit_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "submit_size",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "submit_size_mobile",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "submit_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "submit_padding_vertical",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "submit_padding_vertical_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Padding vertical - mobile",
+        "default": 16
+      },
+      {
+         "type": "range",
+         "id": "submit_padding_horizontal",
+         "min": 0,
+         "max": 100,
+         "step": 2,
+         "unit": "px",
+         "label": "Padding horizontal",
+         "default": 24
+      },
+      {
+         "type": "range",
+         "id": "submit_padding_horizontal_mobile",
+         "min": 0,
+         "max": 100,
+         "step": 2,
+         "unit": "px",
+         "label": "Padding horizontal - mobile",
+         "default": 24
+      },
+      {
+         "type": "range",
+         "id": "submit_radius",
+         "min": 0,
+         "max": 50,
+         "step": 2,
+         "unit": "px",
+         "label": "Roundness",
+         "default": 0
+      },
+      {
+         "type": "range",
+         "id": "submit_border_thickness",
+         "min": 0,
+         "max": 10,
+         "step": 1,
+         "unit": "px",
+         "label": "Border thickness",
+         "default": 0
+      },
+      {
+      "type": "header",
+      "content": "Success message settings"
+    },
+    {
+      "type": "text",
+      "id": "thanks_text",
+      "label": "Text",
+      "default": "Thanks for subscribing!"
+    },
+    {
+      "type": "checkbox",
+      "id": "thanks_text_custom",
+      "label": "Use custom font",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "thanks_text_font",
+      "label": "Font family",
+      "default": "josefin_sans_n4",
+      "visible_if": "{{ section.settings.thanks_text_custom }}"
+    },
+    {
+      "type": "range",
+      "id": "thanks_text_size",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "thanks_text_size_mobile",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size - mobile",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "thanks_text_height",
+      "min": 50,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "label": "Line height",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "thanks_text_mt",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin top",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "thanks_text_mt_mobile",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Margin top - mobile",
+      "default": 20
+    },
+      {
+        "type": "header",
+        "content": "Privacy text settings"
+      },
+      {
+        "type": "richtext",
+        "id": "privacy_text",
+        "label": "Text",
+        "default": "<p>By signing up, you agree to our <a href='#'>Privacy Policy*.</a></p>"
+      },
+      {
+        "type": "checkbox",
+        "id": "privacy_text_custom",
+        "label": "Use custom font",
+        "default": false
+      },
+      {
+        "type": "font_picker",
+        "id": "privacy_text_font",
+        "label": "Font family",
+        "default": "josefin_sans_n4"
+      },
+      {
+        "type": "range",
+        "id": "privacy_text_size",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "privacy_text_size_mobile",
+        "min": 0,
+        "max": 72,
+        "step": 2,
+        "unit": "px",
+        "label": "Font size - mobile",
+        "default": 14
+      },
+      {
+        "type": "range",
+        "id": "privacy_text_height",
+        "min": 50,
+        "max": 200,
+        "step": 10,
+        "unit": "%",
+        "label": "Line height",
+        "default": 150
+      },
+      {
+        "type": "range",
+        "id": "privacy_text_mt",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "privacy_text_mt_mobile",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top - mobile",
+        "default": 16
+      },
+      {
+        "type": "text_alignment",
+        "id": "privacy_text_align",
+        "label": "Alignment"
+      },
+      {
+        "type": "text_alignment",
+        "id": "privacy_text_align_mobile",
+        "label": "Alignmnet - mobile"
+      },
+      {
+        "type": "header",
+        "content": "Menu heading settings"
+      },
+      {
+          "type": "checkbox",
+          "id": "column_heading_custom",
+          "label": "Use custom font",
+          "default": false
+      },
+      {
+          "type": "font_picker",
+          "id": "column_heading_font",
+          "label": "Font family",
+          "default": "josefin_sans_n4"
+      },
+      {
+          "type": "range",
+          "id": "column_heading_size",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Font size",
+          "default": 16
+      },
+      {
+          "type": "range",
+          "id": "column_heading_size_mobile",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Font size - mobile",
+          "default": 14
+      },
+      {
+          "type": "range",
+          "id": "column_heading_height",
+          "min": 50,
+          "max": 200,
+          "step": 10,
+          "unit": "%",
+          "label": "Line height",
+          "default": 130
+      },
+      {
+        "type": "header",
+        "content": "Menu list settings"
+      },
+      {
+        "type": "range",
+        "id": "list_mt",
+        "min": 0,
+        "max": 50,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top",
+        "default": 16
+      },
+      {
+        "type": "range",
+        "id": "list_mt_mobile",
+        "min": 0,
+        "max": 50,
+        "step": 2,
+        "unit": "px",
+        "label": "Margin top - mobile",
+        "default": 14
+      },
+      {
+        "type": "range",
+        "id": "list_gap",
+        "min": 0,
+        "max": 50,
+        "step": 2,
+        "unit": "px",
+        "label": "Gap",
+        "default": 24
+      },
+      {
+        "type": "range",
+        "id": "list_gap_mobile",
+        "min": 0,
+        "max": 50,
+        "step": 2,
+        "unit": "px",
+        "label": "Gap - mobile",
+        "default": 16
+      },
+      {
+        "type": "header",
+        "content": "Menu link settings"
+      },
+      {
+          "type": "checkbox",
+          "id": "link_custom",
+          "label": "Use custom font",
+          "default": false
+      },
+      {
+          "type": "font_picker",
+          "id": "link_font",
+          "label": "Font family",
+          "default": "josefin_sans_n4"
+      },
+      {
+          "type": "range",
+          "id": "link_size",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Font size",
+          "default": 16
+      },
+      {
+          "type": "range",
+          "id": "link_size_mobile",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Font size - mobile",
+          "default": 14
+      },
+      {
+          "type": "range",
+          "id": "link_height",
+          "min": 50,
+          "max": 200,
+          "step": 10,
+          "unit": "%",
+          "label": "Line height",
+          "default": 130
+      },
+      {
+        "type": "header",
+        "content": "Info text settings"
+      },
+      {
+          "type": "checkbox",
+          "id": "column_text_custom",
+          "label": "Use custom font",
+          "default": false
+      },
+      {
+          "type": "font_picker",
+          "id": "column_text_font",
+          "label": "Font family",
+          "default": "josefin_sans_n4"
+      },
+      {
+          "type": "range",
+          "id": "column_text_size",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Font size",
+          "default": 16
+      },
+      {
+          "type": "range",
+          "id": "column_text_size_mobile",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Font size - mobile",
+          "default": 14
+      },
+      {
+          "type": "range",
+          "id": "column_text_height",
+          "min": 50,
+          "max": 200,
+          "step": 10,
+          "unit": "%",
+          "label": "Line height",
+          "default": 150
+      },
+      {
+          "type": "range",
+          "id": "column_text_mt",
+          "min": 0,
+          "max": 50,
+          "step": 2,
+          "unit": "px",
+          "label": "Margin top",
+          "default": 16
+      },
+      {
+          "type": "range",
+          "id": "column_text_mt_mobile",
+          "min": 0,
+          "max": 50,
+          "step": 2,
+          "unit": "px",
+          "label": "Margin top - mobile",
+          "default": 14
+      },
+      {
+        "type": "header",
+        "content": "Block colors"
+      },
+      {
+        "type": "color",
+        "label": "Border",
+        "id": "block_border_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "header",
+        "content": "Text colors"
+      },
+      {
+        "type": "color",
+        "label": "Text",
+        "id": "text_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "color",
+        "label": "Privacy text",
+        "id": "privacy_text_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "header",
+        "content": "Newsletter colors"
+      },
+      {
+        "type": "color",
+        "label": "Border",
+        "id": "newsletter_border_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "header",
+        "content": "Newsletter input colors"
+      },
+      {
+        "type": "color",
+        "label": "Background",
+        "id": "input_bg_color",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "label": "Border",
+        "id": "input_border_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "color",
+        "label": "Text",
+        "id": "input_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "color",
+        "label": "Placeholder",
+        "id": "input_placeholder_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "header",
+        "content": "Newsletter button colors"
+      },
+      {
+        "type": "color",
+        "label": "Text",
+        "id": "submit_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "color",
+        "label": "Text hover",
+        "id": "submit_hover_color",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "label": "Background",
+        "id": "submit_bg_color",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "label": "Background hover",
+        "id": "submit_bg_hover_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "color",
+        "label": "Button border",
+        "id": "submit_border_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "color",
+        "label": "Border hover",
+        "id": "submit_border_hover_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "header",
+        "content": "Menu colors"
+      },
+      {
+        "type": "color",
+        "label": "Heading",
+        "id": "column_heading_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "color",
+        "label": "Text",
+        "id": "column_text_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "color",
+        "label": "Link",
+        "id": "link_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "color",
+        "label": "Link hover",
+        "id": "link_hover_color",
+        "default": "#84827E"
+      },
+      {
+        "type": "header",
+        "content": "Section colors"
+      },
+      {
+        "type": "color",
+        "label": "Section background",
+        "id": "background_color",
+        "default": "#F1F0ED"
+      },
+      {
+        "type": "color_background",
+        "id": "background_gradient",
+        "label": "Section background gradient"
+      },
+      {
+        "type": "color",
+        "label": "Border",
+        "id": "border_color",
+        "default": "#000000"
+      },
+      {
+        "type": "header",
+        "content": "Section margin (outside)"
+      },
+      {
+        "type": "range",
+        "id": "margin_top",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Margin top",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "margin_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Margin bottom",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "margin_horizontal",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "rem",
+        "label": "Margin sides",
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "margin_horizontal_mobile",
+        "min": 0,
+        "max": 15,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Margin sides mobile",
+        "default": 1.5
+      },
+      {
+        "type": "header",
+        "content": "Section padding (inside)"
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Padding top",
+        "default": 0
+      },
+      {
+         "type": "range",
+         "id": "padding_bottom",
+         "min": 0,
+         "max": 100,
+         "step": 4,
+         "unit": "px",
+         "label": "Padding bottom",
+         "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding_horizontal",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "rem",
+        "label": "Padding sides",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "padding_horizontal_mobile",
+        "min": 0,
+        "max": 15,
+        "step": 0.5,
+        "unit": "rem",
+        "label": "Padding sides mobile",
+        "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Section settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Full width",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "content_width",
+        "min": 0,
+        "max": 400,
+        "step": 10,
+        "unit": "rem",
+        "label": "Section content width",
+        "default": 120
+      },
+      {
+        "type": "range",
+        "id": "border_thickness",
+        "min": 0,
+        "max": 50,
+        "step": 1,
+        "unit": "px",
+        "label": "Border thickness",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "section_radius",
+        "min": 0,
+        "max": 100,
+        "step": 2,
+        "unit": "px",
+        "label": "Section roundness",
+        "default": 12
+      },
+      {
+        "type": "checkbox",
+        "id": "lazy",
+        "label": "Lazy load",
+        "info": "Lazy load images for speed optimisation",
+        "default": true
+      }
+    ],
+    "blocks": [
+      {
+        "type": "logo",
+        "limit": 1,
+        "name": "Logo",
+        "settings": [
+          {
+            "type": "header",
+            "content": "Logo image settings"
+          },
+          {
+            "type": "image_picker",
+            "id": "logo",
+            "label": "Logo"
+          },
+          {
+            "type": "range",
+            "id": "image_width",
+            "min": 10,
+            "max": 100,
+            "step": 2,
+            "unit": "%",
+            "label": "Width",
+            "default": 100
+          },
+          {
+            "type": "range",
+            "id": "image_width_mobile",
+            "min": 10,
+            "max": 100,
+            "step": 2,
+            "unit": "%",
+            "label": "Width - mobile",
+            "default": 100
+          },
+          {
+            "type": "header",
+            "content": "Text settings"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<h2>section.store</h2>"
+          },
+          {
+            "type": "checkbox",
+            "id": "text_custom",
+            "label": "Use custom font",
+            "default": false
+          },
+          {
+            "type": "font_picker",
+            "id": "text_font",
+            "label": "Font family",
+            "default": "josefin_sans_n4"
+          },
+          {
+            "type": "range",
+            "id": "text_size",
+            "min": 0,
+            "max": 200,
+            "step": 2,
+            "unit": "px",
+            "label": "Font size",
+            "default": 120
+          },
+          {
+            "type": "range",
+            "id": "text_size_mobile",
+            "min": 0,
+            "max": 200,
+            "step": 2,
+            "unit": "px",
+            "label": "Font size - mobile",
+            "default": 40
+          },
+          {
+            "type": "range",
+            "id": "text_height",
+            "min": 50,
+            "max": 200,
+            "step": 10,
+            "unit": "%",
+            "label": "Line height",
+            "default": 100
+          },
+          {
+            "type": "color",
+            "id": "text_color",
+            "label": "Color",
+            "default": "#67645E"
+          }
+        ]
+      },
+      {
+        "type": "column",
+        "name": "Menu",
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Heading",
+            "default": "QUICK LINKS"
+          },
+          {
+            "type": "link_list",
+            "id": "menu",
+            "label": "Menu",
+            "default": "footer",
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Text",
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Heading",
+            "default": "HEADING"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Share contact information, store details, and brand content with your customers.</p>"
+          }
+        ]
+      },
+      {
+        "type": "socials",
+        "name": "Socials",
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Heading",
+            "default": "SOCIALS"
+          },
+          {
+            "type": "text",
+            "label": "Twitter text",
+            "id": "twitter_text",
+            "default": "Twitter"
+          },
+          {
+            "type": "text",
+            "label": "Twitter link",
+            "id": "twitter"
+          },
+          {
+            "type": "text",
+            "label": "Facebook text",
+            "id": "facebook_text",
+            "default": "Facebook"
+          },
+          {
+            "type": "text",
+            "label": "Facebook link",
+            "id": "facebook",
+            "default": "#"
+          },
+          {
+            "type": "text",
+            "label": "Linkedin text",
+            "id": "linkedin_text",
+            "default": "Linkedin"
+          },
+          {
+            "type": "text",
+            "label": "Linkedin link",
+            "id": "linkedin"
+          },
+          {
+            "type": "text",
+            "label": "Instagram text",
+            "id": "instagram_text",
+            "default": "Instagram"
+          },
+          {
+            "type": "text",
+            "label": "Instagram link",
+            "id": "instagram",
+            "default": "#"
+          },
+          {
+            "type": "text",
+            "label": "Youtube text",
+            "id": "youtube_text",
+            "default": "Youtube"
+          },
+          {
+            "type": "text",
+            "label": "Youtube link",
+            "id": "youtube"
+          },
+          {
+            "type": "text",
+            "label": "Pinterest text",
+            "id": "pinterest_text",
+            "default": "Pinterest"
+          },
+          {
+            "type": "text",
+            "label": "Pinterest link",
+            "id": "pinterest"
+          },
+          {
+            "type": "text",
+            "label": "Whatsapp text",
+            "id": "whatsapp_text",
+            "default": "Whatsapp"
+          },
+          {
+            "type": "text",
+            "label": "Whatsapp link",
+            "id": "whatsapp"
+          },
+          {
+            "type": "text",
+            "label": "Tiktok text",
+            "id": "tiktok_text",
+            "default": "Tiktok"
+          },
+          {
+            "type": "text",
+            "label": "Tiktok link",
+            "id": "tiktok",
+            "default": "#"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "SS - Footer #7",
+        "blocks": [
+          {
+            "type": "logo"
+          },
+          {
+            "type": "column"
+          },
+          {
+            "type": "socials"
+          },
+          {
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

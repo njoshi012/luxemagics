@@ -1,0 +1,200 @@
+{
+  "sections": {
+    "hero": {
+      "type": "lm-bulk-hero",
+      "blocks": {
+        "pill_desk": {
+          "type": "pill",
+          "settings": {
+            "label": "Desk"
+          }
+        },
+        "pill_wall": {
+          "type": "pill",
+          "settings": {
+            "label": "Wall"
+          }
+        },
+        "pill_fridge": {
+          "type": "pill",
+          "settings": {
+            "label": "Fridge"
+          }
+        },
+        "pill_photo": {
+          "type": "pill",
+          "settings": {
+            "label": "Photo"
+          }
+        }
+      },
+      "block_order": [
+        "pill_desk",
+        "pill_wall",
+        "pill_fridge",
+        "pill_photo"
+      ],
+      "settings": {
+        "eyebrow": "Bulk orders · 2027 calendars",
+        "heading": "Give them a year they will want to keep.",
+        "text": "<p>Custom 2027 calendars for corporate gifting, client thank-yous, events and festive hampers. Made in Hyderabad and personalised with your brand or their photos.</p>",
+        "button_label": "Enquire for bulk",
+        "button_label_2": "Download catalogue",
+        "quote": "We live in a world where we capture everything but remember nothing.",
+        "big_text": "2027",
+        "color_scheme": "scheme-2",
+        "padding_top": 40,
+        "padding_bottom": 72
+      }
+    },
+    "range": {
+      "type": "lm-bulk-range",
+      "blocks": {
+        "desk": {
+          "type": "calendar",
+          "settings": {
+            "title": "Desk Calendar",
+            "tagline": "Stays on the desk all year.",
+            "points": "Tent-style stand-up format\nYour logo and brand colours on the cover\nMonthly pages with room for notes",
+            "best_for": "Corporate gifting and client desks",
+            "illustration": "desk"
+          }
+        },
+        "wall": {
+          "type": "calendar",
+          "settings": {
+            "title": "Wall Calendar",
+            "tagline": "One big page for every month.",
+            "points": "Large photo or artwork panel each month\nYour festivals and company dates marked in\nReady to hang",
+            "best_for": "Offices, reception areas and shops",
+            "illustration": "wall"
+          }
+        },
+        "fridge": {
+          "type": "calendar",
+          "settings": {
+            "title": "Magnetic Fridge Calendar",
+            "tagline": "Always in sight at home.",
+            "points": "Magnetic back sticks to any fridge\nCompact monthly grid\nPairs with Luxe Magics fridge magnets",
+            "best_for": "Festive hampers and customer thank-yous",
+            "illustration": "fridge"
+          }
+        },
+        "photo": {
+          "type": "calendar",
+          "settings": {
+            "title": "Photo Memory Calendar",
+            "tagline": "Their photos, twelve months.",
+            "points": "A photo you or your recipient chose for each month\nCaptions and dates for birthdays and anniversaries\nA gift that is remembered, not just used",
+            "best_for": "Family gifting, weddings and milestones",
+            "illustration": "photo"
+          }
+        }
+      },
+      "block_order": [
+        "desk",
+        "wall",
+        "fridge",
+        "photo"
+      ],
+      "settings": {
+        "heading": "The 2027 range",
+        "text": "Pick the format that fits who you are gifting. Choose one and it carries straight into your enquiry below.",
+        "year": "2027",
+        "button_label": "Select for enquiry",
+        "anchor": "calendars",
+        "color_scheme": "scheme-1",
+        "show_borders": true,
+        "padding_top": 72,
+        "padding_bottom": 80,
+        "selected_label": "Selected for enquiry"
+      }
+    },
+    "steps": {
+      "type": "lm-bulk-steps",
+      "blocks": {
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "title": "Tell us what you need",
+            "text": "Share the calendar type, rough quantity and the date you need them by using the form below."
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "title": "Approve your design",
+            "text": "We send a quote and a design proof with your logo, colours or photos. Nothing is printed until you approve it."
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "title": "We print and deliver",
+            "text": "Your calendars are printed, packed and shipped from Hyderabad so they land before your gifting date."
+          }
+        }
+      },
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3"
+      ],
+      "settings": {
+        "heading": "How a bulk order works",
+        "color_scheme": "scheme-2",
+        "padding_top": 72,
+        "padding_bottom": 72
+      }
+    },
+    "enquiry": {
+      "type": "lm-bulk-enquiry",
+      "settings": {
+        "heading": "Bulk order enquiry",
+        "text": "Need custom branding, photos or a large quantity? Tell us about your order and we will reply with a quote and design options.",
+        "calendar_types": "Desk Calendar\nWall Calendar\nMagnetic Fridge Calendar\nPhoto Memory Calendar",
+        "personalisation_options": "Our logo and brand colours\nCustom photos\nStandard design\nNot sure yet",
+        "button_label": "Send enquiry",
+        "submit_note": "We usually reply within one working day.",
+        "success_message": "Thank you! Your enquiry is in. We will reply with a quote and design options shortly.",
+        "enquiry_tag": "Bulk order – 2027 calendars",
+        "empty_selection": "No calendar picked yet",
+        "tips_heading": "Good to know",
+        "tips": "<ul><li>Share your logo or photos when we reply and we will build your proof.</li><li>Tell us your gifting date so we can plan printing around it.</li><li>Mixed formats in one order are fine. Mention them in your message.</li></ul>",
+        "address": "<p>Luxe Magics<br/>Hyderabad, India<br/>luxemagics.com</p>",
+        "color_scheme": "scheme-23569c26-f5ed-40b4-9abf-cec33cbe9e35",
+        "form_color_scheme": "scheme-1",
+        "aside_color_scheme": "scheme-4",
+        "show_borders": true,
+        "padding_top": 72,
+        "padding_bottom": 80,
+        "min_quantity": 25
+      }
+    },
+    "resources": {
+      "type": "lm-bulk-resources",
+      "settings": {
+        "heading": "Not ready to enquire yet?",
+        "text": "Take the catalogue with you, or hold a sample in your hands before you decide.",
+        "catalogue_eyebrow": "Catalogue",
+        "catalogue_heading": "Download the 2027 calendar catalogue",
+        "catalogue_text": "All four formats with details, in one PDF you can share with your team.",
+        "catalogue_button": "Download PDF",
+        "sample_eyebrow": "Sample",
+        "sample_heading": "Order a sample calendar",
+        "sample_text": "See the paper, print and finish before you place your bulk order.",
+        "sample_button": "Order a sample",
+        "color_scheme": "scheme-2",
+        "padding_top": 72,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "range",
+    "steps",
+    "enquiry",
+    "resources"
+  ]
+}

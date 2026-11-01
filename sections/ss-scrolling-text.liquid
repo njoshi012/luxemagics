@@ -1,0 +1,564 @@
+<style>
+  .{{ section.id }}-ss-scroller__container{
+    position: relative;
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+    flex-wrap: no-wrap;
+    transform:translateZ(0);
+    background-color:{{section.settings.background_color}};
+    background-image: {{section.settings.background_gradient}};
+    padding: {{section.settings.inside_padding}}px 0;
+  }
+
+  .{{ section.id }}-ss-scroller__container.reverse {
+    flex-direction: row-reverse;
+  }
+
+  .{{ section.id }}-ss-scroller__text{
+    font-size:25px;
+    margin:0;
+    white-space:nowrap;
+    width:auto;
+    perspective:900px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    animation:ss-scroller-left {{ section.settings.scrolling_speed }}s linear infinite;
+    color: {{section.settings.text_color}};
+  }
+
+  .{{ section.id }}-ss-scroller__text-item {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform: translate3d(0, 0, 0);
+    {% unless section.settings.text_gradient == blank %}
+      background-image: {{section.settings.text_gradient}};
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    {% endunless %}
+  }
+
+  @media only screen and (min-width:769px){
+
+      .{{ section.id }}-ss-scroller__text span{
+        padding:0 15px;
+      }
+    }
+
+    .{{ section.id }}-ss-scroller__text span{
+      padding:0 20px;
+    }
+
+  .ss-scroller__text--right{
+    animation-name:ss-scroller-right;
+  }
+
+  @keyframes ss-scroller-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes ss-scroller-right {
+     from { transform:translateX(-50%); }
+     to {transform:translateX(0%); }
+    }
+  }
+</style>
+{% if section.settings.pause_hover %}
+  <style>
+    .{{ section.id }}-ss-scroller__text:hover {
+      animation-play-state: paused;
+    }
+  </style>
+{% endif %}
+{%- style -%}
+    {% if section.settings.color_scheme == 'button' %}
+      .ss-scroller--{{ section.id }} {
+        background: {{ settings.color_button }};
+        color: {{ settings.color_button_text }};
+      }
+    {% endif %}
+    .ss-scroller--{{ section.id }} .{{ section.id }}-ss-scroller__text {
+      font-size: {{ section.settings.text_size }}px;
+      animation-duration: {{ section.settings.scrolling_speed}}s;
+    }
+    @media screen and (max-width: 768px) {
+      .ss-scroller--{{ section.id }} .{{ section.id }}-ss-scroller__text {
+        font-size: {{ section.settings.text_size_mobile}}px;
+        animation-duration: {{ section.settings.scrolling_speed_mobile }}s;
+      }
+    }
+    {% unless section.settings.text_spacing %}
+      .ss-scroller--{{ section.id }} .ss-scroller__text span {
+        padding: 0;
+      }
+    {% endunless %}
+  }
+{%- endstyle -%}
+
+{% capture icon %}
+  {% if section.settings.icon != blank %}
+    <img
+      src="{{ section.settings.icon | img_url: 'master' }}"
+      alt="{{ section.settings.icon.alt }}"
+      style="width: {{ section.settings.icon_width }}px; object-fit: contain;"
+    >
+  {% endif %}
+{% endcapture %}
+
+{% assign text_font = section.settings.text_font %}
+<style>
+  {{ text_font | font_face }}
+</style>
+
+{% if section.settings.direction_rtl %}
+  <style>
+  .{{ section.id }}-ss-scroller__text-item span {
+    unicode-bidi: bidi-override !important;
+    direction: rtl !important;
+    text-align:right; 
+  }
+  </style>
+{% endif %}
+
+<div class="ss-scroller ss-scroller--{{ section.id }}">
+  {%- capture markup -%}
+    <div class="{{ section.id }}-ss-scroller__container">
+      <div class="{{ section.id }}-ss-scroller__text ss-scroller__text--{{ section.settings.direction }}"
+      style="font-family: {{ text_font.family | escape }};"
+      >
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <!-- <span aria-hidden="true">{{ section.settings.text }}</span>
+            {{ icon }} -->
+      </div>
+      <div class="{{ section.id }}-ss-scroller__text ss-scroller__text--{{ section.settings.direction }}"
+      style="font-family: {{ text_font.family | escape }};"
+      >
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <div class="{{ section.id }}-ss-scroller__text-item">
+          {% if section.settings.direction_rtl %}
+            {{ icon }}
+          {% endif %}
+          <span>{{ section.settings.text }}</span>
+          {% unless section.settings.direction_rtl %}
+            {{ icon }}
+          {% endunless %}
+        </div>
+        <!-- <span aria-hidden="true">{{ section.settings.text }}</span>
+            {{ icon }} -->
+      </div>
+    </div>
+  {%- endcapture -%}
+
+  {%- if section.settings.link != blank -%}
+    <a href="{{ section.settings.link }}" style="text-decoration:none;">
+      {{ markup }}
+    </a>
+  {%- else -%}
+    {{ markup }}
+  {%- endif -%}
+</div>
+
+{% if section.settings.direction_rtl %}
+  <script>
+    function initScrollingText() {
+      var htmlElement = document.documentElement;
+  
+      if (window.getComputedStyle(htmlElement).getPropertyValue('direction') === 'rtl') {
+          document.querySelector('.{{ section.id }}-ss-scroller__container').classList.add('reverse');
+      }
+    }
+  
+    document.addEventListener('DOMContentLoaded', initScrollingText);
+    
+    if (Shopify.designMode) {
+       document.addEventListener('shopify:section:unload', initScrollingText);
+       document.addEventListener('shopify:section:load', initScrollingText);
+    }
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "SS - Scrolling text",
+  "class": "text",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Free shipping and easy returns"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon",
+      "label": "Icon (Optional)"
+    },
+    {
+      "type": "range",
+      "id": "icon_width",
+      "label": "Icon width",
+      "default": 24,
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "default": "left",
+      "options": [
+        {
+          "label": "Left",
+          "value": "left"
+        },
+        {
+          "label": "Right",
+          "value": "right"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "inside_padding",
+      "label": "Inside padding",
+      "default": 0,
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "Font family",
+      "default": "open_sans_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "default": 70,
+      "min": 20,
+      "max": 150,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Text size mobile",
+      "default": 40,
+      "min": 20,
+      "max": 150,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "scrolling_speed",
+      "label": "Scrolling speed",
+      "default": 25,
+      "min": 5,
+      "max": 100,
+      "step": 1,
+      "unit": "s"
+    },
+    {
+      "type": "range",
+      "id": "scrolling_speed_mobile",
+      "label": "Scrolling speed mobile",
+      "default": 30,
+      "min": 5,
+      "max": 100,
+      "step": 1,
+      "unit": "s"
+    },
+    {
+      "type": "checkbox",
+      "id": "text_spacing",
+      "label": "Add spacing",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id":"pause_hover",
+      "label": "Pause on Hover",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Colors",
+      "info": "Gradient replaces solid colors when set."
+    },
+    {
+      "type": "color",
+      "label": "Text color",
+      "id": "text_color",
+      "default": "#232323"
+    },
+    {
+      "type": "color_background",
+      "id": "text_gradient",
+      "label": "Text gradient"
+    },
+    {
+      "type": "color",
+      "label": "Background color",
+      "id": "background_color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color_background",
+      "id": "background_gradient",
+      "label": "Section background gradient"
+    },
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "direction_rtl",
+      "label": "Use RTL Direction"
+    }
+  ],
+  "presets": [
+    {
+      "name": "SS - Scrolling text",
+      "category": "Text"
+    }
+  ]
+}
+{% endschema %}

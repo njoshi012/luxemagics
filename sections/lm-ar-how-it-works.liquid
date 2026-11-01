@@ -1,0 +1,959 @@
+{%- comment -%}
+  Luxe Magics — AR Hero Section
+  Filename: sections/lm-ar-hero.liquid
+{%- endcomment -%}
+
+{%- liquid
+  assign pt         = section.settings.padding_top
+  assign pb         = section.settings.padding_bottom
+  assign accent     = section.settings.accent_color
+  assign qr_url     = section.settings.qr_demo_url
+  assign qr_image   = section.settings.qr_custom_image
+  assign image_fit  = section.settings.frame_image_fit
+  assign has_qr     = false
+  assign has_qr_img = false
+  if qr_image != blank
+    assign has_qr_img = true
+    assign has_qr = true
+  elsif qr_url != blank
+    assign has_qr = true
+    assign qr_encoded = qr_url | url_encode
+    assign qr_api = 'https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=6&color=000000&bgcolor=ffffff&data=' | append: qr_encoded
+  endif
+-%}
+
+{%- style -%}
+
+  #lm-hero-{{ section.id }} {
+    padding-top: {{ pt | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ pb | times: 0.75 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    #lm-hero-{{ section.id }} {
+      padding-top: {{ pt }}px;
+      padding-bottom: {{ pb }}px;
+    }
+  }
+
+  #lm-hero-{{ section.id }} {
+    --lm-accent:    {{ accent }};
+    --lm-accent-10: {{ accent }}1a;
+    --lm-accent-20: {{ accent }}33;
+  }
+
+  /* ── Two-column grid ── */
+  .lm-hero__grid-{{ section.id }} {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  @media screen and (min-width: 990px) {
+    .lm-hero__grid-{{ section.id }} {
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+  }
+
+  /* ── Left column ── */
+  .lm-hero__left-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+  }
+  .lm-hero__eyebrow-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--lm-accent);
+    margin-bottom: 1.4rem;
+  }
+  .lm-hero__eyebrow-line-{{ section.id }} {
+    display: block;
+    width: 28px;
+    height: 1.5px;
+    background: var(--lm-accent);
+    flex-shrink: 0;
+  }
+  .lm-hero__heading-{{ section.id }} {
+    font-size: clamp(30px, 5vw, 54px);
+    font-weight: 400;
+    line-height: 1.08;
+    margin: 0 0 1.2rem;
+    letter-spacing: -0.01em;
+    color: rgb(var(--color-foreground));
+  }
+  .lm-hero__heading-{{ section.id }} em {
+    font-style: italic;
+    color: var(--lm-accent);
+  }
+  .lm-hero__sub-{{ section.id }} {
+    font-size: 15px;
+    line-height: 1.75;
+    color: rgba(var(--color-foreground), 0.65);
+    margin: 0 0 2.2rem;
+    max-width: 440px;
+  }
+  .lm-hero__hiw-label-{{ section.id }} {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(var(--color-foreground), 0.38);
+    margin-bottom: 0.9rem;
+  }
+  .lm-hero__steps-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 2.4rem;
+  }
+  .lm-hero__step-{{ section.id }} {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .lm-hero__step-num-{{ section.id }} {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--lm-accent);
+    color: var(--lm-accent);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: background 0.25s, color 0.25s;
+  }
+  .lm-hero__step-{{ section.id }}:hover .lm-hero__step-num-{{ section.id }} {
+    background: var(--lm-accent);
+    color: #fff;
+  }
+  .lm-hero__step-copy-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 3px;
+  }
+  .lm-hero__step-title-{{ section.id }} {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(var(--color-foreground));
+    line-height: 1.3;
+    margin: 0;
+  }
+  .lm-hero__step-desc-{{ section.id }} {
+    font-size: 13px;
+    color: rgba(var(--color-foreground), 0.6);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ── Right column ── */
+  .lm-hero__right-{{ section.id }} {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  @media screen and (max-width: 989px) {
+    .lm-hero__right-{{ section.id }} {
+      order: -1;
+    }
+  }
+
+  /*
+    frame-wrap: tight box around the frame only.
+    Badges are absolute to THIS — so they always sit relative to the frame edges.
+    Padding = space for badges that poke outside the frame boundary.
+    top/bottom padding = badge height room
+    right padding = scan badge overflows right
+    left padding = play badge overflows left (half its width)
+  */
+  .lm-hero__frame-wrap-{{ section.id }} {
+    position: relative;
+    display: inline-block;
+    padding: 2.8rem 4rem 2.8rem 4rem;
+  }
+
+  /* Accent shadow */
+  .lm-hero__frame-shadow-{{ section.id }} {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 85%;
+    height: 85%;
+    background: var(--lm-accent-10);
+    border-radius: 3px;
+    z-index: 0;
+  }
+
+  /* ── Frame shell ── */
+  .lm-hero__frame-{{ section.id }} {
+    width: 240px;
+    border: 9px solid rgb(var(--color-foreground));
+    border-radius: 3px;
+    background: rgb(var(--color-background));
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    box-shadow: 18px 18px 0 var(--lm-accent-10);
+    flex-shrink: 0;
+  }
+  @media screen and (min-width: 990px) {
+    .lm-hero__frame-{{ section.id }} {
+      width: 360px;
+    }
+  }
+
+  /* ── Photo area — full frame ── */
+  .lm-hero__frame-photo-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: linear-gradient(150deg, #ddd0c4 0%, #c8b4a4 55%, #b49880 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lm-hero__frame-photo-{{ section.id }} img.lm-frame-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: {{ image_fit | default: 'cover' }};
+    object-position: center top;
+    display: block;
+  }
+  .lm-hero__frame-placeholder-{{ section.id }} {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── QR — bottom-right inside photo ── */
+  .lm-hero__qr-wrap-{{ section.id }} {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 3;
+  }
+  .lm-hero__qr-box-{{ section.id }} {
+    width: 52px;
+    height: 52px;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-decoration: none;
+    position: relative;
+  }
+  .lm-hero__qr-box-{{ section.id }}:hover { transform: scale(1.07); }
+  /* Reset browser button styles */
+  button.lm-hero__qr-box-{{ section.id }} {
+    outline: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .lm-hero__qr-box-{{ section.id }} img.lm-live-qr {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .lm-hero__qr-tip-{{ section.id }} {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    right: 0;
+    left: auto;
+    background: rgb(var(--color-foreground));
+    color: rgb(var(--color-background));
+    font-size: 9px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .lm-hero__qr-box-{{ section.id }}:hover .lm-hero__qr-tip-{{ section.id }} {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── QR Lightbox overlay ── */
+  .lm-qr-lightbox-{{ section.id }} {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.6);
+    cursor: pointer;
+    /* visibility:hidden keeps it in render tree but invisible — no layout recalc on toggle */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+    will-change: opacity;
+    /* backdrop-filter only applied when open to avoid GPU cost at idle */
+  }
+  .lm-qr-lightbox-{{ section.id }}.lm-qr-open {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+  .lm-qr-lightbox-inner-{{ section.id }} {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 24px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+    cursor: default;
+    max-width: 88vw;
+    position: relative;
+    will-change: transform;
+    transform: scale(0.85);
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .lm-qr-lightbox-{{ section.id }}.lm-qr-open .lm-qr-lightbox-inner-{{ section.id }} {
+    transform: scale(1);
+  }
+  .lm-qr-lightbox-inner-{{ section.id }} img {
+    width: 220px;
+    height: 220px;
+    object-fit: contain;
+    display: block;
+    border-radius: 8px;
+  }
+  .lm-qr-lightbox-label-{{ section.id }} {
+    font-size: 14px;
+    font-weight: 600;
+    color: #121212;
+    text-align: center;
+  }
+  .lm-qr-lightbox-sub-{{ section.id }} {
+    font-size: 11px;
+    color: rgba(0,0,0,0.45);
+    text-align: center;
+    margin-top: -6px;
+  }
+  .lm-qr-lightbox-close-{{ section.id }} {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    line-height: 30px;
+    text-align: center;
+    transition: background 0.15s;
+    padding: 0;
+  }
+  .lm-qr-lightbox-close-{{ section.id }}:hover { background: #e0e0e0; }
+  .lm-qr-lightbox-link-{{ section.id }} {
+    display: inline-block;
+    background: {{ accent }};
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 9px 22px;
+    border-radius: 40px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s;
+  }
+  .lm-qr-lightbox-link-{{ section.id }}:hover { opacity: 0.85; }
+  /* lightbox uses CSS transitions now — no keyframes needed */
+
+  /*
+    ── Floating badges ──
+    Both anchored to .frame-wrap so they always hug the frame.
+
+    SCAN badge: top-right — pokes out the right side
+      right: 0 = right edge of frame-wrap = right edge of frame + right padding
+      We push it inward by half so it straddles the frame's right border:
+      right: calc(4rem - 50%) won't work cleanly, so we use a fixed negative right.
+
+    PLAY badge: bottom-left — half inside, half outside the frame's left edge.
+      transform: translateX(-50%) on a left: 0 badge would centre it on the left edge.
+      We want ~half hanging outside, so: left: 0 + translateX(-50%)
+      But the wrap has left padding of 4rem, so left:0 is already outside the frame.
+      Frame left edge = 4rem into the wrap.
+      To centre badge on frame's left edge: left = 4rem, translateX(-50%)
+  */
+  .lm-hero__scan-tag-{{ section.id }} {
+    position: absolute;
+    top: 1rem;
+    right: 0;
+    background: var(--lm-accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 40px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    animation: lm-float-{{ section.id }} 3s ease-in-out infinite;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    z-index: 4;
+    will-change: transform;
+  }
+
+  .lm-hero__play-tag-{{ section.id }} {
+    position: absolute;
+    bottom: 1rem;
+    left: 4rem;
+    transform: translateX(-30%);
+    background: rgb(var(--color-foreground));
+    color: rgb(var(--color-background));
+    font-size: 11px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    animation: lm-float-play-{{ section.id }} 3s ease-in-out infinite 1.5s;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    z-index: 4;
+    will-change: transform;
+  }
+  .lm-hero__play-dot-{{ section.id }} {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    border-radius: 50%;
+    background: var(--lm-accent);
+  }
+
+  @keyframes lm-float-{{ section.id }} {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-6px); }
+  }
+  /* Play badge has translateX so we combine both transforms in keyframes */
+  @keyframes lm-float-play-{{ section.id }} {
+    0%, 100% { transform: translateX(-30%) translateY(0); }
+    50%       { transform: translateX(-30%) translateY(-6px); }
+  }
+
+  /* ── Scroll-in animation ── */
+  {% if settings.animations_reveal_on_scroll %}
+  .lm-hero__left-{{ section.id }},
+  .lm-hero__right-{{ section.id }} {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .lm-hero__right-{{ section.id }} { transition-delay: 0.15s; }
+  .lm-hero__left-{{ section.id }}.lm-vis,
+  .lm-hero__right-{{ section.id }}.lm-vis {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  {% endif %}
+
+{%- endstyle -%}
+
+<div
+  id="lm-hero-{{ section.id }}"
+  class="gradient color-{{ section.settings.color_scheme }}"
+  {{ section.shopify_attributes }}
+>
+  <div class="page-width">
+    <div class="lm-hero__grid-{{ section.id }}">
+
+      {%- comment -%}────── LEFT ──────{%- endcomment -%}
+      <div class="lm-hero__left-{{ section.id }}{% if settings.animations_reveal_on_scroll %} lm-anim-l{% endif %}">
+
+        {%- if section.settings.eyebrow != blank -%}
+          <span class="lm-hero__eyebrow-{{ section.id }}">
+            <span class="lm-hero__eyebrow-line-{{ section.id }}"></span>
+            {{ section.settings.eyebrow }}
+          </span>
+        {%- endif -%}
+
+        {%- if section.settings.heading != blank -%}
+          <h1 class="lm-hero__heading-{{ section.id }}">{{ section.settings.heading }}</h1>
+        {%- endif -%}
+
+        {%- if section.settings.subheading != blank -%}
+          <p class="lm-hero__sub-{{ section.id }}">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+
+        {%- if section.blocks.size > 0 -%}
+          <p class="lm-hero__hiw-label-{{ section.id }}">How it works</p>
+          <div class="lm-hero__steps-{{ section.id }}">
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'step' -%}
+                <div class="lm-hero__step-{{ section.id }}" {{ block.shopify_attributes }}>
+                  <div class="lm-hero__step-num-{{ section.id }}">{{ forloop.index }}</div>
+                  <div class="lm-hero__step-copy-{{ section.id }}">
+                    {%- if block.settings.title != blank -%}
+                      <p class="lm-hero__step-title-{{ section.id }}">{{ block.settings.title }}</p>
+                    {%- endif -%}
+                    {%- if block.settings.description != blank -%}
+                      <p class="lm-hero__step-desc-{{ section.id }}">{{ block.settings.description }}</p>
+                    {%- endif -%}
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.show_cta and section.settings.cta_text != blank -%}
+          <div>
+            <a href="{{ section.settings.cta_url | default: '#' }}" class="button">
+              {{ section.settings.cta_text }}
+            </a>
+          </div>
+        {%- endif -%}
+
+      </div>
+
+      {%- comment -%}────── RIGHT ──────{%- endcomment -%}
+      <div class="lm-hero__right-{{ section.id }}{% if settings.animations_reveal_on_scroll %} lm-anim-r{% endif %}">
+
+        <div class="lm-hero__frame-wrap-{{ section.id }}">
+
+          {%- comment -%} Scan badge — top-right, pokes out right side {%- endcomment -%}
+          <span class="lm-hero__scan-tag-{{ section.id }}">
+            {{ section.settings.scan_badge_text }} ✦
+          </span>
+
+          <div class="lm-hero__frame-shadow-{{ section.id }}"></div>
+
+          <div class="lm-hero__frame-{{ section.id }}">
+
+            <div class="lm-hero__frame-photo-{{ section.id }}">
+
+              {%- if section.settings.frame_image != blank -%}
+                {{
+                  section.settings.frame_image
+                  | image_url: width: 600
+                  | image_tag:
+                      class: 'lm-frame-img',
+                      loading: 'lazy',
+                      alt: 'AR Frame photo'
+                }}
+              {%- else -%}
+                <div class="lm-hero__frame-placeholder-{{ section.id }}">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+                    stroke="rgba(255,255,255,0.65)" stroke-width="1.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="3.5"/>
+                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                  </svg>
+                </div>
+              {%- endif -%}
+
+              {%- comment -%} QR — bottom-right of photo {%- endcomment -%}
+              <div class="lm-hero__qr-wrap-{{ section.id }}">
+                {%- if has_qr -%}
+                  {%- comment -%} Always a button so the lightbox trigger works whether URL or image is set {%- endcomment -%}
+                  <button type="button"
+                    class="lm-hero__qr-box-{{ section.id }}"
+                    data-qr-open="lm-qr-lb-{{ section.id }}"
+                    aria-label="Tap to scan QR">
+                    <span class="lm-hero__qr-tip-{{ section.id }}">Tap to scan</span>
+                    {%- if has_qr_img -%}
+                      {{
+                        qr_image
+                        | image_url: width: 120
+                        | image_tag: class: 'lm-live-qr', loading: 'lazy', alt: 'Scan QR'
+                      }}
+                    {%- else -%}
+                      <img class="lm-live-qr" src="{{ qr_api }}"
+                        alt="Scan to preview" width="52" height="52" loading="lazy">
+                    {%- endif -%}
+                  </button>
+                {%- else -%}
+                  {%- comment -%} No QR set — show static placeholder icon, no lightbox {%- endcomment -%}
+                  <div class="lm-hero__qr-box-{{ section.id }}" aria-label="QR placeholder">
+                    <span class="lm-hero__qr-tip-{{ section.id }}">Add QR URL in customizer</span>
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+                      <rect x="2" y="2" width="7" height="7" rx="1" stroke="#121212" stroke-width="1.3" fill="none"/>
+                      <rect x="4" y="4" width="3" height="3" fill="#121212"/>
+                      <rect x="15" y="2" width="7" height="7" rx="1" stroke="#121212" stroke-width="1.3" fill="none"/>
+                      <rect x="17" y="4" width="3" height="3" fill="#121212"/>
+                      <rect x="2" y="15" width="7" height="7" rx="1" stroke="#121212" stroke-width="1.3" fill="none"/>
+                      <rect x="4" y="17" width="3" height="3" fill="#121212"/>
+                      <rect x="15" y="15" width="2" height="2" fill="#121212"/>
+                      <rect x="19" y="15" width="2" height="2" fill="#121212"/>
+                      <rect x="15" y="19" width="2" height="2" fill="#121212"/>
+                      <rect x="19" y="19" width="2" height="2" fill="#121212"/>
+                      <rect x="22" y="15" width="1" height="2" fill="#121212"/>
+                      <rect x="15" y="22" width="2" height="1" fill="#121212"/>
+                    </svg>
+                  </div>
+                {%- endif -%}
+              </div>
+
+            </div>
+            {%- comment -%} End photo area {%- endcomment -%}
+
+          </div>
+          {%- comment -%} End frame {%- endcomment -%}
+
+          {%- comment -%}
+            Play badge — left: 4rem centres it on the frame's left edge
+            (4rem = left padding of frame-wrap = where frame starts)
+            translateX(-50%) = shift left by half its own width = half in, half out
+          {%- endcomment -%}
+          <div class="lm-hero__play-tag-{{ section.id }}">
+            <div class="lm-hero__play-dot-{{ section.id }}"></div>
+            {{ section.settings.play_badge_text }}
+          </div>
+
+        </div>
+        {%- comment -%} End frame-wrap {%- endcomment -%}
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{%- if has_qr -%}
+<div
+  id="lm-qr-lb-{{ section.id }}"
+  class="lm-qr-lightbox-{{ section.id }}"
+  data-qr-overlay="lm-qr-lb-{{ section.id }}"
+  role="dialog"
+  aria-modal="true"
+  aria-label="QR Code"
+>
+  <div class="lm-qr-lightbox-inner-{{ section.id }}">
+    <button
+      class="lm-qr-lightbox-close-{{ section.id }}"
+      data-qr-close="lm-qr-lb-{{ section.id }}"
+      aria-label="Close"
+    >✕</button>
+    {%- if has_qr_img -%}
+      {{
+        qr_image
+        | image_url: width: 440
+        | image_tag: loading: 'lazy', alt: 'Scan QR to experience AR', width: 220, height: 220
+      }}
+    {%- else -%}
+      <img data-src="{{ qr_api }}" alt="Scan QR" width="220" height="220" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+    {%- endif -%}
+    <p class="lm-qr-lightbox-label-{{ section.id }}">{{ section.settings.qr_popup_label }}</p>
+    <p class="lm-qr-lightbox-sub-{{ section.id }}">{{ section.settings.qr_popup_sub }}</p>
+    {%- if qr_url != blank -%}
+      <a href="{{ qr_url }}" target="_blank" rel="noopener" class="lm-qr-lightbox-link-{{ section.id }}">
+        {{ section.settings.qr_popup_btn }} ↗
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+(function() {
+  var sid = '{{ section.id }}';
+  var lbId = 'lm-qr-lb-' + sid;
+
+  function openLb() {
+    var el = document.getElementById(lbId);
+    if (!el) return;
+    // Lazy-load the QR image only on first open
+    var lazyImg = el.querySelector('img[data-src]');
+    if (lazyImg) {
+      lazyImg.src = lazyImg.getAttribute('data-src');
+      lazyImg.removeAttribute('data-src');
+    }
+    el.classList.add('lm-qr-open');
+  }
+  function closeLb() {
+    var el = document.getElementById(lbId);
+    if (el) el.classList.remove('lm-qr-open');
+  }
+
+  document.addEventListener('click', function(e) {
+    // Open
+    var opener = e.target.closest('[data-qr-open="' + lbId + '"]');
+    if (opener) { openLb(); return; }
+    // Close button
+    var closer = e.target.closest('[data-qr-close="' + lbId + '"]');
+    if (closer) { closeLb(); return; }
+    // Click on overlay backdrop
+    var overlay = e.target.closest('[data-qr-overlay="' + lbId + '"]');
+    if (overlay && e.target === overlay) { closeLb(); return; }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLb();
+  });
+})();
+</script>
+{%- endif -%}
+
+{%- if settings.animations_reveal_on_scroll -%}
+<script>
+(function() {
+  var sid = '{{ section.id }}';
+  var els = [
+    document.querySelector('#lm-hero-' + sid + ' .lm-anim-l'),
+    document.querySelector('#lm-hero-' + sid + ' .lm-anim-r')
+  ].filter(Boolean);
+  if (!els.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('lm-vis'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(function(el) { obs.observe(el); });
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "AR – Hero",
+  "tag": "section",
+  "class": "lm-ar-hero",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2",
+      "info": "scheme-2 = cream #fff8f0 (recommended)"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#F26B6C",
+      "info": "Steps, eyebrow, italic heading, scan badge, CTA. Defaults to Luxe Magics coral."
+    },
+    {
+      "type": "header",
+      "content": "Text"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow label",
+      "default": "AR Personalized Frames"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your photo. Your video. <em>Alive on the wall.</em>",
+      "info": "Wrap words in <em> for italic accent-color styling."
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Scan the QR code on your frame and watch your still photo transform into a moving video memory — relived, every single time."
+    },
+    {
+      "type": "header",
+      "content": "CTA Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button text",
+      "default": "Shop All AR Frames"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Frame Mockup"
+    },
+    {
+      "type": "image_picker",
+      "id": "frame_image",
+      "label": "Photo inside frame",
+      "info": "Leave blank for placeholder icon."
+    },
+    {
+      "type": "select",
+      "id": "frame_image_fit",
+      "label": "Photo fit",
+      "default": "cover",
+      "options": [
+        { "value": "cover", "label": "Cover — fills frame, crops edges" },
+        { "value": "contain", "label": "Contain — fits fully, shows background" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Live QR Demo"
+    },
+    {
+      "type": "image_picker",
+      "id": "qr_custom_image",
+      "label": "QR code image (upload)",
+      "info": "Upload your own QR image. Takes priority over auto-generated QR below."
+    },
+    {
+      "type": "url",
+      "id": "qr_demo_url",
+      "label": "QR demo URL (auto-generate)",
+      "info": "Paste your Stories AR link. Used as tap destination and to auto-generate QR if no image uploaded."
+    },
+    {
+      "type": "header",
+      "content": "QR Popup Customization"
+    },
+    {
+      "type": "text",
+      "id": "qr_popup_label",
+      "label": "Popup heading",
+      "default": "Point your phone camera here"
+    },
+    {
+      "type": "text",
+      "id": "qr_popup_sub",
+      "label": "Popup subtext",
+      "default": "iOS — native camera app · Android — quick app"
+    },
+    {
+      "type": "text",
+      "id": "qr_popup_btn",
+      "label": "Popup button text",
+      "default": "Open link directly",
+      "info": "Only shows when a QR URL is set. The ↗ arrow is added automatically."
+    },
+    {
+      "type": "header",
+      "content": "Floating Badges"
+    },
+    {
+      "type": "text",
+      "id": "scan_badge_text",
+      "label": "Top badge (coral pill — top right)",
+      "default": "Scan to play",
+      "info": "The ✦ symbol is added automatically."
+    },
+    {
+      "type": "text",
+      "id": "play_badge_text",
+      "label": "Bottom badge (dark pill — half on frame left edge)",
+      "default": "Video plays instantly",
+      "info": "Centred on the left edge of the frame — half inside, half outside."
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Step title"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "Describe what happens in this step."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "AR – Hero",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "title": "Choose your frame",
+            "description": "Pick the occasion — baby, couple, family, or celebration."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Send us your photo + video",
+            "description": "We embed your video memory behind the QR code."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Scan & relive it",
+            "description": "Point your phone at the QR — your memory plays instantly."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

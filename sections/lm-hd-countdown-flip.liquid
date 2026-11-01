@@ -1,0 +1,690 @@
+{%- comment -%}
+  Luxe Magics — Header: Flip Countdown Bar (v3.1 — zero dependencies)
+  Filename: sections/lm-hd-countdown-flip.liquid
+  Self-contained airport split-flap countdown. No external libraries, no CDN,
+  no asset uploads — everything is in this one file, so it cannot silently fail.
+  Two-phase flip: old digit folds down, new digit unfolds, with realistic shading.
+  Label + tap-to-copy code pill (optional redirect) + dismiss. Evergreen mode,
+  hide-on-expiry, sticky. Fully customizable via theme editor.
+  PASTE CHECK: the very last line of this file must be {% endschema %}
+{%- endcomment -%}
+
+{%- liquid
+  assign uid = section.id
+  assign dh = section.settings.digit_size
+  assign dw = dh | times: 0.72 | round: 0
+  assign df = dh | times: 0.55 | round: 0
+  assign dh_m = dh | times: 0.8 | round: 0
+  assign dw_m = dh | times: 0.58 | round: 0
+  assign df_m = dh | times: 0.44 | round: 0
+-%}
+
+{%- style -%}
+
+  #lm-cdf-{{ uid }} {
+    {% if section.settings.sticky %}
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    {% endif %}
+    position: relative;
+    width: 100%;
+    background: {{ section.settings.bg_color }};
+    {% if section.settings.bg_gradient != blank %}
+    background: {{ section.settings.bg_gradient }};
+    {% endif %}
+    padding: {{ section.settings.padding_block }}px 48px;
+    box-sizing: border-box;
+  }
+
+  .lm-cdf__inner-{{ uid }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px 36px;
+  }
+
+  /* Label */
+  .lm-cdf__label-{{ uid }} {
+    font-size: {{ section.settings.label_size }}px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: {{ section.settings.label_color }};
+    margin: 0;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Timer */
+  .lm-cdf__timer-{{ uid }} {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .lm-cdf__unit-{{ uid }} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .lm-cdf__digits-{{ uid }} {
+    display: flex;
+    gap: 3px;
+    perspective: 260px;
+  }
+  .lm-cdf__cell-{{ uid }} {
+    position: relative;
+    width: {{ dw }}px;
+    height: {{ dh }}px;
+    border-radius: 5px;
+    background: {{ section.settings.digit_bg_color }};
+  }
+  /* static halves */
+  .lm-cdf__half-{{ uid }} {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    overflow: hidden;
+    background: {{ section.settings.digit_bg_color }};
+  }
+  .lm-cdf__half--t-{{ uid }} { top: 0; border-radius: 5px 5px 0 0; }
+  .lm-cdf__half--b-{{ uid }} { bottom: 0; border-radius: 0 0 5px 5px; }
+  .lm-cdf__half-{{ uid }} i {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: {{ dh }}px;
+    font-style: normal;
+    font-weight: 800;
+    font-size: {{ df }}px;
+    line-height: {{ dh }}px;
+    text-align: center;
+    color: {{ section.settings.digit_text_color }};
+  }
+  .lm-cdf__half--t-{{ uid }} i { top: 0; }
+  .lm-cdf__half--b-{{ uid }} i { bottom: 0; }
+  /* seam */
+  .lm-cdf__cell-{{ uid }}::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: rgba(255,255,255,0.16);
+    z-index: 5;
+    pointer-events: none;
+  }
+  /* animated flaps */
+  .lm-cdf__flap-{{ uid }} {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    overflow: hidden;
+    background: {{ section.settings.digit_bg_color }};
+    backface-visibility: hidden;
+    z-index: 3;
+  }
+  .lm-cdf__flap-{{ uid }} i {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: {{ dh }}px;
+    font-style: normal;
+    font-weight: 800;
+    font-size: {{ df }}px;
+    line-height: {{ dh }}px;
+    text-align: center;
+    color: {{ section.settings.digit_text_color }};
+  }
+  .lm-cdf__flap--t-{{ uid }} {
+    top: 0;
+    border-radius: 5px 5px 0 0;
+    transform-origin: center bottom;
+    animation: lmFoldT-{{ uid }} 0.28s ease-in forwards;
+  }
+  .lm-cdf__flap--t-{{ uid }} i { top: 0; }
+  .lm-cdf__flap--b-{{ uid }} {
+    bottom: 0;
+    border-radius: 0 0 5px 5px;
+    transform-origin: center top;
+    transform: rotateX(90deg);
+    animation: lmFoldB-{{ uid }} 0.28s ease-out 0.26s forwards;
+  }
+  .lm-cdf__flap--b-{{ uid }} i { bottom: 0; }
+  @keyframes lmFoldT-{{ uid }} {
+    0%   { transform: rotateX(0deg);   filter: brightness(1); }
+    100% { transform: rotateX(-90deg); filter: brightness(0.55); }
+  }
+  @keyframes lmFoldB-{{ uid }} {
+    0%   { transform: rotateX(90deg);  filter: brightness(0.55); }
+    100% { transform: rotateX(0deg);   filter: brightness(1); }
+  }
+
+  .lm-cdf__unitlabel-{{ uid }} {
+    font-size: 12px;
+    font-weight: 500;
+    color: {{ section.settings.unit_label_color }};
+  }
+
+  /* Coupon pill */
+  .lm-cdf__cta-{{ uid }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1.5px dashed {{ section.settings.cta_border_color }};
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: {{ section.settings.cta_text_color }};
+    background: transparent;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .lm-cdf__cta-{{ uid }}:hover { background: rgba(0,0,0,0.05); }
+  .lm-cdf__cta-{{ uid }}.lm-copied { border-style: solid; }
+  .lm-cdf__cta-{{ uid }} svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* Dismiss */
+  .lm-cdf__close-{{ uid }} {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    color: {{ section.settings.close_color }};
+    opacity: 0.7;
+    padding: 6px;
+  }
+  .lm-cdf__close-{{ uid }}:hover { opacity: 1; }
+
+  @media screen and (max-width: 749px) {
+    #lm-cdf-{{ uid }} { padding-left: 16px; padding-right: 40px; }
+    .lm-cdf__inner-{{ uid }} { gap: 10px 20px; }
+    .lm-cdf__timer-{{ uid }} { gap: 9px; }
+    .lm-cdf__label-{{ uid }} { font-size: {{ section.settings.label_size | times: 0.85 | round: 0 }}px; }
+    .lm-cdf__cell-{{ uid }} { width: {{ dw_m }}px; height: {{ dh_m }}px; }
+    .lm-cdf__half-{{ uid }} i,
+    .lm-cdf__flap-{{ uid }} i { height: {{ dh_m }}px; line-height: {{ dh_m }}px; font-size: {{ df_m }}px; }
+    .lm-cdf__unitlabel-{{ uid }} { font-size: 10px; }
+    .lm-cdf__cta-{{ uid }} { padding: 8px 16px; font-size: 12px; }
+    .lm-cdf__close-{{ uid }} { right: 6px; }
+  }
+
+{%- endstyle -%}
+
+<div id="lm-cdf-{{ uid }}" {{ section.shopify_attributes }} {% if section.settings.enable_dismiss %}data-dismiss-key="lm-cdf-dismiss-{{ uid }}"{% endif %}>
+  <div class="lm-cdf__inner-{{ uid }}">
+
+    {%- if section.settings.label != blank -%}
+      <p class="lm-cdf__label-{{ uid }}">
+        {%- if section.settings.label_emoji != blank -%}<span>{{ section.settings.label_emoji }}</span>{%- endif -%}
+        <span>{{ section.settings.label }}</span>
+        {%- if section.settings.label_emoji != blank -%}<span>{{ section.settings.label_emoji }}</span>{%- endif -%}
+      </p>
+    {%- endif -%}
+
+    <div class="lm-cdf__timer-{{ uid }}">
+      {%- if section.settings.show_days -%}
+        <div class="lm-cdf__unit-{{ uid }}">
+          <div class="lm-cdf__digits-{{ uid }}" data-lm-unit="days"></div>
+          <span class="lm-cdf__unitlabel-{{ uid }}">Days</span>
+        </div>
+      {%- endif -%}
+      <div class="lm-cdf__unit-{{ uid }}">
+        <div class="lm-cdf__digits-{{ uid }}" data-lm-unit="hours"></div>
+        <span class="lm-cdf__unitlabel-{{ uid }}">Hours</span>
+      </div>
+      <div class="lm-cdf__unit-{{ uid }}">
+        <div class="lm-cdf__digits-{{ uid }}" data-lm-unit="mins"></div>
+        <span class="lm-cdf__unitlabel-{{ uid }}">Minutes</span>
+      </div>
+      <div class="lm-cdf__unit-{{ uid }}">
+        <div class="lm-cdf__digits-{{ uid }}" data-lm-unit="secs"></div>
+        <span class="lm-cdf__unitlabel-{{ uid }}">Seconds</span>
+      </div>
+    </div>
+
+    {%- if section.settings.coupon_code != blank -%}
+      <button
+        type="button"
+        class="lm-cdf__cta-{{ uid }}"
+        data-lm-copy
+        data-code="{{ section.settings.coupon_code | escape }}"
+        {% if section.settings.cta_link != blank %}data-link="{{ section.settings.cta_link }}"{% endif %}
+        aria-label="Copy discount code"
+      >
+        <span data-lm-code-text>{{ section.settings.coupon_code }}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      </button>
+    {%- endif -%}
+
+  </div>
+
+  {%- if section.settings.enable_dismiss -%}
+    <button type="button" class="lm-cdf__close-{{ uid }}" data-lm-close aria-label="Dismiss">&#10005;</button>
+  {%- endif -%}
+</div>
+
+<script>
+(function() {
+  var root = document.getElementById('lm-cdf-{{ uid }}');
+  if (!root) return;
+
+  /* ---------- Dismiss ---------- */
+  var dismissKey = root.getAttribute('data-dismiss-key');
+  try {
+    if (dismissKey && localStorage.getItem(dismissKey) === '1') {
+      root.style.display = 'none';
+      return;
+    }
+  } catch (e) {}
+  var closeBtn = root.querySelector('[data-lm-close]');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+      root.style.display = 'none';
+      try { if (dismissKey) localStorage.setItem(dismissKey, '1'); } catch (e) {}
+    });
+  }
+
+  /* ---------- Settings ---------- */
+  var endStr = '{{ section.settings.end_date }} {{ section.settings.end_time | default: "23:59" }}';
+  var evergreen = {{ section.settings.evergreen | json }};
+  var evergreenHours = {{ section.settings.evergreen_hours | default: 24 }};
+  var hideExpired = {{ section.settings.hide_expired | json }};
+  var showDays = {{ section.settings.show_days | json }};
+
+  function getTarget() {
+    if (evergreen) {
+      var key = 'lm-evergreen-end';
+      try {
+        var saved = localStorage.getItem(key);
+        var now = Date.now();
+        if (saved && parseInt(saved, 10) > now) return parseInt(saved, 10);
+        var t = now + evergreenHours * 3600 * 1000;
+        localStorage.setItem(key, String(t));
+        return t;
+      } catch (e) {
+        return Date.now() + evergreenHours * 3600 * 1000;
+      }
+    }
+    var t = new Date(endStr.replace(/-/g, '/')).getTime();
+    return isNaN(t) ? 0 : t;
+  }
+
+  /* ---------- Build digit cells ---------- */
+  var CELL = 'lm-cdf__cell-{{ uid }}';
+  var HALF = 'lm-cdf__half-{{ uid }}';
+  var FLAP = 'lm-cdf__flap-{{ uid }}';
+
+  function makeCell() {
+    var c = document.createElement('span');
+    c.className = CELL;
+    c.innerHTML =
+      '<span class="' + HALF + ' lm-cdf__half--t-{{ uid }}"><i>0</i></span>' +
+      '<span class="' + HALF + ' lm-cdf__half--b-{{ uid }}"><i>0</i></span>';
+    c.setAttribute('data-val', '0');
+    return c;
+  }
+
+  function flipCell(cell, v) {
+    var old = cell.getAttribute('data-val');
+    if (old === v) return;
+    cell.setAttribute('data-val', v);
+
+    var topI = cell.querySelector('.lm-cdf__half--t-{{ uid }} i');
+    var botI = cell.querySelector('.lm-cdf__half--b-{{ uid }} i');
+
+    /* remove any in-flight flaps */
+    var stale = cell.querySelectorAll('.' + FLAP);
+    for (var i = 0; i < stale.length; i++) stale[i].parentNode.removeChild(stale[i]);
+
+    /* static top shows NEW (revealed as the old flap folds away) */
+    topI.textContent = v;
+
+    /* flap 1: old digit's top half folds down */
+    var fT = document.createElement('span');
+    fT.className = FLAP + ' lm-cdf__flap--t-{{ uid }}';
+    fT.innerHTML = '<i>' + old + '</i>';
+
+    /* flap 2: new digit's bottom half unfolds */
+    var fB = document.createElement('span');
+    fB.className = FLAP + ' lm-cdf__flap--b-{{ uid }}';
+    fB.innerHTML = '<i>' + v + '</i>';
+
+    fB.addEventListener('animationend', function() {
+      botI.textContent = v;
+      if (fT.parentNode) fT.parentNode.removeChild(fT);
+      if (fB.parentNode) fB.parentNode.removeChild(fB);
+    });
+
+    cell.appendChild(fT);
+    cell.appendChild(fB);
+  }
+
+  function setUnit(group, value, animate) {
+    var str = String(value);
+    if (str.length < 2) str = '0' + str;
+    while (group.children.length < str.length) {
+      group.insertBefore(makeCell(), group.firstChild);
+    }
+    for (var i = 0; i < group.children.length; i++) {
+      var ch = str[i] || '0';
+      if (animate) {
+        flipCell(group.children[i], ch);
+      } else {
+        var cell = group.children[i];
+        cell.setAttribute('data-val', ch);
+        cell.querySelector('.lm-cdf__half--t-{{ uid }} i').textContent = ch;
+        cell.querySelector('.lm-cdf__half--b-{{ uid }} i').textContent = ch;
+      }
+    }
+  }
+
+  var units = {
+    days:  root.querySelector('[data-lm-unit="days"]'),
+    hours: root.querySelector('[data-lm-unit="hours"]'),
+    mins:  root.querySelector('[data-lm-unit="mins"]'),
+    secs:  root.querySelector('[data-lm-unit="secs"]')
+  };
+  /* two cells per unit to start */
+  for (var k in units) {
+    if (units[k]) { units[k].appendChild(makeCell()); units[k].appendChild(makeCell()); }
+  }
+
+  var target = getTarget();
+  var first = true;
+
+  function tick() {
+    var diff = target - Date.now();
+    if (diff <= 0) {
+      if (evergreen) {
+        try { localStorage.removeItem('lm-evergreen-end'); } catch (e) {}
+        target = getTarget();
+        return;
+      }
+      diff = 0;
+      clearInterval(iv);
+      if (hideExpired) root.style.display = 'none';
+    }
+    var secs  = Math.floor(diff / 1000);
+    var days  = Math.floor(secs / 86400);
+    var hours = Math.floor((secs % 86400) / 3600);
+    if (!showDays) { hours += days * 24; days = 0; }
+    var mins  = Math.floor((secs % 3600) / 60);
+    var s     = secs % 60;
+    var animate = !first;
+    if (units.days)  setUnit(units.days, days, animate);
+    if (units.hours) setUnit(units.hours, hours, animate);
+    if (units.mins)  setUnit(units.mins, mins, animate);
+    if (units.secs)  setUnit(units.secs, s, animate);
+    first = false;
+  }
+
+  tick();
+  var iv = setInterval(tick, 1000);
+
+  /* ---------- Copy code, then follow link ---------- */
+  var btn = root.querySelector('[data-lm-copy]');
+  if (btn) {
+    btn.addEventListener('click', function() {
+      var code = btn.getAttribute('data-code');
+      var link = btn.getAttribute('data-link');
+      var label = btn.querySelector('[data-lm-code-text]');
+      var original = label.textContent;
+
+      function done() {
+        btn.classList.add('lm-copied');
+        label.textContent = '{{ section.settings.copied_text | default: "Copied!" }}';
+        setTimeout(function() {
+          btn.classList.remove('lm-copied');
+          label.textContent = original;
+          if (link) window.location.href = link;
+        }, 900);
+      }
+
+      function fallbackCopy() {
+        var ta = document.createElement('textarea');
+        ta.value = code;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        ta.setAttribute('readonly', '');
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, 99999);
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        done();
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(done).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
+    });
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Header — Flip Countdown",
+  "tag": "div",
+  "class": "lm-hd-countdown-flip",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "LIMITED OFFER"
+    },
+    {
+      "type": "text",
+      "id": "label_emoji",
+      "label": "Emoji around label",
+      "default": "❤️",
+      "info": "Shown on both sides of the label. Clear to remove."
+    },
+    {
+      "type": "text",
+      "id": "coupon_code",
+      "label": "Discount code",
+      "default": "LMWELCOME10",
+      "info": "Shown as the pill. Tap copies it. Leave empty to hide."
+    },
+    {
+      "type": "text",
+      "id": "copied_text",
+      "label": "Text after copying",
+      "default": "Copied!"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Go to link after copying",
+      "info": "Optional. After the code is copied, the page redirects here (e.g. your sale collection)."
+    },
+    {
+      "type": "header",
+      "content": "Countdown"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "End date",
+      "default": "2026-07-31",
+      "info": "Format: YYYY-MM-DD"
+    },
+    {
+      "type": "text",
+      "id": "end_time",
+      "label": "End time (24h)",
+      "default": "23:59",
+      "info": "Format: HH:MM — visitor's local timezone"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_days",
+      "label": "Show days unit",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_expired",
+      "label": "Hide bar when countdown ends",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "evergreen",
+      "label": "Evergreen mode",
+      "default": false,
+      "info": "Ignores end date. Each visitor gets their own countdown that restarts at zero."
+    },
+    {
+      "type": "range",
+      "id": "evergreen_hours",
+      "label": "Evergreen duration",
+      "min": 1,
+      "max": 72,
+      "step": 1,
+      "unit": "hr",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Design"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#F5F0E8"
+    },
+    {
+      "type": "text",
+      "id": "bg_gradient",
+      "label": "Background gradient (optional, overrides color)",
+      "info": "CSS value, e.g. linear-gradient(180deg, #EDE7DC 0%, #FAF7F2 100%)"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "digit_bg_color",
+      "label": "Flip card color",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "digit_text_color",
+      "label": "Flip card text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "unit_label_color",
+      "label": "Unit labels color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Code text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "cta_border_color",
+      "label": "Code border color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "close_color",
+      "label": "Dismiss icon color",
+      "default": "#E86A6B"
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "label": "Label size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "digit_size",
+      "label": "Flip card height",
+      "min": 28,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "padding_block",
+      "label": "Vertical padding",
+      "min": 6,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Stick to top on scroll",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_dismiss",
+      "label": "Show dismiss (×) button",
+      "default": true,
+      "info": "Once closed, won't reappear for that visitor."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header — Flip Countdown"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,148 @@
+{% comment %}
+  Renders the upsell carousel inside the cart drawer.
+  Products come from Theme settings > Cart > Cart drawer upsell (product list first, then collection).
+  Products already in the cart, and sold-out products, are skipped.
+
+  Tracking: every add is tagged with the hidden line item property `_upsell_source`
+  and fires analytics events (see assets/cart-upsell.js).
+
+  Usage:
+  {% render 'cart-drawer-upsell' %}
+{% endcomment %}
+
+{%- if settings.cart_upsell_enable and cart != empty -%}
+{%- liquid
+  assign cart_product_ids = cart.items | map: 'product_id' | join: ','
+  assign cart_product_ids = ',' | append: cart_product_ids | append: ','
+  assign seen_ids = ','
+  assign shown = 0
+  assign max_items = settings.cart_upsell_limit | default: 6
+-%}
+
+{%- capture upsell_cards -%}
+  {%- for source in (1..2) -%}
+    {%- liquid
+      if source == 1
+        assign source_products = settings.cart_upsell_products
+      else
+        assign source_products = settings.cart_upsell_collection.products
+      endif
+    -%}
+    {%- for product in source_products -%}
+      {%- liquid
+        if shown >= max_items
+          break
+        endif
+        assign id_key = ',' | append: product.id | append: ','
+        if product.available == false or cart_product_ids contains id_key or seen_ids contains id_key
+          continue
+        endif
+        assign seen_ids = seen_ids | append: product.id | append: ','
+        assign shown = shown | plus: 1
+        assign variant = product.selected_or_first_available_variant
+        assign position = shown
+      -%}
+      <div
+        class="cart-upsell__card"
+        data-product-id="{{ product.id }}"
+        data-product-title="{{ product.title | escape }}"
+        data-position="{{ position }}"
+      >
+        <a href="{{ product.url }}" class="cart-upsell__media" tabindex="-1" aria-hidden="true">
+          {%- if product.featured_media -%}
+            <img
+              src="{{ product.featured_media | image_url: width: 300 }}"
+              alt="{{ product.featured_media.alt | escape }}"
+              width="150"
+              height="{{ 150 | divided_by: product.featured_media.aspect_ratio | ceil }}"
+              loading="lazy"
+            >
+          {%- endif -%}
+          <span
+            class="cart-upsell__badge color-{{ settings.sale_badge_color_scheme }}"
+            {% unless variant.compare_at_price > variant.price %}
+              hidden
+            {% endunless %}
+          >
+            {{- settings.cart_upsell_badge_text | default: 'Save' }}
+            <span data-upsell-save>
+              {%- if variant.compare_at_price > variant.price -%}
+                {{- variant.compare_at_price | minus: variant.price | times: 100 | divided_by: variant.compare_at_price -}}
+              {%- endif -%}
+            </span>
+            {{- '%' -}}
+          </span>
+        </a>
+
+        <div class="cart-upsell__info">
+          <a href="{{ product.url }}" class="cart-upsell__title">{{ product.title | escape }}</a>
+
+          {%- unless product.has_only_default_variant -%}
+            <select class="cart-upsell__variant" aria-label="{{ product.title | escape }}" data-upsell-variant>
+              {%- for v in product.variants -%}
+                {%- if v.available -%}
+                  <option
+                    value="{{ v.id }}"
+                    data-cents="{{ v.price }}"
+                    data-price="{{ v.price | money_without_trailing_zeros | escape }}"
+                    data-compare="{% if v.compare_at_price > v.price %}{{ v.compare_at_price | money_without_trailing_zeros | escape }}{% endif %}"
+                    data-save="{% if v.compare_at_price > v.price %}{{ v.compare_at_price | minus: v.price | times: 100 | divided_by: v.compare_at_price }}{% endif %}"
+                    {% if v.id == variant.id %}
+                      selected
+                    {% endif %}
+                  >
+                    {{- v.title | escape -}}
+                  </option>
+                {%- endif -%}
+              {%- endfor -%}
+            </select>
+          {%- endunless -%}
+
+          <div class="cart-upsell__prices">
+            <span class="cart-upsell__price" data-upsell-price>{{ variant.price | money_without_trailing_zeros }}</span>
+            <s class="cart-upsell__compare" data-upsell-compare>
+              {%- if variant.compare_at_price > variant.price -%}
+                {{- variant.compare_at_price | money_without_trailing_zeros -}}
+              {%- endif -%}
+            </s>
+          </div>
+
+          <button
+            type="button"
+            class="cart-upsell__button"
+            data-upsell-add
+            data-variant-id="{{ variant.id }}"
+            data-price-cents="{{ variant.price }}"
+            aria-label="{{ settings.cart_upsell_button_text | default: 'Grab now' | escape }}: {{ product.title | escape }}"
+          >
+            <span class="cart-upsell__button-text">{{ settings.cart_upsell_button_text | default: 'Grab now' }}</span>
+            <span class="cart-upsell__spinner" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if shown > 0 -%}
+  <cart-upsell class="cart-upsell" data-source="Cart Drawer Upsell">
+    <div class="cart-upsell__header">
+      <h3 class="cart-upsell__heading">{{ settings.cart_upsell_heading }}</h3>
+      {%- if shown > 2 -%}
+        <div class="cart-upsell__arrows">
+          <button type="button" class="cart-upsell__arrow" data-upsell-prev aria-label="{{ 'general.slider.previous_slide' | t }}">
+            <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+          </button>
+          <button type="button" class="cart-upsell__arrow cart-upsell__arrow--next" data-upsell-next aria-label="{{ 'general.slider.next_slide' | t }}">
+            <span class="svg-wrapper">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+    <div class="cart-upsell__track" data-upsell-track>
+      {{ upsell_cards }}
+    </div>
+    <p class="cart-upsell__error" role="alert" data-upsell-error hidden></p>
+  </cart-upsell>
+{%- endif -%}
+{%- endif -%}

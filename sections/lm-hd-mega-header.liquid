@@ -1,0 +1,851 @@
+{%- comment -%}
+  Luxe Magics — Header: Mega Menu Bar
+  Filename: sections/lm-hd-mega-header.liquid
+  PEBBLE-style header: nav left, logo center, search/account/cart right.
+  Mega menu panels built automatically from your navigation menu (3 levels),
+  optional promo cards per menu item (blocks), expanding search, cart count
+  badge, mobile slide-in drawer with accordions. Floating pill or full-width,
+  sticky optional. Fully customizable via theme editor.
+
+  NOTE: This is a standalone header. Use it INSTEAD of the theme's header
+  (hide/remove the Dawn header in the header group). Cart icon links to the
+  cart page; search submits to the search page.
+{%- endcomment -%}
+
+{%- liquid
+  assign uid = section.id
+  assign menu = section.settings.menu
+-%}
+
+{%- style -%}
+
+  #lm-mh-{{ uid }} {
+    {% if section.settings.sticky %}
+    position: sticky;
+    top: {% if section.settings.floating %}{{ section.settings.float_gap }}px{% else %}0{% endif %};
+    {% else %}
+    position: relative;
+    {% endif %}
+    z-index: 90;
+    {% if section.settings.floating %}
+    padding: {{ section.settings.float_gap }}px {{ section.settings.float_gap }}px 0;
+    {% endif %}
+  }
+
+  .lm-mh__bar-{{ uid }} {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    height: {{ section.settings.bar_height }}px;
+    padding: 0 22px;
+    background: {{ section.settings.bar_bg }};
+    {% if section.settings.floating %}
+    border-radius: {{ section.settings.bar_radius }}px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+    {% endif %}
+  }
+
+  /* ----- Left: nav ----- */
+  .lm-mh__nav-{{ uid }} {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .lm-mh__navitem-{{ uid }} { position: static; }
+  .lm-mh__navlink-{{ uid }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 9px 12px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    color: {{ section.settings.text_color }};
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .lm-mh__navitem-{{ uid }}:hover > .lm-mh__navlink-{{ uid }},
+  .lm-mh__navitem-{{ uid }}.lm-open > .lm-mh__navlink-{{ uid }} {
+    background: {{ section.settings.hover_bg }};
+    color: {{ section.settings.hover_text }};
+  }
+  .lm-mh__caret-{{ uid }} {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+  }
+  .lm-mh__navitem-{{ uid }}.lm-open .lm-mh__caret-{{ uid }} { transform: rotate(180deg); }
+
+  /* ----- Center: logo ----- */
+  .lm-mh__logo-{{ uid }} {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  .lm-mh__logo-{{ uid }} img {
+    display: block;
+    width: {{ section.settings.logo_width }}px;
+    height: auto;
+  }
+  .lm-mh__logotext-{{ uid }} {
+    font-size: 24px;
+    font-weight: 800;
+    color: {{ section.settings.text_color }};
+    letter-spacing: 0.01em;
+  }
+
+  /* ----- Right: actions ----- */
+  .lm-mh__actions-{{ uid }} {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    min-width: 0;
+  }
+  .lm-mh__iconbtn-{{ uid }} {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: {{ section.settings.text_color }};
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+  .lm-mh__iconbtn-{{ uid }}:hover { background: {{ section.settings.hover_bg }}; }
+  .lm-mh__iconbtn-{{ uid }} svg { width: 21px; height: 21px; }
+
+  .lm-mh__badge-{{ uid }} {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: {{ section.settings.badge_bg }};
+    color: {{ section.settings.badge_text }};
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ----- Search overlay ----- */
+  .lm-mh__search-{{ uid }} {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    padding: 0 18px;
+    background: {{ section.settings.bar_bg }};
+    {% if section.settings.floating %}border-radius: {{ section.settings.bar_radius }}px;{% endif %}
+    z-index: 5;
+  }
+  .lm-mh__search-{{ uid }}.lm-open { display: flex; }
+  .lm-mh__search-{{ uid }} form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+  .lm-mh__search-{{ uid }} input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16px;
+    color: {{ section.settings.text_color }};
+  }
+  .lm-mh__search-{{ uid }} input::placeholder { color: {{ section.settings.text_color }}; opacity: 0.5; }
+
+  /* ----- Mega menu panel ----- */
+  .lm-mh__panel-{{ uid }} {
+    position: absolute;
+    top: calc(100% + {% if section.settings.floating %}8px{% else %}0px{% endif %});
+    left: 0;
+    right: 0;
+    display: none;
+    background: {{ section.settings.mega_bg }};
+    border-radius: {% if section.settings.floating %}{{ section.settings.bar_radius | at_most: 18 }}px{% else %}0 0 14px 14px{% endif %};
+    box-shadow: 0 14px 40px rgba(0,0,0,0.12);
+    padding: 34px 40px;
+    z-index: 4;
+  }
+  .lm-mh__navitem-{{ uid }}.lm-open .lm-mh__panel-{{ uid }} { display: block; }
+
+  .lm-mh__panelgrid-{{ uid }} {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+  }
+  .lm-mh__cols-{{ uid }} {
+    display: flex;
+    gap: 48px;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+  }
+  .lm-mh__col-{{ uid }} { min-width: 140px; }
+  .lm-mh__coltitle-{{ uid }} {
+    margin: 0 0 14px;
+    font-size: 16px;
+    font-weight: 800;
+    color: {{ section.settings.mega_text }};
+  }
+  .lm-mh__coltitle-{{ uid }} a { color: inherit; text-decoration: none; }
+  .lm-mh__collink-{{ uid }} {
+    display: block;
+    padding: 5px 0;
+    font-size: 14.5px;
+    color: {{ section.settings.mega_text }};
+    opacity: 0.75;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+  }
+  .lm-mh__collink-{{ uid }}:hover { opacity: 1; }
+
+  /* simple dropdown (no grandchildren) */
+  .lm-mh__panel-{{ uid }}.lm-simple {
+    left: auto;
+    right: auto;
+    min-width: 230px;
+    padding: 14px 10px;
+  }
+  .lm-mh__panel-{{ uid }}.lm-simple .lm-mh__collink-{{ uid }} { padding: 9px 14px; border-radius: 10px; }
+  .lm-mh__panel-{{ uid }}.lm-simple .lm-mh__collink-{{ uid }}:hover { background: {{ section.settings.hover_bg }}; }
+  .lm-mh__navitem--simple-{{ uid }} { position: relative; }
+
+  /* promo cards */
+  .lm-mh__promos-{{ uid }} {
+    display: flex;
+    gap: 20px;
+    flex: 0 0 auto;
+  }
+  .lm-mh__promo-{{ uid }} {
+    position: relative;
+    width: 300px;
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+    aspect-ratio: 4 / 3;
+    background: #EEE;
+  }
+  .lm-mh__promo-{{ uid }} img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .lm-mh__promoinner-{{ uid }} {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px;
+  }
+  .lm-mh__promotag-{{ uid }} {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .lm-mh__promoheading-{{ uid }} {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+  .lm-mh__promobtn-{{ uid }} {
+    margin-top: 6px;
+    display: inline-block;
+    padding: 10px 22px;
+    border-radius: 999px;
+    background: #FFFFFF;
+    color: #000000;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* ----- Mobile ----- */
+  .lm-mh__burger-{{ uid }} { display: none; }
+  .lm-mh__drawer-{{ uid }} {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(86vw, 380px);
+    background: {{ section.settings.drawer_bg }};
+    z-index: 999;
+    transform: translateX(-102%);
+    transition: transform 0.28s ease;
+    overflow-y: auto;
+    padding: 18px;
+    box-shadow: 6px 0 30px rgba(0,0,0,0.15);
+  }
+  .lm-mh__drawer-{{ uid }}.lm-open { transform: translateX(0); }
+  .lm-mh__scrim-{{ uid }} {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .lm-mh__scrim-{{ uid }}.lm-open { opacity: 1; pointer-events: auto; }
+
+  .lm-mh__drawer-{{ uid }} details { border-bottom: 1px solid rgba(0,0,0,0.08); }
+  .lm-mh__drawer-{{ uid }} summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 6px;
+    font-size: 16px;
+    font-weight: 700;
+    color: {{ section.settings.mega_text }};
+    cursor: pointer;
+  }
+  .lm-mh__drawer-{{ uid }} summary::-webkit-details-marker { display: none; }
+  .lm-mh__drawer-{{ uid }} summary svg { width: 14px; height: 14px; transition: transform 0.2s ease; }
+  .lm-mh__drawer-{{ uid }} details[open] > summary svg { transform: rotate(180deg); }
+  .lm-mh__drawerlink-{{ uid }} {
+    display: block;
+    padding: 13px 6px;
+    font-size: 16px;
+    font-weight: 700;
+    color: {{ section.settings.mega_text }};
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  .lm-mh__drawersub-{{ uid }} { padding: 0 6px 10px 14px; }
+  .lm-mh__drawersub-{{ uid }} a {
+    display: block;
+    padding: 9px 0;
+    font-size: 15px;
+    color: {{ section.settings.mega_text }};
+    opacity: 0.8;
+    text-decoration: none;
+  }
+  .lm-mh__drawerclose-{{ uid }} {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 6px;
+  }
+
+  @media screen and (max-width: 989px) {
+    .lm-mh__nav-{{ uid }} { display: none; }
+    .lm-mh__burger-{{ uid }} { display: inline-flex; }
+    .lm-mh__bar-{{ uid }} { padding: 0 12px; gap: 8px; }
+    .lm-mh__actions-{{ uid }} .lm-mh__iconbtn--account-{{ uid }} { display: none; }
+    .lm-mh__logo-{{ uid }} img { width: {{ section.settings.logo_width | times: 0.8 | round: 0 }}px; }
+    #lm-mh-{{ uid }} {
+      {% if section.settings.floating %}
+      padding: {{ section.settings.float_gap | times: 0.6 | round: 0 }}px {{ section.settings.float_gap | times: 0.6 | round: 0 }}px 0;
+      {% endif %}
+    }
+  }
+
+{%- endstyle -%}
+
+<div id="lm-mh-{{ uid }}" {{ section.shopify_attributes }}>
+  <div class="lm-mh__bar-{{ uid }}">
+
+    {%- comment -%} Mobile burger (left) {%- endcomment -%}
+    <button type="button" class="lm-mh__iconbtn-{{ uid }} lm-mh__burger-{{ uid }}" data-lm-burger aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+
+    {%- comment -%} Desktop nav (left) {%- endcomment -%}
+    <nav class="lm-mh__nav-{{ uid }}" aria-label="Main">
+      {%- for link in linklists[menu].links -%}
+        {%- liquid
+          assign has_children = false
+          assign has_grandchildren = false
+          if link.links.size > 0
+            assign has_children = true
+            for child in link.links
+              if child.links.size > 0
+                assign has_grandchildren = true
+              endif
+            endfor
+          endif
+        -%}
+
+        {%- if has_children -%}
+          <div class="lm-mh__navitem-{{ uid }}{% unless has_grandchildren %} lm-mh__navitem--simple-{{ uid }}{% endunless %}" data-lm-item>
+            <a href="{{ link.url }}" class="lm-mh__navlink-{{ uid }}" aria-haspopup="true">
+              {{ link.title }}
+              <svg class="lm-mh__caret-{{ uid }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </a>
+
+            <div class="lm-mh__panel-{{ uid }}{% unless has_grandchildren %} lm-simple{% endunless %}">
+              {%- if has_grandchildren -%}
+                <div class="lm-mh__panelgrid-{{ uid }}">
+                  <div class="lm-mh__cols-{{ uid }}">
+                    {%- for child in link.links -%}
+                      <div class="lm-mh__col-{{ uid }}">
+                        <p class="lm-mh__coltitle-{{ uid }}">
+                          {%- if child.url != '#' -%}<a href="{{ child.url }}">{{ child.title }}</a>{%- else -%}{{ child.title }}{%- endif -%}
+                        </p>
+                        {%- for grandchild in child.links -%}
+                          <a class="lm-mh__collink-{{ uid }}" href="{{ grandchild.url }}">{{ grandchild.title }}</a>
+                        {%- endfor -%}
+                        {%- if child.links.size == 0 -%}
+                          <a class="lm-mh__collink-{{ uid }}" href="{{ child.url }}">{{ child.title }}</a>
+                        {%- endif -%}
+                      </div>
+                    {%- endfor -%}
+                  </div>
+
+                  {%- assign link_title_down = link.title | downcase | strip -%}
+                  {%- assign promo_count = 0 -%}
+                  {%- for block in section.blocks -%}
+                    {%- assign block_item_down = block.settings.menu_item | downcase | strip -%}
+                    {%- if block_item_down == link_title_down and promo_count < 2 -%}
+                      {%- if promo_count == 0 -%}<div class="lm-mh__promos-{{ uid }}">{%- endif -%}
+                      {%- assign promo_count = promo_count | plus: 1 -%}
+                      <a class="lm-mh__promo-{{ uid }}" href="{{ block.settings.link | default: '#' }}" {{ block.shopify_attributes }}>
+                        {%- if block.settings.image != blank -%}
+                          <img src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.heading | escape }}" loading="lazy" width="600" height="450">
+                        {%- endif -%}
+                        <div class="lm-mh__promoinner-{{ uid }}" style="color: {{ block.settings.text_color }};">
+                          {%- if block.settings.tag != blank -%}<p class="lm-mh__promotag-{{ uid }}">{{ block.settings.tag }}</p>{%- endif -%}
+                          {%- if block.settings.heading != blank -%}<p class="lm-mh__promoheading-{{ uid }}">{{ block.settings.heading }}</p>{%- endif -%}
+                          {%- if block.settings.button_text != blank -%}<span class="lm-mh__promobtn-{{ uid }}">{{ block.settings.button_text }}</span>{%- endif -%}
+                        </div>
+                      </a>
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- if promo_count > 0 -%}</div>{%- endif -%}
+                </div>
+              {%- else -%}
+                {%- for child in link.links -%}
+                  <a class="lm-mh__collink-{{ uid }}" href="{{ child.url }}">{{ child.title }}</a>
+                {%- endfor -%}
+              {%- endif -%}
+            </div>
+          </div>
+        {%- else -%}
+          <div class="lm-mh__navitem-{{ uid }}">
+            <a href="{{ link.url }}" class="lm-mh__navlink-{{ uid }}">{{ link.title }}</a>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </nav>
+
+    {%- comment -%} Logo (center) {%- endcomment -%}
+    <a href="{{ routes.root_url }}" class="lm-mh__logo-{{ uid }}">
+      {%- if section.settings.logo != blank -%}
+        <img src="{{ section.settings.logo | image_url: width: 400 }}" alt="{{ shop.name | escape }}" width="{{ section.settings.logo_width }}" height="{{ section.settings.logo_width | divided_by: section.settings.logo.aspect_ratio | round: 0 }}">
+      {%- else -%}
+        <span class="lm-mh__logotext-{{ uid }}">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    {%- comment -%} Actions (right) {%- endcomment -%}
+    <div class="lm-mh__actions-{{ uid }}">
+      {%- if section.settings.show_search -%}
+        <button type="button" class="lm-mh__iconbtn-{{ uid }}" data-lm-search-open aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+        </button>
+      {%- endif -%}
+      {%- if section.settings.show_account -%}
+        <a href="{{ routes.account_url }}" class="lm-mh__iconbtn-{{ uid }} lm-mh__iconbtn--account-{{ uid }}" aria-label="Account">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {%- endif -%}
+      {%- if section.settings.show_cart -%}
+        <a href="{{ routes.cart_url }}" class="lm-mh__iconbtn-{{ uid }}" aria-label="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          {%- if cart.item_count > 0 -%}
+            <span class="lm-mh__badge-{{ uid }}">{{ cart.item_count }}</span>
+          {%- endif -%}
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Search overlay {%- endcomment -%}
+    {%- if section.settings.show_search -%}
+      <div class="lm-mh__search-{{ uid }}" data-lm-search>
+        <form action="{{ routes.search_url }}" method="get" role="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:20px;height:20px;color:{{ section.settings.text_color }};"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+          <input type="search" name="q" placeholder="{{ section.settings.search_placeholder }}" data-lm-search-input>
+          <button type="button" class="lm-mh__iconbtn-{{ uid }}" data-lm-search-close aria-label="Close search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </form>
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{%- comment -%} Mobile drawer + scrim {%- endcomment -%}
+<div class="lm-mh__scrim-{{ uid }}" data-lm-scrim></div>
+<aside class="lm-mh__drawer-{{ uid }}" data-lm-drawer aria-label="Menu">
+  <div class="lm-mh__drawerclose-{{ uid }}">
+    <button type="button" class="lm-mh__iconbtn-{{ uid }}" data-lm-drawer-close aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  {%- for link in linklists[menu].links -%}
+    {%- if link.links.size > 0 -%}
+      <details>
+        <summary>
+          {{ link.title }}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="lm-mh__drawersub-{{ uid }}">
+          <a href="{{ link.url }}">All {{ link.title }}</a>
+          {%- for child in link.links -%}
+            {%- if child.links.size > 0 -%}
+              <details>
+                <summary style="padding: 9px 0; font-size: 15px;">
+                  {{ child.title }}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="lm-mh__drawersub-{{ uid }}">
+                  {%- for grandchild in child.links -%}
+                    <a href="{{ grandchild.url }}">{{ grandchild.title }}</a>
+                  {%- endfor -%}
+                </div>
+              </details>
+            {%- else -%}
+              <a href="{{ child.url }}">{{ child.title }}</a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </details>
+    {%- else -%}
+      <a class="lm-mh__drawerlink-{{ uid }}" href="{{ link.url }}">{{ link.title }}</a>
+    {%- endif -%}
+  {%- endfor -%}
+</aside>
+
+<script>
+(function() {
+  var root = document.getElementById('lm-mh-{{ uid }}');
+  if (!root) return;
+
+  /* ---------- Mega menu open/close (desktop) ---------- */
+  var items = Array.prototype.slice.call(root.querySelectorAll('[data-lm-item]'));
+  var closeTimer;
+
+  function closeAll(except) {
+    items.forEach(function(it) {
+      if (it !== except) it.classList.remove('lm-open');
+    });
+  }
+
+  items.forEach(function(it) {
+    it.addEventListener('mouseenter', function() {
+      clearTimeout(closeTimer);
+      closeAll(it);
+      it.classList.add('lm-open');
+    });
+    it.addEventListener('mouseleave', function() {
+      closeTimer = setTimeout(function() { it.classList.remove('lm-open'); }, 180);
+    });
+    /* touch/keyboard: first tap opens, second follows the link */
+    var trigger = it.querySelector('a');
+    trigger.addEventListener('click', function(e) {
+      var isTouch = window.matchMedia('(hover: none)').matches;
+      if (isTouch && !it.classList.contains('lm-open')) {
+        e.preventDefault();
+        closeAll(it);
+        it.classList.add('lm-open');
+      }
+    });
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!root.contains(e.target)) closeAll();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { closeAll(); closeSearch(); closeDrawer(); }
+  });
+
+  /* ---------- Search ---------- */
+  var search = root.querySelector('[data-lm-search]');
+  var searchInput = root.querySelector('[data-lm-search-input]');
+  function closeSearch() { if (search) search.classList.remove('lm-open'); }
+  var openBtn = root.querySelector('[data-lm-search-open]');
+  var closeBtn = root.querySelector('[data-lm-search-close]');
+  if (openBtn) openBtn.addEventListener('click', function() {
+    search.classList.add('lm-open');
+    setTimeout(function() { searchInput && searchInput.focus(); }, 50);
+  });
+  if (closeBtn) closeBtn.addEventListener('click', closeSearch);
+
+  /* ---------- Mobile drawer ---------- */
+  var drawer = document.querySelector('.lm-mh__drawer-{{ uid }}');
+  var scrim = document.querySelector('.lm-mh__scrim-{{ uid }}');
+  var burger = root.querySelector('[data-lm-burger]');
+  var drawerClose = drawer ? drawer.querySelector('[data-lm-drawer-close]') : null;
+
+  function openDrawer() {
+    drawer.classList.add('lm-open');
+    scrim.classList.add('lm-open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    if (!drawer) return;
+    drawer.classList.remove('lm-open');
+    scrim.classList.remove('lm-open');
+    document.body.style.overflow = '';
+  }
+  if (burger) burger.addEventListener('click', openDrawer);
+  if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+  if (scrim) scrim.addEventListener('click', closeDrawer);
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Header — Mega Menu",
+  "tag": "div",
+  "class": "lm-hd-mega-header",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image",
+      "info": "Falls back to your store name as text"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 60,
+      "max": 260,
+      "step": 10,
+      "unit": "px",
+      "default": 140
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu",
+      "info": "Nest items in Navigation (Online Store → Navigation) to create dropdowns. 3 levels deep = mega menu with columns."
+    },
+    {
+      "type": "header",
+      "content": "Bar style"
+    },
+    {
+      "type": "checkbox",
+      "id": "floating",
+      "label": "Floating pill bar",
+      "default": true,
+      "info": "Rounded bar with gap around it (like the reference). Off = full-width bar."
+    },
+    {
+      "type": "range",
+      "id": "bar_radius",
+      "label": "Bar corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "float_gap",
+      "label": "Gap around floating bar",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "bar_height",
+      "label": "Bar height",
+      "min": 56,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Sticky on scroll",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Icons"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder",
+      "default": "What are you looking for?"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show cart",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bar_bg",
+      "label": "Bar background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text & icons",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "hover_bg",
+      "label": "Hover pill background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "hover_text",
+      "label": "Hover pill text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "mega_bg",
+      "label": "Mega menu background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "mega_text",
+      "label": "Mega menu text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "drawer_bg",
+      "label": "Mobile drawer background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg",
+      "label": "Cart badge background",
+      "default": "#F26B6C"
+    },
+    {
+      "type": "color",
+      "id": "badge_text",
+      "label": "Cart badge text",
+      "default": "#FFFFFF"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "promo",
+      "name": "Mega menu promo card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "Show under menu item",
+          "info": "Type the top-level menu item's name exactly, e.g. Shop. Max 2 cards per item."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Small label",
+          "default": "NEW COLLECTION"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "The Cozy Crew"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button label",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color",
+          "default": "#FFFFFF"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header — Mega Menu"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,512 @@
+{%- comment -%}
+  Luxe Magics — Product Details: FAQ
+  Filename: sections/lm-pd-faq.liquid
+  Layout matches screenshot:
+  - Left: eyebrow line + large two-line serif heading
+  - Right: accordion list, first item open by default
+  - Open state: coral question text + coral × toggle button
+  - Closed state: dark question text + circle + toggle
+  Each Q&A is a block — add, remove, reorder in customizer.
+{%- endcomment -%}
+
+{%- liquid
+  assign pt     = section.settings.padding_top
+  assign pb     = section.settings.padding_bottom
+  assign accent = section.settings.accent_color
+-%}
+
+{%- style -%}
+
+  #lm-faq-{{ section.id }} {
+    padding-top: {{ pt | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ pb | times: 0.75 | round: 0 }}px;
+    --lm-accent: {{ accent }};
+    border-top: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+  @media screen and (min-width: 750px) {
+    #lm-faq-{{ section.id }} {
+      padding-top: {{ pt }}px;
+      padding-bottom: {{ pb }}px;
+    }
+  }
+
+  /* ── Inner wrapper ── */
+  .lm-faq__inner-{{ section.id }} {
+    max-width: {{ section.settings.content_width }}px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  @media screen and (min-width: 990px) {
+    .lm-faq__inner-{{ section.id }} {
+      grid-template-columns: {{ section.settings.heading_col }}fr {{ section.settings.list_col }}fr;
+      gap: 5rem;
+      padding: 0 3rem;
+      align-items: start;
+    }
+  }
+
+  /* ── Left: heading ── */
+  .lm-faq__heading-col-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+  }
+  @media screen and (min-width: 990px) {
+    .lm-faq__heading-col-{{ section.id }} {
+      position: sticky;
+      top: 100px;
+    }
+  }
+
+  .lm-faq__eyebrow-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--lm-accent);
+    margin-bottom: 1.2rem;
+  }
+  .lm-faq__eyebrow-line-{{ section.id }} {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: var(--lm-accent);
+    flex-shrink: 0;
+  }
+
+  .lm-faq__title-{{ section.id }} {
+    font-size: clamp(28px, 4vw, {{ section.settings.title_size }}px);
+    font-weight: 400;
+    line-height: 1.15;
+    color: rgb(var(--color-foreground));
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .lm-faq__title-{{ section.id }} em {
+    font-style: italic;
+    color: var(--lm-accent);
+    display: block;
+  }
+
+  /* ── Right: accordion list ── */
+  .lm-faq__list-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Individual item ── */
+  .lm-faq__item-{{ section.id }} {
+    border-bottom: 1px solid rgba(var(--color-foreground), 0.1);
+  }
+  .lm-faq__item-{{ section.id }}:first-child {
+    border-top: 1px solid rgba(var(--color-foreground), 0.1);
+  }
+
+  /* Question row */
+  .lm-faq__q-{{ section.id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: {{ section.settings.item_pad }}px 0;
+    cursor: pointer;
+    color: rgb(var(--color-foreground));
+    font-size: {{ section.settings.q_size }}px;
+    font-weight: 400;
+    line-height: 1.4;
+    transition: color 0.2s;
+    user-select: none;
+    list-style: none;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+  }
+  .lm-faq__q-{{ section.id }}:hover {
+    color: var(--lm-accent);
+  }
+
+  /* Open state — coral question */
+  .lm-faq__item-{{ section.id }}.lm-open .lm-faq__q-{{ section.id }} {
+    color: var(--lm-accent);
+  }
+
+  /* Toggle circle button */
+  .lm-faq__toggle-{{ section.id }} {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(var(--color-foreground), 0.2);
+    background: transparent;
+    color: rgba(var(--color-foreground), 0.5);
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.25s;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+  /* Open state — coral filled circle, × rotated */
+  .lm-faq__item-{{ section.id }}.lm-open .lm-faq__toggle-{{ section.id }} {
+    background: var(--lm-accent);
+    border-color: var(--lm-accent);
+    color: #fff;
+    transform: rotate(45deg);
+  }
+
+  /* Answer */
+  .lm-faq__a-{{ section.id }} {
+    max-height: 0;
+    overflow: hidden;
+    font-size: {{ section.settings.a_size }}px;
+    color: rgba(var(--color-foreground), 0.6);
+    line-height: 1.75;
+    transition: max-height 0.35s ease, padding-bottom 0.35s ease;
+    padding-bottom: 0;
+  }
+  .lm-faq__item-{{ section.id }}.lm-open .lm-faq__a-{{ section.id }} {
+    max-height: 400px;
+    padding-bottom: {{ section.settings.item_pad }}px;
+  }
+
+  /* Scroll animation */
+  {% if settings.animations_reveal_on_scroll %}
+  .lm-faq__heading-col-{{ section.id }},
+  .lm-faq__list-{{ section.id }} {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .lm-faq__list-{{ section.id }} { transition-delay: 0.1s; }
+  .lm-faq__heading-col-{{ section.id }}.lm-vis,
+  .lm-faq__list-{{ section.id }}.lm-vis {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  {% endif %}
+
+{%- endstyle -%}
+
+<div
+  id="lm-faq-{{ section.id }}"
+  class="gradient color-{{ section.settings.color_scheme }}"
+  {{ section.shopify_attributes }}
+>
+  <div class="lm-faq__inner-{{ section.id }}">
+
+    {%- comment -%}── Left: Heading ──{%- endcomment -%}
+    <div class="lm-faq__heading-col-{{ section.id }}{% if settings.animations_reveal_on_scroll %} lm-faq-anim-h{% endif %}">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="lm-faq__eyebrow-{{ section.id }}">
+          <span class="lm-faq__eyebrow-line-{{ section.id }}"></span>
+          {{ section.settings.eyebrow }}
+        </span>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="lm-faq__title-{{ section.id }}">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}── Right: Accordion ──{%- endcomment -%}
+    <div class="lm-faq__list-{{ section.id }}{% if settings.animations_reveal_on_scroll %} lm-faq-anim-l{% endif %}">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'faq' -%}
+          <div
+            class="lm-faq__item-{{ section.id }}{% if forloop.first and section.settings.open_first %} lm-open{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            <button
+              class="lm-faq__q-{{ section.id }}"
+              aria-expanded="{% if forloop.first and section.settings.open_first %}true{% else %}false{% endif %}"
+              type="button"
+            >
+              {{ block.settings.question }}
+              <span class="lm-faq__toggle-{{ section.id }}" aria-hidden="true">+</span>
+            </button>
+            <div class="lm-faq__a-{{ section.id }}" role="region">
+              {{ block.settings.answer }}
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  var sid  = '{{ section.id }}';
+  var list = document.querySelector('#lm-faq-' + sid + ' .lm-faq__list-' + sid);
+  if (!list) return;
+
+  list.addEventListener('click', function(e) {
+    var btn = e.target.closest('.lm-faq__q-' + sid);
+    if (!btn) return;
+
+    var item     = btn.closest('.lm-faq__item-' + sid);
+    var isOpen   = item.classList.contains('lm-open');
+    var allItems = list.querySelectorAll('.lm-faq__item-' + sid);
+
+    /* Close all */
+    allItems.forEach(function(el) {
+      el.classList.remove('lm-open');
+      el.querySelector('.lm-faq__q-' + sid).setAttribute('aria-expanded', 'false');
+    });
+
+    /* Open clicked if it was closed */
+    if (!isOpen) {
+      item.classList.add('lm-open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  });
+})();
+</script>
+
+{%- if settings.animations_reveal_on_scroll -%}
+<script>
+(function() {
+  var els = document.querySelectorAll(
+    '#lm-faq-{{ section.id }} .lm-faq-anim-h, #lm-faq-{{ section.id }} .lm-faq-anim-l'
+  );
+  if (!els.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('lm-vis'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(function(el) { obs.observe(el); });
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PD — FAQ",
+  "tag": "section",
+  "class": "lm-pd-faq",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#F26B6C"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Common questions"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Everything you <em>wanted to ask</em>",
+      "info": "Wrap words in <em> for italic accent color. Use <em> on the second line for the exact screenshot look."
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Heading size (desktop max)",
+      "min": 28,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 46
+    },
+    {
+      "type": "header",
+      "content": "Accordion"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_first",
+      "label": "Open first item by default",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "item_pad",
+      "label": "Item padding (top/bottom)",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "q_size",
+      "label": "Question font size",
+      "min": 13,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "a_size",
+      "label": "Answer font size",
+      "min": 12,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "heading_col",
+      "label": "Heading column width",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 1,
+      "info": "Ratio vs accordion column. 1:2 = heading takes 1/3, accordion takes 2/3."
+    },
+    {
+      "type": "range",
+      "id": "list_col",
+      "label": "Accordion column width",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Max content width",
+      "min": 800,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "default": 1100
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "Question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Your question here?"
+        },
+        {
+          "type": "textarea",
+          "id": "answer",
+          "label": "Answer",
+          "default": "Your answer here."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PD — FAQ",
+      "blocks": [
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Do I need to download an app to scan the frame?",
+            "answer": "No app needed — ever. Open any camera on your phone (the default iPhone camera, Android camera, WhatsApp scanner, Google Lens), point it at the QR code, and tap the notification that appears. The video plays in your browser, instantly."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "What kind of video can I use?",
+            "answer": "Any video you have — WhatsApp clips, iPhone videos, Instagram Reels, Google Photos exports, MP4 or MOV files. Length can range from 15 seconds to around 5 minutes. Just send it to us via WhatsApp after placing your order and we handle everything from there."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Can the photo and video be different moments?",
+            "answer": "Absolutely. The photo is what hangs on the wall — it can be any image you love. The video can be a completely different memory. Many customers use a beautiful portrait as the photo, and a candid video from the same day or a different occasion entirely as the AR layer."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "How long does the AR access last?",
+            "answer": "Every frame includes lifetime AR video access. Once your memory is linked to the frame, it stays linked — no renewals, no expiry, no extra fees. Ever."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "How long does delivery take?",
+            "answer": "Every frame is made to order. Once you send us your photo and video, we produce and ship within 2–4 working days. Delivery across India typically takes 4–7 additional days depending on your location."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Can I give it as a gift if I don't know the recipient's phone?",
+            "answer": "Yes — the QR code works on any smartphone with any camera app. You don't need to set anything up on the recipient's phone. Hand them the frame. Tell them to scan. That's all they need to know."
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "Since every frame is custom-made, we don't accept returns based on change of mind. If your frame arrives damaged, or if there's any quality issue with the print, AR link, or packaging — we replace it immediately, no questions asked. Your satisfaction is non-negotiable."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

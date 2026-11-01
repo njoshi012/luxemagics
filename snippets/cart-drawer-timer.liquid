@@ -1,0 +1,41 @@
+{%- comment -%}
+  Cart drawer urgency timer. Shares the evergreen end time (localStorage 'lm-evergreen-end')
+  with the header flip countdown. Restarts every 18 hours so it never ends.
+{%- endcomment -%}
+<div class="cart-drawer-timer" data-cart-timer hidden>
+  <span class="cart-drawer-timer__label">Offer ends in</span>
+  <span class="cart-drawer-timer__time" data-cart-timer-time>00:00:00</span>
+</div>
+<style>
+  .cart-drawer-timer { display:flex; align-items:center; justify-content:center; gap:10px; padding:10px 20px; background:#1a1a1a; color:#fff; font-size:1.3rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+  .cart-drawer-timer[hidden] { display:none; }
+  .cart-drawer-timer__time { font-variant-numeric:tabular-nums; font-size:1.6rem; }
+</style>
+<script>
+  (function () {
+    var KEY = 'lm-evergreen-end', DURATION = 18 * 3600 * 1000;
+    var box = document.querySelector('[data-cart-timer]');
+    if (!box) return;
+    var out = box.querySelector('[data-cart-timer-time]');
+    function target() {
+      var now = Date.now();
+      try {
+        var saved = parseInt(localStorage.getItem(KEY), 10);
+        if (saved && saved > now) return saved;
+        localStorage.setItem(KEY, String(now + DURATION));
+      } catch (e) {}
+      return now + DURATION;
+    }
+    var end = target();
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    function tick() {
+      var diff = end - Date.now();
+      if (diff <= 0) { end = target(); diff = end - Date.now(); }
+      var s = Math.floor(diff / 1000);
+      out.textContent = pad(Math.floor(s / 3600)) + ':' + pad(Math.floor(s % 3600 / 60)) + ':' + pad(s % 60);
+      box.hidden = false;
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>

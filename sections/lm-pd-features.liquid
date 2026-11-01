@@ -1,0 +1,529 @@
+{%- comment -%}
+  Luxe Magics — Product Details: What Makes It Special
+  Filename: sections/lm-pd-features.liquid
+  "What makes it special — Built to last. Designed to feel."
+  Feature cards in a grid. Each card is a block — fully customizable.
+  Supports icon (emoji or SVG), title, description per card.
+{%- endcomment -%}
+
+{%- liquid
+  assign pt     = section.settings.padding_top
+  assign pb     = section.settings.padding_bottom
+  assign accent = section.settings.accent_color
+  assign cols   = section.settings.columns
+-%}
+
+{%- style -%}
+
+  #lm-feat-{{ section.id }} {
+    padding-top: {{ pt | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ pb | times: 0.75 | round: 0 }}px;
+    --lm-accent: {{ accent }};
+    --lm-accent-10: {{ accent }}1a;
+    border-top: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+  @media screen and (min-width: 750px) {
+    #lm-feat-{{ section.id }} {
+      padding-top: {{ pt }}px;
+      padding-bottom: {{ pb }}px;
+    }
+  }
+
+  .lm-feat__inner-{{ section.id }} {
+    max-width: {{ section.settings.content_width }}px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  @media screen and (min-width: 990px) {
+    .lm-feat__inner-{{ section.id }} {
+      padding: 0 3rem;
+    }
+  }
+
+  /* ── Header ── */
+  .lm-feat__header-{{ section.id }} {
+    text-align: {{ section.settings.header_align }};
+    margin-bottom: {{ section.settings.header_gap }}px;
+  }
+  .lm-feat__eyebrow-{{ section.id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--lm-accent);
+    margin-bottom: 1rem;
+  }
+  .lm-feat__eyebrow-line-{{ section.id }} {
+    width: 22px;
+    height: 1.5px;
+    background: var(--lm-accent);
+    flex-shrink: 0;
+  }
+  .lm-feat__headline-{{ section.id }} {
+    font-size: clamp(26px, 4vw, {{ section.settings.headline_size }}px);
+    font-weight: 400;
+    line-height: 1.18;
+    color: rgb(var(--color-foreground));
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.01em;
+  }
+  .lm-feat__headline-{{ section.id }} em {
+    font-style: italic;
+    color: var(--lm-accent);
+  }
+  .lm-feat__subtext-{{ section.id }} {
+    font-size: 14px;
+    line-height: 1.75;
+    color: rgba(var(--color-foreground), 0.5);
+    max-width: 480px;
+    {% if section.settings.header_align == 'center' %}margin: 0 auto;{% endif %}
+  }
+
+  /* ── Grid ── */
+  .lm-feat__grid-{{ section.id }} {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: {{ section.settings.card_gap }}px;
+  }
+  @media screen and (min-width: 600px) {
+    .lm-feat__grid-{{ section.id }} {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media screen and (min-width: 990px) {
+    .lm-feat__grid-{{ section.id }} {
+      grid-template-columns: repeat({{ cols }}, minmax(0, 1fr));
+    }
+  }
+
+  /* ── Feature card ── */
+  .lm-feat__card-{{ section.id }} {
+    background: rgb(var(--color-background));
+    border: 0.5px solid rgba(var(--color-foreground), 0.1);
+    border-radius: var(--border-radius-lg);
+    padding: {{ section.settings.card_pad }}px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: background 0.25s, border-color 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .lm-feat__card-{{ section.id }}:hover {
+    background: var(--lm-accent-10);
+    border-color: var(--lm-accent);
+  }
+
+  /* Accent top border on hover */
+  .lm-feat__card-{{ section.id }}::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--lm-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .lm-feat__card-{{ section.id }}:hover::before {
+    transform: scaleX(1);
+  }
+
+  /* Icon */
+  .lm-feat__icon-{{ section.id }} {
+    font-size: {{ section.settings.icon_size }}px;
+    line-height: 1;
+    width: {{ section.settings.icon_size | plus: 16 }}px;
+    height: {{ section.settings.icon_size | plus: 16 }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--lm-accent-10);
+    border-radius: var(--border-radius-md);
+    flex-shrink: 0;
+    transition: background 0.25s;
+  }
+  .lm-feat__card-{{ section.id }}:hover .lm-feat__icon-{{ section.id }} {
+    background: rgba(var(--color-foreground), 0.06);
+  }
+
+  /* Title */
+  .lm-feat__title-{{ section.id }} {
+    font-size: {{ section.settings.title_size }}px;
+    font-weight: 500;
+    color: rgb(var(--color-foreground));
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  /* Description */
+  .lm-feat__desc-{{ section.id }} {
+    font-size: {{ section.settings.desc_size }}px;
+    color: rgba(var(--color-foreground), 0.55);
+    line-height: 1.75;
+    margin: 0;
+    flex: 1;
+  }
+
+  /* Tag pill (optional per card) */
+  .lm-feat__tag-{{ section.id }} {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--lm-accent);
+    background: var(--lm-accent-10);
+    padding: 3px 10px;
+    border-radius: 20px;
+    align-self: flex-start;
+    margin-top: auto;
+  }
+
+  /* Scroll animation */
+  {% if settings.animations_reveal_on_scroll %}
+  .lm-feat__card-{{ section.id }} {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s ease, transform 0.5s ease, background 0.25s, border-color 0.25s;
+  }
+  .lm-feat__card-{{ section.id }}.lm-vis {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  {% endif %}
+
+{%- endstyle -%}
+
+<div
+  id="lm-feat-{{ section.id }}"
+  class="gradient color-{{ section.settings.color_scheme }}"
+  {{ section.shopify_attributes }}
+>
+  <div class="lm-feat__inner-{{ section.id }}">
+
+    {%- comment -%}── Header ──{%- endcomment -%}
+    <div class="lm-feat__header-{{ section.id }}">
+      {%- if section.settings.eyebrow != blank -%}
+        <div class="lm-feat__eyebrow-{{ section.id }}">
+          {%- if section.settings.header_align == 'left' -%}
+            <span class="lm-feat__eyebrow-line-{{ section.id }}"></span>
+          {%- endif -%}
+          {{ section.settings.eyebrow }}
+        </div>
+      {%- endif -%}
+      {%- if section.settings.headline != blank -%}
+        <h2 class="lm-feat__headline-{{ section.id }}">{{ section.settings.headline }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtext != blank -%}
+        <p class="lm-feat__subtext-{{ section.id }}">{{ section.settings.subtext }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}── Feature cards ──{%- endcomment -%}
+    <div class="lm-feat__grid-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'feature' -%}
+          <div
+            class="lm-feat__card-{{ section.id }}{% if settings.animations_reveal_on_scroll %} lm-feat-anim{% endif %}"
+            style="transition-delay: {{ forloop.index0 | times: 80 }}ms"
+            {{ block.shopify_attributes }}
+          >
+            {%- if block.settings.icon != blank -%}
+              <div class="lm-feat__icon-{{ section.id }}">{{ block.settings.icon }}</div>
+            {%- endif -%}
+
+            {%- if block.settings.title != blank -%}
+              <p class="lm-feat__title-{{ section.id }}">{{ block.settings.title }}</p>
+            {%- endif -%}
+
+            {%- if block.settings.description != blank -%}
+              <p class="lm-feat__desc-{{ section.id }}">{{ block.settings.description }}</p>
+            {%- endif -%}
+
+            {%- if block.settings.tag != blank -%}
+              <span class="lm-feat__tag-{{ section.id }}">{{ block.settings.tag }}</span>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</div>
+
+{%- if settings.animations_reveal_on_scroll -%}
+<script>
+(function() {
+  var cards = document.querySelectorAll('#lm-feat-{{ section.id }} .lm-feat-anim');
+  if (!cards.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('lm-vis'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  cards.forEach(function(el) { obs.observe(el); });
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "PD — Features",
+  "tag": "section",
+  "class": "lm-pd-features",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#F26B6C"
+    },
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "What makes it special"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "headline",
+      "label": "Headline",
+      "default": "Built to last. <em>Designed to feel.</em>"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext (optional)"
+    },
+    {
+      "type": "select",
+      "id": "header_align",
+      "label": "Header alignment",
+      "default": "center",
+      "options": [
+        { "value": "left",   "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "headline_size",
+      "label": "Headline size (desktop max)",
+      "min": 24,
+      "max": 52,
+      "step": 2,
+      "unit": "px",
+      "default": 38
+    },
+    {
+      "type": "range",
+      "id": "header_gap",
+      "label": "Space below header",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns (desktop)",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 2,
+      "info": "Mobile is always 1 column. Tablet is always 2 columns."
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Gap between cards",
+      "min": 1,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 2,
+      "info": "Set to 1–2px for a tight grid look, 16–24px for spaced cards."
+    },
+    {
+      "type": "header",
+      "content": "Card style"
+    },
+    {
+      "type": "range",
+      "id": "card_pad",
+      "label": "Card padding",
+      "min": 16,
+      "max": 56,
+      "step": 4,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon size",
+      "min": 18,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Card title size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "desc_size",
+      "label": "Card description size",
+      "min": 12,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Max content width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon (emoji)",
+          "default": "◈",
+          "info": "Paste any emoji or symbol."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Feature title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Describe what makes this feature meaningful — not just what it does, but why it matters."
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Tag pill (optional)",
+          "info": "Short label like 'Lifetime access' or 'Handmade'. Leave blank to hide."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PD — Features",
+      "blocks": [
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "◈",
+            "title": "AR-powered memory",
+            "description": "Scan with any camera app — no download needed on iPhone. One tap and the moment plays. Powered by Stories AR, stored for life.",
+            "tag": "Lifetime access"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "◉",
+            "title": "Premium frame finishes",
+            "description": "Four finishes — Classic Black, Grande Black, Oakwood Depth, Metal Slim. Fibreboard frame with shatter-safe clear front. Built to hang for decades.",
+            "tag": ""
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "◇",
+            "title": "Handcrafted packaging",
+            "description": "Arrives in kraft tissue with a branded stamp, foam protection, a personal insert card, and a wax-seal sticker. The unboxing is part of the gift.",
+            "tag": ""
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "◎",
+            "title": "Made for you, only",
+            "description": "Every frame is made to order. Your photo. Your video. Your memory. Nothing off-the-shelf. Nothing generic.",
+            "tag": "Fully personalised"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

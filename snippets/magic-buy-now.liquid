@@ -1,0 +1,253 @@
+{% comment %}
+  Support script for the custom "Buy it now" button in snippets/buy-buttons.liquid.
+
+  - Razorpay Magic Checkout (magic-shopify.js) opens its Buy Now flow for any click on
+    .rzp-magic-btn__buy-product. Before opening, it calls window.customMagicAddToCart(event)
+    when defined; we use it to add exactly the variant/quantity/properties of the form the
+    button belongs to (works on product page, featured product and quick-add popups).
+  - Easify Product Options (photo upload etc.) only validates its required fields on Add to
+    cart, so Buy it now clicks are checked here first (same rules Easify uses: inputs with
+    data-required="1" that are visible must have a value, and no Easify error may be showing).
+  - Easify only renders its options (photo upload) on the product page, not in the quick-add
+    popup or other product blocks. For products that have an Easify option set, forms without
+    the Easify fields show a "Personalise" button that opens the product page instead of
+    Add to cart / Buy it now.
+  - Keeps the Buy it now button disabled/enabled in sync with the Add to cart button.
+  - The cart page redirects to /?viewcart=true (layout/theme.liquid); the theme cart drawer
+    is opened for that param.
+{% endcomment %}
+<style>
+  .tpo_option-container.lux-required-missing {
+    box-shadow: 0 0 0 2px #d72c0d;
+    border-radius: 6px;
+  }
+  product-form.lux-needs-personalise .product-form__submit,
+  product-form.lux-needs-personalise .product-form__buy-now,
+  product-form:not(.lux-needs-personalise) .lux-personalise-button {
+    display: none !important;
+  }
+</style>
+<script>
+  (function () {
+    if (window.__luxMagicBuyNow) return;
+    window.__luxMagicBuyNow = true;
+
+    var BUY_NOW = '.rzp-magic-btn__buy-product';
+    var ERROR_TEXT = 'Please upload your photo and fill in all required options before buying.';
+    var PERSONALISE_TEXT = 'Personalise & upload photo';
+
+    // Products that have an Easify option set (from the Easify app embed config).
+    function isCustomisable(productForm) {
+      var sets = (window.TPOConfigs && window.TPOConfigs.product_options_easify) || [];
+      var id = productForm.dataset.productId;
+      var handle = productForm.dataset.productHandle;
+      return sets.some(function (entry) {
+        var set = (entry && entry.option_set) || {};
+        if (set.status === 0) return false;
+        var byId = (set.option_set_products || []).some(function (p) {
+          return String(p.product_id).split('/').pop() === id;
+        });
+        if (byId) return true;
+        try {
+          return JSON.parse(set.products_handle || '[]').indexOf(handle) !== -1;
+        } catch (e) {
+          return false;
+        }
+      });
+    }
+
+    function hasEasifyFields(productForm) {
+      var scope = productForm.closest('quick-add-modal') || productForm.closest('.shopify-section') || document;
+      return !!scope.querySelector('.tpo_option-set-wrapper, .tpo_option-set-container');
+    }
+
+    function needsPersonalise(productForm) {
+      return !!productForm && !!productForm.dataset.productUrl && isCustomisable(productForm) && !hasEasifyFields(productForm);
+    }
+
+    function applyPersonalise(productForm) {
+      if (productForm.closest('quick-add-modal') == null || !needsPersonalise(productForm)) return;
+      var buttons = productForm.querySelector('.product-form__buttons');
+      if (!buttons) return;
+      if (!buttons.querySelector('.lux-personalise-button')) {
+        var link = document.createElement('a');
+        link.href = productForm.dataset.productUrl;
+        link.className = 'lux-personalise-button button button--full-width button--primary';
+        link.textContent = PERSONALISE_TEXT;
+        buttons.appendChild(link);
+      }
+      productForm.classList.add('lux-needs-personalise');
+    }
+
+    // Quick-add popup content is injected after page load; swap its buttons once it appears.
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        mutation.addedNodes.forEach(function (node) {
+          if (node.nodeType !== 1) return;
+          var forms = node.matches && node.matches('product-form') ? [node] : node.querySelectorAll ? node.querySelectorAll('product-form') : [];
+          Array.prototype.forEach.call(forms, applyPersonalise);
+        });
+      });
+    }).observe(document.documentElement, { childList: true, subtree: true });
+
+    // Safety net anywhere else (e.g. featured product blocks): a customisable product without
+    // the Easify fields goes to its product page instead of being added without a photo.
+    window.addEventListener(
+      'click',
+      function (event) {
+        var button = event.target && event.target.closest && event.target.closest('.product-form__submit, ' + BUY_NOW);
+        if (!button) return;
+        var productForm = button.closest('product-form');
+        if (!needsPersonalise(productForm)) return;
+        // Already on this product's page (Easify still loading): let Easify handle it.
+        if (new URL(productForm.dataset.productUrl, window.location.origin).pathname === window.location.pathname) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        window.location.href = productForm.dataset.productUrl;
+      },
+      true
+    );
+
+    function isHiddenOption(el) {
+      var container = el.closest('.tpo_option-container');
+      while (container) {
+        if (container.classList.contains('tpo_hidden')) return true;
+        container = container.parentElement && container.parentElement.closest('.tpo_option-container');
+      }
+      return false;
+    }
+
+    function optionScope(form) {
+      return form.closest('.product, .product__info-wrapper, section, .shopify-section') || document;
+    }
+
+    function findMissingOptions(form) {
+      var scope = optionScope(form);
+      var fields = Array.from(form.elements || []);
+      scope.querySelectorAll('.tpo_option-set-wrapper input, .tpo_option-set-wrapper textarea, .tpo_option-set-wrapper select').forEach(function (el) {
+        if (fields.indexOf(el) === -1) fields.push(el);
+      });
+
+      var missing = fields.filter(function (el) {
+        if (el.tagName === 'BUTTON' || el.dataset.required !== '1' || el.disabled) return false;
+        if (String(el.className).indexOf('tpo') === -1 || isHiddenOption(el)) return false;
+        return el.type === 'checkbox' ? !el.checked : el.value === '';
+      });
+
+      scope.querySelectorAll('.tpo_error-message, .tpo-quantity-error').forEach(function (el) {
+        if (el.innerHTML.trim() !== '' && !isHiddenOption(el)) missing.push(el);
+      });
+
+      return missing;
+    }
+
+    function showMissing(button, missing) {
+      var productForm = button.closest('product-form');
+      var wrapper = productForm && productForm.querySelector('.product-form__error-message-wrapper');
+      var message = wrapper && wrapper.querySelector('.product-form__error-message');
+      if (wrapper && message) {
+        message.textContent = ERROR_TEXT;
+        wrapper.removeAttribute('hidden');
+      } else {
+        alert(ERROR_TEXT);
+      }
+
+      var containers = [];
+      missing.forEach(function (el) {
+        var container = el.closest('.tpo_option-container');
+        if (container && containers.indexOf(container) === -1) containers.push(container);
+      });
+      containers.forEach(function (container) {
+        container.classList.add('lux-required-missing');
+        container.addEventListener('change', function () {
+          container.classList.remove('lux-required-missing');
+        }, { once: true });
+      });
+      var first = containers[0] || missing[0];
+      if (first && first.scrollIntoView) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Capture phase on window runs before Razorpay's click handler, so an incomplete
+    // customisation never reaches Magic Checkout.
+    window.addEventListener(
+      'click',
+      function (event) {
+        var button = event.target && event.target.closest && event.target.closest(BUY_NOW);
+        if (!button) return;
+        var form = button.closest('form');
+        if (!form) return;
+
+        var missing = findMissingOptions(form);
+        if (!missing.length) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        showMissing(button, missing);
+      },
+      true
+    );
+
+    window.customMagicAddToCart = function (event) {
+      var target = event && event.target;
+      var form = (target && target.closest && target.closest('form')) || document.querySelector('form[action*="/cart/add"]');
+      if (!form) return Promise.reject('Product form not found');
+
+      var formData = new FormData(form);
+      // Drop empty option properties (same clean-up Easify does before adding to cart).
+      Array.from(formData.keys()).forEach(function (key) {
+        if (key.indexOf('properties[') !== 0) return;
+        var value = formData.get(key);
+        var isEmptyFile = typeof File !== 'undefined' && value instanceof File && !value.name && !value.size;
+        if (isEmptyFile || (typeof value === 'string' && (value.trim() === '' || value.trim() === '{}' || (key === 'properties[_tpo_price]' && value.trim() === '0')))) {
+          formData.delete(key);
+        }
+      });
+
+      var addUrl = ((window.routes && window.routes.cart_add_url) || '/cart/add') + '.js';
+
+      return fetch(addUrl, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData,
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          if (data.status) return Promise.reject(data.description || data.message || 'Could not add product');
+          return data.items ? data : { items: [data] };
+        });
+    };
+
+    function syncBuyNow(submitButton) {
+      var wrapper = submitButton.closest('.product-form__buttons');
+      var buyNow = wrapper && wrapper.querySelector('.product-form__buy-now');
+      if (!buyNow) return;
+      buyNow.toggleAttribute('disabled', submitButton.hasAttribute('disabled'));
+    }
+
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        if (mutation.target.classList && mutation.target.classList.contains('product-form__submit')) {
+          syncBuyNow(mutation.target);
+        }
+      });
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['disabled'], subtree: true });
+
+    // Coming from the cart page redirect: open the theme cart drawer.
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('viewcart') === 'true') {
+      params.delete('viewcart');
+      var query = params.toString();
+      window.history.replaceState(window.history.state, '', window.location.pathname + (query ? '?' + query : '') + window.location.hash);
+
+      window.addEventListener('load', function () {
+        var drawer = document.querySelector('cart-drawer');
+        if (drawer && typeof drawer.open === 'function') drawer.open();
+      });
+    }
+  })();
+</script>

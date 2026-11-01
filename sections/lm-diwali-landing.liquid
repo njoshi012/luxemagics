@@ -1,0 +1,988 @@
+{%- comment -%}
+  Luxe Magics — Diwali landing page section (emotion-led, combo pricing)
+  File: sections/lm-diwali-landing.liquid
+  Usage: Online Store > Themes > Customize > (page template "page.diwali") > Add section > "LM Diwali Landing"
+  Everything is editable in the theme editor: colours, copy, moments, combos, steps, reviews, FAQs.
+
+  Combo pricing: in each Combo block, list one item per line as  Item name | price
+  e.g.  3 magnetic bookmarks | 399
+  The section adds the item prices, shows that total struck through, then the combo price and the saving.
+  Use your real single-item prices so the "separately" total is honest.
+{%- endcomment -%}
+
+{%- style -%}
+  #lm-dw-{{ section.id }} {
+    --lm-dw-brand: {{ section.settings.brand_color }};
+    --lm-dw-bg: {{ section.settings.bg_color }};
+    --lm-dw-accent: {{ section.settings.accent_color }};
+    --lm-dw-ink: {{ section.settings.text_color }};
+    --lm-dw-card: {{ section.settings.card_color }};
+    --lm-dw-btn-ink: {{ section.settings.button_text_color }};
+  }
+{%- endstyle -%}
+
+<div id="lm-dw-{{ section.id }}" class="lm-dw" {{ section.shopify_attributes }}>
+
+  {%- comment -%} ===== HERO ===== {%- endcomment -%}
+  <header class="lm-dw__hero">
+    <div class="lm-dw__wrap lm-dw__hero-grid">
+      <div class="lm-dw__hero-copy">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="lm-dw__eyebrow">{{ section.settings.eyebrow }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h1 class="lm-dw__h1">{{ section.settings.heading }}</h1>
+        {%- endif -%}
+        {%- if section.settings.subheading != blank -%}
+          <p class="lm-dw__lead">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+        <div class="lm-dw__ctas">
+          {%- if section.settings.cta1_label != blank -%}
+            <a class="lm-dw__btn lm-dw__btn--primary" href="{{ section.settings.cta1_link | default: '#lm-dw-boxes' }}">{{ section.settings.cta1_label }}</a>
+          {%- endif -%}
+          {%- if section.settings.cta2_label != blank -%}
+            <a class="lm-dw__btn lm-dw__btn--ghost" href="{{ section.settings.cta2_link | default: '#lm-dw-moments' }}">{{ section.settings.cta2_label }}</a>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="lm-dw__hero-media">
+        {%- if section.settings.hero_image != blank -%}
+          {{ section.settings.hero_image | image_url: width: 1200 | image_tag: loading: 'eager', class: 'lm-dw__hero-img', sizes: '(min-width: 900px) 45vw, 100vw', alt: section.settings.heading }}
+        {%- else -%}
+          <div class="lm-dw__hero-art" aria-hidden="true">
+            <svg viewBox="0 0 200 200" class="lm-dw__diya">
+              <path d="M28 132 Q100 196 172 132 Z" fill="var(--lm-dw-brand)"/>
+              <ellipse cx="100" cy="132" rx="72" ry="14" fill="var(--lm-dw-brand)"/>
+              <ellipse cx="100" cy="130" rx="60" ry="8" fill="#000" opacity=".12"/>
+              <path class="lm-dw__flame" d="M100 52 C84 84 87 112 100 122 C113 112 116 84 100 52 Z" fill="var(--lm-dw-accent)"/>
+              <path class="lm-dw__flame" d="M100 82 C93 98 94 112 100 117 C106 112 107 98 100 82 Z" fill="#fff" opacity=".85"/>
+            </svg>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </header>
+
+  {%- comment -%} ===== BRAND TRUTH ===== {%- endcomment -%}
+  {%- if section.settings.truth_line != blank -%}
+    <section class="lm-dw__truth">
+      <div class="lm-dw__wrap lm-dw__wrap--narrow">
+        <p class="lm-dw__truth-line">{{ section.settings.truth_line }}</p>
+        {%- if section.settings.truth_text != blank -%}<p class="lm-dw__truth-text">{{ section.settings.truth_text }}</p>{%- endif -%}
+      </div>
+    </section>
+  {%- endif -%}
+
+  {%- comment -%} ===== MOMENTS (WHO IT'S FOR) ===== {%- endcomment -%}
+  {%- assign moment_count = section.blocks | where: 'type', 'moment' | size -%}
+  {%- if moment_count > 0 -%}
+    <section id="lm-dw-moments" class="lm-dw__section" aria-labelledby="lm-dw-moments-title-{{ section.id }}">
+      <div class="lm-dw__wrap">
+        <div class="lm-dw__section-head">
+          <h2 id="lm-dw-moments-title-{{ section.id }}" class="lm-dw__h2">{{ section.settings.moments_heading }}</h2>
+          {%- if section.settings.moments_subheading != blank -%}<p class="lm-dw__sub">{{ section.settings.moments_subheading }}</p>{%- endif -%}
+        </div>
+        <div class="lm-dw__moments">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'moment' -%}
+              <a class="lm-dw__moment" href="{{ block.settings.link | default: '#lm-dw-boxes' }}" {{ block.shopify_attributes }}>
+                {%- if block.settings.image != blank -%}
+                  <span class="lm-dw__moment-media">{{ block.settings.image | image_url: width: 700 | image_tag: loading: 'lazy', sizes: '(min-width: 750px) 30vw, 90vw', alt: block.settings.title }}</span>
+                {%- endif -%}
+                <span class="lm-dw__moment-body">
+                  <span class="lm-dw__moment-title">{{ block.settings.title }}</span>
+                  <span class="lm-dw__moment-text">{{ block.settings.text }}</span>
+                  {%- if block.settings.link_label != blank -%}<span class="lm-dw__moment-link">{{ block.settings.link_label }} →</span>{%- endif -%}
+                </span>
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </section>
+  {%- endif -%}
+
+  {%- comment -%} ===== Build combo cards ===== {%- endcomment -%}
+  {%- assign combo_cards = '' -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'combo' -%}
+            {%- assign p = block.settings.product -%}
+            {%- assign box_title = block.settings.title | default: p.title -%}
+            {%- assign box_link = block.settings.link | default: p.url | default: '#' -%}
+
+            {%- comment -%} Combo price in rupees: setting first, else product price {%- endcomment -%}
+            {%- assign combo_price = 0 -%}
+            {%- if block.settings.combo_price != blank -%}
+              {%- assign combo_price = block.settings.combo_price | plus: 0 -%}
+            {%- elsif p != blank -%}
+              {%- assign combo_price = p.price | divided_by: 100 -%}
+            {%- endif -%}
+
+            {%- comment -%} Sum the single-item prices {%- endcomment -%}
+            {%- assign separate_total = 0 -%}
+            {%- assign lines = block.settings.items | newline_to_br | split: '<br />' -%}
+
+            {%- capture card_html -%}
+            <article class="lm-dw__box{% if block.settings.highlight %} lm-dw__box--featured{% endif %}" {{ block.shopify_attributes }}>
+              {%- if block.settings.badge != blank -%}<span class="lm-dw__badge">{{ block.settings.badge }}</span>{%- endif -%}
+              <a class="lm-dw__box-media" href="{{ box_link }}" tabindex="-1" aria-hidden="true">
+                {%- if block.settings.image != blank -%}
+                  {{ block.settings.image | image_url: width: 800 | image_tag: loading: 'lazy', sizes: '(min-width: 900px) 30vw, 90vw', alt: box_title }}
+                {%- elsif p.featured_image != blank -%}
+                  {{ p.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', sizes: '(min-width: 900px) 30vw, 90vw', alt: box_title }}
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'lm-dw__placeholder' }}
+                {%- endif -%}
+              </a>
+              <div class="lm-dw__box-body">
+                <h3 class="lm-dw__h3"><a href="{{ box_link }}">{{ box_title }}</a></h3>
+                {%- if block.settings.feeling != blank -%}<p class="lm-dw__feeling">{{ block.settings.feeling }}</p>{%- endif -%}
+
+                <ul class="lm-dw__items">
+                  {%- for line in lines -%}
+                    {%- assign clean = line | strip -%}
+                    {%- if clean != blank -%}
+                      {%- assign parts = clean | split: '|' -%}
+                      {%- assign item_name = parts[0] | strip -%}
+                      {%- assign item_price = 0 -%}
+                      {%- assign item_free = false -%}
+                      {%- assign price_word = parts[1] | strip | downcase -%}
+                      {%- if price_word == 'free' -%}{%- assign item_free = true -%}{%- endif -%}
+                      {%- if parts.size > 1 and item_free == false -%}
+                        {%- assign item_price = parts[1] | strip | remove: '₹' | remove: ',' | remove: 'Rs.' | remove: 'Rs' | strip | plus: 0 -%}
+                      {%- endif -%}
+                      {%- assign separate_total = separate_total | plus: item_price -%}
+                      <li>
+                        <span class="lm-dw__item-name">{{ item_name }}</span>
+                        {%- if item_free -%}<span class="lm-dw__item-free">{{ section.settings.free_label }}</span>{%- elsif item_price > 0 -%}<span class="lm-dw__item-price">{{ item_price | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span>{%- endif -%}
+                      </li>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </ul>
+
+                <div class="lm-dw__deal">
+                  {%- if separate_total > combo_price and combo_price > 0 -%}
+                    {%- assign saving = separate_total | minus: combo_price -%}
+                    <p class="lm-dw__deal-row">
+                      <span class="lm-dw__deal-label">{{ section.settings.separately_label }}</span>
+                      <s class="lm-dw__was">{{ separate_total | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</s>
+                    </p>
+                    <p class="lm-dw__deal-row lm-dw__deal-row--main">
+                      <span class="lm-dw__deal-label">{{ section.settings.together_label }}</span>
+                      <span class="lm-dw__now">{{ combo_price | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span>
+                    </p>
+                    <p class="lm-dw__save">{{ section.settings.save_prefix }} {{ saving | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</p>
+                  {%- elsif combo_price > 0 -%}
+                    <p class="lm-dw__deal-row lm-dw__deal-row--main">
+                      <span class="lm-dw__deal-label">{{ section.settings.together_label }}</span>
+                      <span class="lm-dw__now">{{ combo_price | times: 100 | money_without_trailing_zeros | replace: 'Rs. ', '₹' | replace: 'Rs.', '₹' }}</span>
+                    </p>
+                  {%- endif -%}
+                </div>
+
+                <a class="lm-dw__btn lm-dw__btn--primary lm-dw__btn--block" href="{{ box_link }}">{{ block.settings.button_label }}<span class="lm-dw__sr">: {{ box_title }}</span></a>
+              </div>
+            </article>
+            {%- endcapture -%}
+            {%- assign combo_cards = combo_cards | append: card_html -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- comment -%} ===== COMBO BOXES ===== {%- endcomment -%}
+  <section id="lm-dw-boxes" class="lm-dw__section lm-dw__section--tint" aria-labelledby="lm-dw-boxes-title-{{ section.id }}">
+    <div class="lm-dw__wrap">
+      <div class="lm-dw__section-head">
+        <h2 id="lm-dw-boxes-title-{{ section.id }}" class="lm-dw__h2">{{ section.settings.boxes_heading }}</h2>
+        {%- if section.settings.boxes_subheading != blank -%}<p class="lm-dw__sub">{{ section.settings.boxes_subheading }}</p>{%- endif -%}
+      </div>
+
+      <div class="lm-dw__box-grid">
+        {{ combo_cards }}
+      </div>
+    </div>
+  </section>
+
+  {%- comment -%} ===== HOW IT BECOMES THEIRS ===== {%- endcomment -%}
+  {%- assign step_count = section.blocks | where: 'type', 'step' | size -%}
+  {%- if step_count > 0 -%}
+    <section class="lm-dw__section" aria-labelledby="lm-dw-steps-title-{{ section.id }}">
+      <div class="lm-dw__wrap">
+        <h2 id="lm-dw-steps-title-{{ section.id }}" class="lm-dw__h2">{{ section.settings.steps_heading }}</h2>
+        <ol class="lm-dw__steps">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'step' -%}
+              <li class="lm-dw__step" {{ block.shopify_attributes }}>
+                <h3 class="lm-dw__h3">{{ block.settings.title }}</h3>
+                <p>{{ block.settings.text }}</p>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ol>
+      </div>
+    </section>
+  {%- endif -%}
+
+  {%- comment -%} ===== MESSAGE BAND ===== {%- endcomment -%}
+  {%- if section.settings.band_heading != blank -%}
+    <section class="lm-dw__band" aria-labelledby="lm-dw-band-title-{{ section.id }}">
+      <div class="lm-dw__wrap lm-dw__wrap--narrow lm-dw__band-inner">
+        <h2 id="lm-dw-band-title-{{ section.id }}" class="lm-dw__h2">{{ section.settings.band_heading }}</h2>
+        {%- if section.settings.band_text != blank -%}<p>{{ section.settings.band_text }}</p>{%- endif -%}
+        {%- if section.settings.band_button_label != blank -%}
+          <a class="lm-dw__btn lm-dw__btn--light" href="{{ section.settings.band_button_link | default: '#lm-dw-boxes' }}">{{ section.settings.band_button_label }}</a>
+        {%- endif -%}
+      </div>
+    </section>
+  {%- endif -%}
+
+  {%- comment -%} ===== REVIEWS ===== {%- endcomment -%}
+  {%- assign review_count = section.blocks | where: 'type', 'review' | size -%}
+  {%- if review_count > 0 -%}
+    <section class="lm-dw__section" aria-labelledby="lm-dw-reviews-title-{{ section.id }}">
+      <div class="lm-dw__wrap">
+        <h2 id="lm-dw-reviews-title-{{ section.id }}" class="lm-dw__h2">{{ section.settings.reviews_heading }}</h2>
+        <div class="lm-dw__reviews">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'review' -%}
+              <figure class="lm-dw__review" {{ block.shopify_attributes }}>
+                <blockquote>“{{ block.settings.quote }}”</blockquote>
+                <figcaption>{{ block.settings.name }}{% if block.settings.city != blank %}, {{ block.settings.city }}{% endif %}</figcaption>
+              </figure>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </section>
+  {%- endif -%}
+
+  {%- comment -%} ===== FAQ ===== {%- endcomment -%}
+  {%- assign faq_count = section.blocks | where: 'type', 'faq' | size -%}
+  {%- if faq_count > 0 -%}
+    <section class="lm-dw__section lm-dw__section--tint" aria-labelledby="lm-dw-faq-title-{{ section.id }}">
+      <div class="lm-dw__wrap lm-dw__wrap--narrow">
+        <h2 id="lm-dw-faq-title-{{ section.id }}" class="lm-dw__h2">{{ section.settings.faq_heading }}</h2>
+        <div class="lm-dw__faqs">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'faq' -%}
+              <details class="lm-dw__faq" {{ block.shopify_attributes }}>
+                <summary>{{ block.settings.question }}</summary>
+                <div class="lm-dw__rte">{{ block.settings.answer }}</div>
+              </details>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    </section>
+
+    {%- if section.settings.faq_schema -%}
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {%- assign lm_first = true -%}
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'faq' and block.settings.question != blank -%}
+                {%- unless lm_first -%},{%- endunless -%}
+                {
+                  "@type": "Question",
+                  "name": {{ block.settings.question | json }},
+                  "acceptedAnswer": { "@type": "Answer", "text": {{ block.settings.answer | strip_html | json }} }
+                }
+                {%- assign lm_first = false -%}
+              {%- endif -%}
+            {%- endfor -%}
+          ]
+        }
+      </script>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- if section.settings.closing_line != blank -%}
+    <p class="lm-dw__closing">{{ section.settings.closing_line }}</p>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .lm-dw { background: var(--lm-dw-bg); color: var(--lm-dw-ink); line-height: 1.55; overflow-x: hidden; }
+  .lm-dw *, .lm-dw *::before, .lm-dw *::after { box-sizing: border-box; }
+  .lm-dw__sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; padding: 0; }
+  .lm-dw__wrap { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+  .lm-dw__wrap--narrow { max-width: 760px; }
+
+  .lm-dw__eyebrow { display: inline-block; margin: 0 0 14px; padding: 6px 12px; border-radius: 999px; background: color-mix(in srgb, var(--lm-dw-accent) 18%, transparent); color: var(--lm-dw-ink); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+  .lm-dw__h1 { margin: 0 0 16px; font-size: clamp(34px, 5.4vw, 60px); line-height: 1.05; letter-spacing: -.02em; }
+  .lm-dw__h2 { margin: 0 0 10px; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.15; letter-spacing: -.01em; }
+  .lm-dw__h3 { margin: 0 0 6px; font-size: 20px; line-height: 1.25; }
+  .lm-dw__h3 a { color: inherit; text-decoration: none; }
+  .lm-dw__lead { margin: 0 0 26px; font-size: clamp(17px, 1.8vw, 20px); max-width: 36ch; opacity: .85; }
+  .lm-dw__sub { margin: 0; opacity: .75; max-width: 60ch; }
+
+  .lm-dw__btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 24px; border-radius: 999px; font-weight: 600; font-size: 16px; text-decoration: none; transition: transform .15s ease; border: 2px solid transparent; }
+  .lm-dw__btn:hover { transform: translateY(-1px); }
+  .lm-dw__btn:focus-visible, .lm-dw__moment:focus-visible, .lm-dw__faq summary:focus-visible { outline: 3px solid var(--lm-dw-accent); outline-offset: 3px; }
+  .lm-dw__btn--primary { background: var(--lm-dw-brand); color: var(--lm-dw-btn-ink); box-shadow: 0 6px 18px color-mix(in srgb, var(--lm-dw-brand) 35%, transparent); }
+  .lm-dw__btn--ghost { border-color: var(--lm-dw-ink); color: var(--lm-dw-ink); }
+  .lm-dw__btn--light { background: #fff; color: var(--lm-dw-ink); }
+  .lm-dw__btn--block { width: 100%; margin-top: 18px; }
+  .lm-dw__ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .lm-dw__hero { padding: 40px 0; background: radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--lm-dw-accent) 22%, transparent), transparent 55%); }
+  .lm-dw__hero-grid { display: grid; gap: 28px; align-items: center; }
+  .lm-dw__hero-img { width: 100%; height: auto; border-radius: 24px; display: block; }
+  .lm-dw__hero-art { aspect-ratio: 1; max-width: 420px; margin: 0 auto; border-radius: 50%; background: color-mix(in srgb, var(--lm-dw-brand) 12%, var(--lm-dw-card)); display: grid; place-items: center; }
+  .lm-dw__diya { width: 64%; }
+  .lm-dw__flame { transform-origin: 100px 122px; animation: lm-dw-flicker 2.4s ease-in-out infinite; }
+  @keyframes lm-dw-flicker { 0%,100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.06,.95) rotate(-2deg); } }
+  @media (prefers-reduced-motion: reduce) { .lm-dw__flame { animation: none; } .lm-dw__btn { transition: none; } }
+
+  .lm-dw__truth { padding: 40px 0 8px; text-align: center; }
+  .lm-dw__truth-line { margin: 0 0 12px; font-size: clamp(22px, 3vw, 32px); line-height: 1.3; font-style: italic; }
+  .lm-dw__truth-text { margin: 0 auto; max-width: 52ch; opacity: .8; }
+
+  .lm-dw__section { padding: 56px 0; }
+  .lm-dw__section--tint { background: color-mix(in srgb, var(--lm-dw-accent) 9%, var(--lm-dw-bg)); }
+  .lm-dw__section-head { margin-bottom: 28px; }
+
+  .lm-dw__moments { display: grid; gap: 16px; }
+  .lm-dw__moment { display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--lm-dw-card); color: var(--lm-dw-ink); text-decoration: none; box-shadow: 0 2px 14px rgba(0,0,0,.05); transition: transform .15s ease; }
+  .lm-dw__moment:hover { transform: translateY(-2px); }
+  .lm-dw__moment-media img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+  .lm-dw__moment-body { display: flex; flex-direction: column; gap: 8px; padding: 22px; border-top: 4px solid var(--lm-dw-accent); }
+  .lm-dw__moment-title { font-size: 19px; font-weight: 700; line-height: 1.3; }
+  .lm-dw__moment-text { opacity: .8; }
+  .lm-dw__moment-link { margin-top: 4px; font-weight: 600; color: var(--lm-dw-ink); text-decoration: underline; text-decoration-color: var(--lm-dw-brand); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+  .lm-dw__box-grid { display: grid; gap: 20px; }
+  .lm-dw__box { position: relative; display: flex; flex-direction: column; background: var(--lm-dw-card); border-radius: 20px; overflow: hidden; box-shadow: 0 2px 14px rgba(0,0,0,.06); }
+  .lm-dw__box--featured { outline: 2px solid var(--lm-dw-brand); }
+  .lm-dw__badge { position: absolute; top: 14px; left: 14px; z-index: 1; padding: 5px 12px; border-radius: 999px; background: var(--lm-dw-ink); color: #fff; font-size: 12px; font-weight: 600; letter-spacing: .03em; }
+  .lm-dw__box-media { display: block; aspect-ratio: 4 / 3; background: color-mix(in srgb, var(--lm-dw-brand) 8%, var(--lm-dw-bg)); }
+  .lm-dw__box-media img, .lm-dw__box-media svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .lm-dw__box-body { display: flex; flex-direction: column; flex: 1; padding: 20px; }
+  .lm-dw__feeling { margin: 0 0 14px; font-style: italic; opacity: .8; }
+  .lm-dw__items { margin: 0 0 16px; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 15px; }
+  .lm-dw__items li { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 8px; border-bottom: 1px dashed color-mix(in srgb, var(--lm-dw-ink) 15%, transparent); }
+  .lm-dw__item-name { position: relative; padding-left: 20px; }
+  .lm-dw__item-name::before { content: ""; position: absolute; left: 3px; top: .55em; width: 8px; height: 8px; border-radius: 50%; background: var(--lm-dw-accent); }
+  .lm-dw__item-price { white-space: nowrap; opacity: .6; font-variant-numeric: tabular-nums; }
+  .lm-dw__item-free { align-self: flex-start; flex-shrink: 0; line-height: 1.6; white-space: nowrap; padding: 1px 8px; border-radius: 999px; background: var(--lm-dw-accent); color: var(--lm-dw-ink); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+
+  .lm-dw__deal { margin-top: auto; padding: 14px 16px; border-radius: 14px; background: color-mix(in srgb, var(--lm-dw-brand) 8%, var(--lm-dw-card)); }
+  .lm-dw__deal-row { display: flex; justify-content: space-between; align-items: baseline; margin: 0; }
+  .lm-dw__deal-row + .lm-dw__deal-row { margin-top: 4px; }
+  .lm-dw__deal-label { font-size: 14px; opacity: .75; }
+  .lm-dw__was { opacity: .6; font-variant-numeric: tabular-nums; }
+  .lm-dw__deal-row--main .lm-dw__deal-label { opacity: 1; font-weight: 600; }
+  .lm-dw__now { font-size: 26px; font-weight: 700; color: var(--lm-dw-ink); font-variant-numeric: tabular-nums; }
+  .lm-dw__save { margin: 8px 0 0; display: inline-block; padding: 4px 10px; border-radius: 999px; background: var(--lm-dw-accent); color: var(--lm-dw-ink); font-size: 13px; font-weight: 700; }
+
+  .lm-dw__steps { list-style: none; counter-reset: lmstep; margin: 24px 0 0; padding: 0; display: grid; gap: 16px; }
+  .lm-dw__step { counter-increment: lmstep; position: relative; padding: 20px 20px 20px 72px; border-radius: 16px; background: var(--lm-dw-card); }
+  .lm-dw__step::before { content: counter(lmstep); position: absolute; left: 20px; top: 18px; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--lm-dw-brand); color: var(--lm-dw-btn-ink); font-weight: 700; }
+  .lm-dw__step p { margin: 0; opacity: .8; }
+
+  .lm-dw__band { padding: 56px 0; background: var(--lm-dw-brand); color: var(--lm-dw-btn-ink); text-align: center; }
+  .lm-dw__band-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .lm-dw__band p { margin: 0; opacity: .92; max-width: 50ch; }
+
+  .lm-dw__reviews { display: grid; gap: 16px; margin-top: 24px; }
+  .lm-dw__review { margin: 0; padding: 22px; border-radius: 16px; background: var(--lm-dw-card); }
+  .lm-dw__review blockquote { margin: 0 0 12px; font-size: 17px; }
+  .lm-dw__review figcaption { font-size: 14px; font-weight: 600; opacity: .7; }
+
+  .lm-dw__faqs { margin-top: 20px; display: grid; gap: 10px; }
+  .lm-dw__faq { border-radius: 14px; background: var(--lm-dw-card); }
+  .lm-dw__faq summary { cursor: pointer; list-style: none; padding: 16px 48px 16px 18px; font-weight: 600; position: relative; border-radius: 14px; }
+  .lm-dw__faq summary::-webkit-details-marker { display: none; }
+  .lm-dw__faq summary::after { content: "+"; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 22px; color: var(--lm-dw-brand); }
+  .lm-dw__faq[open] summary::after { content: "–"; }
+  .lm-dw__faq .lm-dw__rte { padding: 0 18px 16px; opacity: .85; }
+  .lm-dw__rte p { margin: 0 0 8px; }
+
+  .lm-dw__closing { margin: 0; padding: 40px 20px 56px; text-align: center; font-size: clamp(18px, 2.2vw, 24px); font-style: italic; opacity: .8; }
+
+  @media (max-width: 899px) { .lm-dw__hero-art { max-width: 220px; } .lm-dw__hero-media { order: -1; } }
+  @media (min-width: 750px) {
+    .lm-dw__moments { grid-template-columns: repeat(2, 1fr); }
+    .lm-dw__box-grid { grid-template-columns: repeat(2, 1fr); }
+    .lm-dw__steps { grid-template-columns: repeat(3, 1fr); }
+    .lm-dw__reviews { grid-template-columns: repeat(3, 1fr); }
+    }
+  @media (min-width: 1100px) { .lm-dw__box-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 900px) {
+    .lm-dw__hero { padding: 72px 0 56px; }
+    .lm-dw__hero-grid { grid-template-columns: 1.1fr .9fr; gap: 48px; }
+    .lm-dw__section { padding: 80px 0; }
+    .lm-dw__moments { grid-template-columns: repeat(4, 1fr); }
+        }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "LM Diwali Landing",
+  "tag": "section",
+  "class": "lm-dw-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colours"
+    },
+    {
+      "type": "color",
+      "id": "brand_color",
+      "label": "Brand (buttons, prices)",
+      "default": "#F26B6C"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Diwali accent (gold)",
+      "default": "#E9A23B"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Page background",
+      "default": "#FFF8F0"
+    },
+    {
+      "type": "color",
+      "id": "card_color",
+      "label": "Card background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#1A1A1A",
+      "info": "Keep dark text on coral so it stays readable."
+    },
+    {
+      "type": "header",
+      "content": "Hero"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Diwali 2026"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "This Diwali, give them a memory, not just a gift"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Sweets get eaten. Lights come down. A gift with their name, their story or your voice stays long after the last diya goes out."
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero image",
+      "info": "Leave empty to show the animated diya."
+    },
+    {
+      "type": "text",
+      "id": "cta1_label",
+      "label": "Primary button",
+      "default": "Find their gift"
+    },
+    {
+      "type": "url",
+      "id": "cta1_link",
+      "label": "Primary button link",
+      "info": "Empty = scrolls to the combos"
+    },
+    {
+      "type": "text",
+      "id": "cta2_label",
+      "label": "Secondary button",
+      "default": "Who are you gifting?"
+    },
+    {
+      "type": "url",
+      "id": "cta2_link",
+      "label": "Secondary button link",
+      "info": "Empty = scrolls to the moments"
+    },
+    {
+      "type": "header",
+      "content": "Brand truth"
+    },
+    {
+      "type": "text",
+      "id": "truth_line",
+      "label": "Line",
+      "default": "We live in a world where we capture everything but remember nothing."
+    },
+    {
+      "type": "textarea",
+      "id": "truth_text",
+      "label": "Text",
+      "default": "Thousands of photos sit in our phones, unseen. So we make small things you can hold, keep and come back to: their name on a notepad, their fandom in a bookmark, your video inside a frame."
+    },
+    {
+      "type": "header",
+      "content": "Moments"
+    },
+    {
+      "type": "text",
+      "id": "moments_heading",
+      "label": "Heading",
+      "default": "Who's on your list this Diwali?"
+    },
+    {
+      "type": "textarea",
+      "id": "moments_subheading",
+      "label": "Subheading",
+      "default": "Start with the person, not the product. Even if that person is you."
+    },
+    {
+      "type": "header",
+      "content": "Combos"
+    },
+    {
+      "type": "text",
+      "id": "boxes_heading",
+      "label": "Heading",
+      "default": "Diwali combos, made to feel personal"
+    },
+    {
+      "type": "textarea",
+      "id": "boxes_subheading",
+      "label": "Subheading",
+      "default": "For the people you love, and one for you. Every combo comes with a free personalised Diwali card and a free sticker set."
+    },
+    {
+      "type": "text",
+      "id": "separately_label",
+      "label": "Label: separate total",
+      "default": "If bought separately"
+    },
+    {
+      "type": "text",
+      "id": "together_label",
+      "label": "Label: combo price",
+      "default": "Together in this combo"
+    },
+    {
+      "type": "text",
+      "id": "save_prefix",
+      "label": "Saving label",
+      "default": "You save"
+    },
+    {
+      "type": "text",
+      "id": "free_label",
+      "label": "Label for free items",
+      "default": "Free"
+    },
+    {
+      "type": "header",
+      "content": "How it becomes theirs"
+    },
+    {
+      "type": "text",
+      "id": "steps_heading",
+      "label": "Heading",
+      "default": "How it becomes theirs"
+    },
+    {
+      "type": "header",
+      "content": "Message band"
+    },
+    {
+      "type": "text",
+      "id": "band_heading",
+      "label": "Heading",
+      "default": "Say the thing you never say out loud"
+    },
+    {
+      "type": "textarea",
+      "id": "band_text",
+      "label": "Text",
+      "default": "Every combo includes a personalised Diwali card. Write the thank-you, the sorry or the I-miss-you. We'll make sure it arrives looking as special as it feels."
+    },
+    {
+      "type": "text",
+      "id": "band_button_label",
+      "label": "Button",
+      "default": "Choose a combo"
+    },
+    {
+      "type": "url",
+      "id": "band_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Reviews"
+    },
+    {
+      "type": "text",
+      "id": "reviews_heading",
+      "label": "Heading",
+      "default": "What people felt when they opened it"
+    },
+    {
+      "type": "header",
+      "content": "FAQ"
+    },
+    {
+      "type": "text",
+      "id": "faq_heading",
+      "label": "Heading",
+      "default": "Questions, answered"
+    },
+    {
+      "type": "checkbox",
+      "id": "faq_schema",
+      "label": "Add FAQ structured data (helps Google and AI search)",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Closing"
+    },
+    {
+      "type": "text",
+      "id": "closing_line",
+      "label": "Closing line",
+      "default": "Happy Diwali from Luxe Magics. May every memory stay bright."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "moment",
+      "name": "Moment",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image (optional)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Who",
+          "default": "For the one who taught you to love books"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Feeling",
+          "default": "A bookmark from their favourite world, so every page reminds them of you."
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label",
+          "default": "See the combo"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "combo",
+      "name": "Combo",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product",
+          "info": "Pick the combo product. The button opens its builder page, and the image, title and price come from it."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image override"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title override"
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge",
+          "default": "Most loved"
+        },
+        {
+          "type": "checkbox",
+          "id": "highlight",
+          "label": "Highlight this combo",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "feeling",
+          "label": "Feeling line",
+          "default": "For the friend who still has your books."
+        },
+        {
+          "type": "textarea",
+          "id": "items",
+          "label": "Items: one per line, as  Item | single price",
+          "info": "One per line as  Item | price. Write  Item | free  for free extras: they show a Free label and don't count in the 'separately' total.",
+          "default": "3 bookmarks you choose | 399\nFridge magnet | 99\nPersonalised Diwali card | free\nSticker set | free"
+        },
+        {
+          "type": "number",
+          "id": "combo_price",
+          "label": "Combo price (₹)",
+          "info": "Leave empty to use the product's price"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button",
+          "default": "Build this combo"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link override"
+        }
+      ]
+    },
+    {
+      "type": "step",
+      "name": "Step",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Think of them"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Pick the combo that feels like them."
+        }
+      ]
+    },
+    {
+      "type": "review",
+      "name": "Review",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "Add a real customer review here."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "default": "Customer name"
+        },
+        {
+          "type": "text",
+          "id": "city",
+          "label": "City",
+          "default": "Hyderabad"
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "name": "FAQ",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Can I add a personal message?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Yes. Every combo includes a personalised Diwali card.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "LM Diwali Landing",
+      "blocks": [
+        {
+          "type": "moment",
+          "settings": {
+            "title": "For the friend who still has your books",
+            "text": "Bookmarks from their favourite fandom, so every chapter they read carries a little of you.",
+            "link_label": "See the Diya combo"
+          }
+        },
+        {
+          "type": "moment",
+          "settings": {
+            "title": "For the sister who makes lists for everything",
+            "text": "A notepad with her name on it, for the plans, the groceries and the dreams she never says out loud.",
+            "link_label": "See the Deepam combo"
+          }
+        },
+        {
+          "type": "moment",
+          "settings": {
+            "title": "For parents who miss the noise at home",
+            "text": "A frame that plays your video when they scan it. Your voice, your laugh, right there on the shelf.",
+            "link_label": "See the Memory combo"
+          }
+        },
+        {
+          "type": "moment",
+          "settings": {
+            "title": "For you, who lit every diya for everyone else",
+            "text": "Diwali is about the people you love, and that includes you. Keep one little thing that is only yours.",
+            "link_label": "See the Me-Time combo"
+          }
+        },
+        {
+          "type": "combo",
+          "settings": {
+            "title": "Diya Combo",
+            "button_label": "Build this combo",
+            "badge": "Little joys",
+            "feeling": "For friends, cousins and every book lover.",
+            "items": "3 bookmarks you choose | 399\nFridge magnet | 99\nPersonalised Diwali card | free\nSticker set | free",
+            "combo_price": 499
+          }
+        },
+        {
+          "type": "combo",
+          "settings": {
+            "title": "Deepam Combo",
+            "button_label": "Build this combo",
+            "badge": "Most loved",
+            "highlight": true,
+            "feeling": "For the sibling, best friend or teacher who shaped you.",
+            "items": "3 bookmarks you choose | 399\nNotepad you choose, with their name | 349\nMemo pad | 199\nPersonalised Diwali card | free\nSticker set | free",
+            "combo_price": 899
+          }
+        },
+        {
+          "type": "combo",
+          "settings": {
+            "title": "Me-Time Combo",
+            "button_label": "Treat yourself",
+            "badge": "Just for you",
+            "feeling": "For the lists, the plans and the dreams you finally write down.",
+            "items": "Notepad printed with your name | 349\nMemo pad | 199\n4 bookmarks you choose | 499\nFridge magnet | 99\nSticker set | free",
+            "combo_price": 749
+          }
+        },
+        {
+          "type": "combo",
+          "settings": {
+            "title": "Memory Combo",
+            "button_label": "Build this combo",
+            "badge": "Plays your video",
+            "feeling": "For parents, partners and first Diwalis away from home.",
+            "items": "AR photo frame with your video | 1299\n2 bookmarks you choose | 279\nPersonalised Diwali card | free\nSticker set | free",
+            "combo_price": 1499
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Pick a combo",
+            "text": "Choose the combo that feels like them, or like you."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Choose what goes inside",
+            "text": "Pick the bookmark designs and notepad they would love, and add their name."
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "We pack it with care",
+            "text": "Packed by hand in Hyderabad, with a free personalised Diwali card and sticker set inside."
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "quote": "Add a real customer review here.",
+            "name": "Customer name",
+            "city": "Hyderabad"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "quote": "Add a real customer review here.",
+            "name": "Customer name",
+            "city": "Bengaluru"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "quote": "Add a real customer review here.",
+            "name": "Customer name",
+            "city": "Pune"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Can I add a personal message?",
+            "answer": "<p>Yes. Every combo includes a personalised Diwali card. Write your message at checkout and we'll print it for you.</p>"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "Can I choose the bookmark designs?",
+            "answer": "<p>Yes. Pick their fandom, from Harry Potter and anime to Disney and coquette, when you choose the combo.</p>"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "How does the AR photo frame work?",
+            "answer": "<p>Point an iPhone camera at the frame and your video plays. On Android, scan it with our free app.</p>"
+          }
+        },
+        {
+          "type": "faq",
+          "settings": {
+            "question": "How do I pay?",
+            "answer": "<p>Pay online with UPI, cards or netbanking. Prepaid orders ship free.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,66 @@
+{% comment %}
+  Offer ribbons for product cards (display only).
+  Offers 1-4 are set in Theme settings > Cart. An offer is on when its ribbon text is set and shows
+  on every product, unless a tag is set, in which case it only shows on products with that tag (case-insensitive).
+  Several offers on one product rotate (CSS only).
+
+  Accepts:
+  - product: {Object} Product object
+  - placement: {String} (optional) 'pdp' for the product page gallery
+
+  Usage:
+  {% render 'offer-ribbons', product: card_product %}
+{% endcomment %}
+
+{%- if settings.offer_ribbons_enable -%}
+  {%- liquid
+    assign product_tags = ''
+    for tag in product.tags
+      assign normalized_tag = tag | strip | downcase
+      assign product_tags = product_tags | append: normalized_tag | append: '|'
+    endfor
+    assign product_tags = product_tags | split: '|'
+
+    assign matched = ''
+    for i in (1..4)
+      assign label_key = 'offer_' | append: i | append: '_label'
+      assign tag_key = 'offer_' | append: i | append: '_tag'
+      assign offer_label = settings[label_key] | strip
+      assign offer_tag = settings[tag_key] | strip | downcase
+      if offer_label != blank
+        if offer_tag == blank or product_tags contains offer_tag
+          assign matched = matched | append: i | append: ','
+        endif
+      endif
+    endfor
+    assign matched = matched | split: ','
+  -%}
+  {%- if matched.size > 0 -%}
+    {%- liquid
+      assign offer_count = matched.size
+      assign speed = settings.offer_ribbon_speed | default: 3
+      assign cycle = speed | times: offer_count
+    -%}
+    {{ 'component-offer-ribbons.css' | asset_url | stylesheet_tag }}
+    <div
+      class="offer-ribbons{% if placement == 'pdp' %} offer-ribbons--pdp{% endif %}{% if offer_count > 1 %} offer-ribbons--rotate offer-ribbons--n{{ offer_count }}{% endif %}"
+      style="--offer-cycle: {{ cycle }}s;"
+    >
+      {%- for n in matched -%}
+        {%- liquid
+          assign label_key = 'offer_' | append: n | append: '_label'
+          assign bg_key = 'offer_' | append: n | append: '_bg'
+          assign text_key = 'offer_' | append: n | append: '_text'
+          assign steps_back = offer_count | minus: forloop.index0 | modulo: offer_count
+          assign delay = steps_back | times: speed
+        -%}
+        <span
+          class="offer-ribbon"
+          style="--ribbon-bg: {{ settings[bg_key] | default: '#000000' }}; --ribbon-fg: {{ settings[text_key] | default: '#ffffff' }}; --offer-delay: -{{ delay }}s;"
+        >
+          {{- settings[label_key] | strip | escape -}}
+        </span>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+{%- endif -%}
